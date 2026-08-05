@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { createClient } from '@supabase/supabase-js'
-import { sendWhatsAppMessage } from '@/lib/wpsent.server'
+import { sendWhatsAppMessage } from '@/lib/whatsapp.server'
 
 export const Route = createFileRoute('/api/public/hooks/send-lessons')({
   server: {

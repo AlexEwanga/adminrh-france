@@ -7,7 +7,7 @@ import { Plus, Search, Edit2, Trash2, Send, ExternalLink, ShieldCheck } from 'lu
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { useServerFn } from '@tanstack/react-start'
-import { testWPSentConnection } from '@/lib/wpsent.server'
+import { testWhatsAppConnection } from '@/lib/whatsapp.server'
 
 export const Route = createFileRoute('/_authenticated/admin')({
   component: AdminPage,
@@ -17,7 +17,8 @@ export const Route = createFileRoute('/_authenticated/admin')({
 function AdminPage() {
   const [testPhone, setTestPhone] = useState('')
   const [isTesting, setIsTesting] = useState(false)
-  const testWPSent = useServerFn(testWPSentConnection)
+  const [activeProvider, setActiveProvider] = useState<'wpsent' | 'callmebot'>('wpsent')
+  const testWhatsApp = useServerFn(testWhatsAppConnection)
 
   const handleTestConnection = async () => {
     if (!testPhone) {
@@ -26,9 +27,9 @@ function AdminPage() {
     }
     setIsTesting(true)
     try {
-      const result = await testWPSent({ data: { phone: testPhone } })
+      const result = await testWhatsApp({ data: { phone: testPhone, provider: activeProvider } })
       if (result.success) {
-        toast.success(result.simulated ? "Simulation réussie (Clé API manquante)" : "Message de test envoyé !")
+        toast.success(result.simulated ? "Simulation réussie (Clé API manquante)" : `Message de test envoyé via ${activeProvider} !`)
       } else {
         toast.error(result.error || "Erreur lors du test")
       }
@@ -44,7 +45,7 @@ function AdminPage() {
       <header className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-[#1E2A4A]">Administration</h1>
-          <p className="text-slate-500">Gérez les messages, les quiz et la configuration WPSent.</p>
+          <p className="text-slate-500">Gérez les messages, les quiz et la configuration WhatsApp (CallMeBot / WPSent).</p>
         </div>
         <div className="flex gap-3">
           <Button variant="outline" className="border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37]/10">
@@ -58,27 +59,59 @@ function AdminPage() {
         </div>
       </header>
 
-      {/* Configuration WPSent Section */}
+      {/* Configuration WhatsApp Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="md:col-span-2">
           <CardHeader>
             <CardTitle className="text-[#1E2A4A] flex items-center gap-2">
               <Send size={20} className="text-[#D4AF37]" />
-              Configuration WPSent
+              Configuration WhatsApp
             </CardTitle>
             <CardDescription>
-              Connectez votre compte WPSent pour envoyer les leçons quotidiennes par WhatsApp.
+              Choisissez et configurez votre solution d'envoi préférée.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="p-4 bg-slate-50 rounded-lg border border-slate-200">
-              <h4 className="font-semibold text-sm mb-2 text-[#1E2A4A]">Instructions :</h4>
-              <ol className="text-sm text-slate-600 list-decimal ml-4 space-y-1">
-                <li>Allez sur votre dashboard <a href="https://wpsent.com" target="_blank" className="text-blue-600 hover:underline flex-inline items-center">WPSent.com <ExternalLink size={12} className="inline ml-1" /></a></li>
-                <li>Récupérez votre <strong>API Key</strong> dans les paramètres.</li>
-                <li>Dans Lovable Cloud, ajoutez un secret nommé <code className="bg-slate-200 px-1 rounded">WPSENT_API_KEY</code>.</li>
-              </ol>
+          <CardContent className="space-y-6">
+            <div className="flex gap-2 p-1 bg-slate-100 rounded-lg w-fit">
+              <Button 
+                variant={activeProvider === 'wpsent' ? 'default' : 'ghost'} 
+                size="sm"
+                className={activeProvider === 'wpsent' ? 'bg-[#1E2A4A]' : ''}
+                onClick={() => setActiveProvider('wpsent')}
+              >
+                WPSent
+              </Button>
+              <Button 
+                variant={activeProvider === 'callmebot' ? 'default' : 'ghost'} 
+                size="sm"
+                className={activeProvider === 'callmebot' ? 'bg-[#1E2A4A]' : ''}
+                onClick={() => setActiveProvider('callmebot')}
+              >
+                CallMeBot (Gratuit)
+              </Button>
             </div>
+
+            {activeProvider === 'wpsent' ? (
+              <div className="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                <h4 className="font-semibold text-sm mb-2 text-[#1E2A4A]">Instructions WPSent :</h4>
+                <ol className="text-sm text-slate-600 list-decimal ml-4 space-y-1">
+                  <li>Allez sur <a href="https://wpsent.com" target="_blank" className="text-blue-600 hover:underline">WPSent.com <ExternalLink size={12} className="inline ml-1" /></a></li>
+                  <li>Récupérez votre <strong>API Key</strong> dans les paramètres.</li>
+                  <li>Dans Lovable Cloud, ajoutez un secret nommé <code className="bg-slate-200 px-1 rounded">WPSENT_API_KEY</code>.</li>
+                </ol>
+              </div>
+            ) : (
+              <div className="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                <h4 className="font-semibold text-sm mb-2 text-[#1E2A4A]">Instructions CallMeBot :</h4>
+                <ol className="text-sm text-slate-600 list-decimal ml-4 space-y-1">
+                  <li>Ajoutez le numéro CallMeBot à vos contacts WhatsApp.</li>
+                  <li>Envoyez <code className="bg-slate-200 px-1 rounded">I allow callmebot to send me messages</code> au +34 621 07 34 86 (ou le numéro indiqué sur le site).</li>
+                  <li>Vous recevrez votre <strong>API Key</strong>.</li>
+                  <li>Dans Lovable Cloud, ajoutez un secret nommé <code className="bg-slate-200 px-1 rounded">CALLMEBOT_API_KEY</code>.</li>
+                  <li>Lien : <a href="https://www.callmebot.com/blog/free-api-whatsapp-messages/" target="_blank" className="text-blue-600 hover:underline">Documentation CallMeBot <ExternalLink size={12} className="inline ml-1" /></a></li>
+                </ol>
+              </div>
+            )}
             
             <div className="flex flex-col sm:flex-row gap-3">
               <div className="flex-1">
@@ -93,7 +126,7 @@ function AdminPage() {
                 disabled={isTesting}
                 className="bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-white"
               >
-                {isTesting ? "Envoi..." : "Tester la connexion"}
+                {isTesting ? "Envoi..." : `Tester ${activeProvider}`}
               </Button>
             </div>
           </CardContent>
