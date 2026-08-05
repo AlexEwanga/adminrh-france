@@ -59,7 +59,7 @@ function AuthPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
             />
-            <Button type="submit" className="w-full bg-[#1E2A4A]" disabled={loading}>
+            <Button type="submit" className="w-full bg-[#1E2A4A] hover:bg-[#1E2A4A]/90" disabled={loading}>
               {loading ? 'Connexion...' : 'Se connecter'}
             </Button>
           </form>
