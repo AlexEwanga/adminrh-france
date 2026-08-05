@@ -4,37 +4,47 @@ import { z } from "zod";
 const CALLMEBOT_API_URL = "https://api.callmebot.com/whatsapp.php";
 
 export async function sendWhatsAppMessage(phoneNumber: string, message: string) {
+  // Read key inside the function to ensure we get the latest value from Lovable Cloud
   const callmebotApiKey = process.env['CALLMEBOT_API_KEY'];
   
   if (!callmebotApiKey) {
-    console.log("[WhatsApp Simulation] No API Key found. Logging message:");
+    console.log("[WhatsApp Simulation] CALLMEBOT_API_KEY is missing in env. Logging to console:");
     console.log(`To: ${phoneNumber}`);
-    console.log("-------------------");
-    console.log(message);
-    console.log("-------------------");
+    console.log(`Message: ${message}`);
     return { success: true, simulated: true };
   }
 
   try {
-    // Nettoyage du numéro : enlever le + et les espaces
+    // Standardize phone format for CallMeBot (no + sign, no spaces)
     const cleanPhone = phoneNumber.replace(/[\s+]/g, "");
-    const url = `${CALLMEBOT_API_URL}?phone=${cleanPhone}&text=${encodeURIComponent(message)}&apikey=${callmebotApiKey}`;
     
-    console.log(`[WhatsApp] Calling: ${url.replace(callmebotApiKey, "HIDDEN")}`);
+    // CallMeBot uses a simple GET request
+    const url = new URL(CALLMEBOT_API_URL);
+    url.searchParams.append("phone", cleanPhone);
+    url.searchParams.append("text", message);
+    url.searchParams.append("apikey", callmebotApiKey);
     
-    const response = await fetch(url);
+    console.log(`[WhatsApp] Sending via CallMeBot to ${cleanPhone}...`);
+    
+    // Use a standard fetch request
+    const response = await fetch(url.toString(), {
+      method: "GET",
+      // Important for some edge runtimes to explicitly avoid cache
+      cache: 'no-store'
+    });
+    
     const responseText = await response.text();
     
     if (response.ok) {
-      console.log("[WhatsApp] CallMeBot Success:", responseText);
-      return { success: true, provider: "callmebot", response: responseText };
+      console.log("[WhatsApp] CallMeBot Success response:", responseText);
+      return { success: true, provider: "callmebot", detail: responseText };
     } else {
-      console.error("[WhatsApp] CallMeBot Error Response:", responseText);
-      throw new Error(`CallMeBot a répondu avec une erreur: ${responseText}`);
+      console.error("[WhatsApp] CallMeBot Failed:", response.status, responseText);
+      throw new Error(`CallMeBot error (${response.status}): ${responseText}`);
     }
   } catch (error: any) {
-    console.error("CallMeBot Fetch Error:", error);
-    throw new Error(`Erreur réseau ou API: ${error.message}`);
+    console.error("[WhatsApp] Network or API Error:", error.message);
+    throw new Error(`Erreur d'envoi: ${error.message}`);
   }
 }
 
@@ -43,14 +53,13 @@ export const testWhatsAppConnection = createServerFn({ method: "POST" })
     phone: z.string()
   }).parse(data))
   .handler(async ({ data }) => {
-    const apiKey = process.env['CALLMEBOT_API_KEY'];
-    if (!apiKey) {
-      return { success: false, error: "Clé CALLMEBOT_API_KEY manquante dans Lovable Cloud (Secrets)." };
+    // Re-check key presence for immediate feedback
+    if (!process.env['CALLMEBOT_API_KEY']) {
+      return { success: false, error: "La clé CALLMEBOT_API_KEY n'est pas détectée par le serveur. Assurez-vous de l'avoir ajoutée dans les Secrets de Lovable Cloud." };
     }
     
     try {
-      const result = await sendWhatsAppMessage(data.phone, "Test de connexion AdminRH-France via CallMeBot 🚀. Si vous voyez ce message, la configuration est correcte !");
-      return result;
+      return await sendWhatsAppMessage(data.phone, "AdminRH-France : Votre configuration est maintenant opérationnelle ! ✅");
     } catch (error: any) {
       return { success: false, error: error.message };
     }
