@@ -19,18 +19,21 @@ export const setupAdminUser = createServerFn({ method: 'POST' })
     });
 
     if (authError) {
-      if (authError.message.includes('already registered')) {
-         // User might already exist, try to find them
-         const { data: { users }, error: listError } = await supabaseAdmin.auth.admin.listUsers();
-         const existingUser = users.find(u => u.email === data.email);
-         if (!existingUser) throw new Error('User exists but could not be found');
-         
-         // Assign role
-         await supabaseAdmin.from('user_roles').upsert({
-           user_id: existingUser.id,
-           role: data.role
-         });
-         return { success: true, message: 'Existing user promoted to ' + data.role };
+      // If user already exists, let s update their password just in case
+      const { data: { users }, error: listError } = await supabaseAdmin.auth.admin.listUsers();
+      const existingUser = users.find(u => u.email === data.email);
+      
+      if (existingUser) {
+        await supabaseAdmin.auth.admin.updateUserById(existingUser.id, {
+          password: data.password
+        });
+        
+        await supabaseAdmin.from('user_roles').upsert({
+          user_id: existingUser.id,
+          role: data.role
+        }, { onConflict: 'user_id, role' });
+        
+        return { success: true, message: 'Existing user updated and promoted to ' + data.role };
       }
       throw authError;
     }
