@@ -18,7 +18,6 @@ import { Route as AuthenticatedLearningRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedProgressionRouteImport } from './routes/_authenticated/progression'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AuthenticatedQuizIndexRouteImport } from './routes/_authenticated/quiz.index'
-import { Route as ApiPublicSetupAdminRouteImport } from './routes/api/public/setup-admin'
 import { Route as ApiPublicHooksSendLessonsRouteImport } from './routes/api/public/hooks/send-lessons'
 
 const IndexRoute = IndexRouteImport.update({
@@ -66,11 +65,6 @@ const AuthenticatedQuizIndexRoute = AuthenticatedQuizIndexRouteImport.update({
   path: '/quiz/',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const ApiPublicSetupAdminRoute = ApiPublicSetupAdminRouteImport.update({
-  id: '/api/public/setup-admin',
-  path: '/api/public/setup-admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiPublicHooksSendLessonsRoute =
   ApiPublicHooksSendLessonsRouteImport.update({
     id: '/api/public/hooks/send-lessons',
@@ -86,7 +80,6 @@ export interface FileRoutesByFullPath {
   '/learning': typeof AuthenticatedLearningRoute
   '/progression': typeof AuthenticatedProgressionRoute
   '/auth/callback': typeof AuthCallbackRoute
-  '/api/public/setup-admin': typeof ApiPublicSetupAdminRoute
   '/quiz/': typeof AuthenticatedQuizIndexRoute
   '/api/public/hooks/send-lessons': typeof ApiPublicHooksSendLessonsRoute
 }
@@ -98,7 +91,6 @@ export interface FileRoutesByTo {
   '/learning': typeof AuthenticatedLearningRoute
   '/progression': typeof AuthenticatedProgressionRoute
   '/auth/callback': typeof AuthCallbackRoute
-  '/api/public/setup-admin': typeof ApiPublicSetupAdminRoute
   '/quiz': typeof AuthenticatedQuizIndexRoute
   '/api/public/hooks/send-lessons': typeof ApiPublicHooksSendLessonsRoute
 }
@@ -112,7 +104,6 @@ export interface FileRoutesById {
   '/_authenticated/learning': typeof AuthenticatedLearningRoute
   '/_authenticated/progression': typeof AuthenticatedProgressionRoute
   '/auth/callback': typeof AuthCallbackRoute
-  '/api/public/setup-admin': typeof ApiPublicSetupAdminRoute
   '/_authenticated/quiz/': typeof AuthenticatedQuizIndexRoute
   '/api/public/hooks/send-lessons': typeof ApiPublicHooksSendLessonsRoute
 }
@@ -126,7 +117,6 @@ export interface FileRouteTypes {
     | '/learning'
     | '/progression'
     | '/auth/callback'
-    | '/api/public/setup-admin'
     | '/quiz/'
     | '/api/public/hooks/send-lessons'
   fileRoutesByTo: FileRoutesByTo
@@ -138,7 +128,6 @@ export interface FileRouteTypes {
     | '/learning'
     | '/progression'
     | '/auth/callback'
-    | '/api/public/setup-admin'
     | '/quiz'
     | '/api/public/hooks/send-lessons'
   id:
@@ -151,7 +140,6 @@ export interface FileRouteTypes {
     | '/_authenticated/learning'
     | '/_authenticated/progression'
     | '/auth/callback'
-    | '/api/public/setup-admin'
     | '/_authenticated/quiz/'
     | '/api/public/hooks/send-lessons'
   fileRoutesById: FileRoutesById
@@ -160,7 +148,6 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
-  ApiPublicSetupAdminRoute: typeof ApiPublicSetupAdminRoute
   ApiPublicHooksSendLessonsRoute: typeof ApiPublicHooksSendLessonsRoute
 }
 
@@ -229,13 +216,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedQuizIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/api/public/setup-admin': {
-      id: '/api/public/setup-admin'
-      path: '/api/public/setup-admin'
-      fullPath: '/api/public/setup-admin'
-      preLoaderRoute: typeof ApiPublicSetupAdminRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/public/hooks/send-lessons': {
       id: '/api/public/hooks/send-lessons'
       path: '/api/public/hooks/send-lessons'
@@ -280,7 +260,6 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
-  ApiPublicSetupAdminRoute: ApiPublicSetupAdminRoute,
   ApiPublicHooksSendLessonsRoute: ApiPublicHooksSendLessonsRoute,
 }
 export const routeTree = rootRouteImport
