@@ -1,7 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts'
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
+import { useSuspenseQuery } from '@tanstack/react-query'
+import { getProgressionData, getLearningStats } from '@/lib/learning.functions'
 
 export const Route = createFileRoute('/_authenticated/progression')({
   component: ProgressionPage,
