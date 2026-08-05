@@ -33,10 +33,12 @@ function AuthPage() {
   }
 
   const handleGoogleLogin = async () => {
+    const search = new URLSearchParams(window.location.search)
+    const redirectPath = search.get('redirect') || '/dashboard'
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: `${window.location.origin}/auth/callback?redirect=${encodeURIComponent(redirectPath)}`,
       },
     })
     if (error) toast.error(error.message)
