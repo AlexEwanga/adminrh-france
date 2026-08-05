@@ -52,6 +52,13 @@ function AuthenticatedLayout() {
   const [globalSearch, setGlobalSearch] = useState('')
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
+  // Use localStorage to share search value between layout and dashboard
+  useEffect(() => {
+    localStorage.setItem('adminrh-global-search', globalSearch)
+    // Dispatch custom event to notify listeners
+    window.dispatchEvent(new CustomEvent('global-search-change', { detail: globalSearch }))
+  }, [globalSearch])
+
   const handleLogout = async () => {
     await supabase.auth.signOut()
     window.location.href = '/auth'

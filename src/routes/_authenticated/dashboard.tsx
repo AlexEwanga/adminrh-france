@@ -1,12 +1,27 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useSuspenseQuery } from '@tanstack/react-query'
-import { getLearningStats, getRecentMessages } from '@/lib/learning.functions'
-import { useState } from 'react'
+import { useSuspenseQuery, useQueryClient } from '@tanstack/react-query'
+import { getLearningStats, getRecentMessages, getNotes, addNote } from '@/lib/learning.functions'
+import { useState, useEffect, useMemo } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
-import { Plus, MoreHorizontal, MessageSquare, Trophy, Target, BookOpen } from 'lucide-react'
+import { Plus, MoreHorizontal, MessageSquare, Trophy, Target, BookOpen, Search, Send, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { 
+  BarChart as ReBarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip as ReTooltip, 
+  ResponsiveContainer,
+  Cell,
+  LineChart,
+  Line
+} from 'recharts'
+import { toast } from 'sonner'
+import { Input } from '@/components/ui/input'
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
 
 export const Route = createFileRoute('/_authenticated/dashboard')({
   component: Dashboard,
@@ -14,6 +29,22 @@ export const Route = createFileRoute('/_authenticated/dashboard')({
 
 function Dashboard() {
   const [activeFilter, setActiveFilter] = useState('Tout')
+  const [searchTerm, setSearchTerm] = useState('')
+  const [newNoteTitle, setNewNoteTitle] = useState('')
+  const [newNoteContent, setNewNoteContent] = useState('')
+  const [isAddingNote, setIsAddingNote] = useState(false)
+  const queryClient = useQueryClient()
+
+  useEffect(() => {
+    const handleSearch = (e: any) => {
+      setSearchTerm(e.detail || '')
+    }
+    window.addEventListener('global-search-change', handleSearch)
+    const initialSearch = localStorage.getItem('adminrh-global-search')
+    if (initialSearch) setSearchTerm(initialSearch)
+    return () => window.removeEventListener('global-search-change', handleSearch)
+  }, [])
+
   const { data: stats } = useSuspenseQuery({
     queryKey: ['learning-stats'],
     queryFn: () => getLearningStats()
@@ -24,6 +55,21 @@ function Dashboard() {
     queryFn: () => getRecentMessages()
   })
 
+  const { data: notes } = useSuspenseQuery({
+    queryKey: ['notes'],
+    queryFn: () => getNotes()
+  })
+
+  const chartData = [
+    { name: 'Lun', score: 65, messages: 5 },
+    { name: 'Mar', score: 78, messages: 5 },
+    { name: 'Mer', score: 45, messages: 3 },
+    { name: 'Jeu', score: 90, messages: 5 },
+    { name: 'Ven', score: 82, messages: 5 },
+    { name: 'Sam', score: 95, messages: 1 },
+    { name: 'Dim', score: 70, messages: 0 },
+  ]
+
   const tasks = [
     { id: 1, title: "Rédaction de contrat de travail", subject: "Droit du Travail", date: "Aujourd'hui", status: "En cours", progress: 65, comments: 3, statusColor: "bg-[#FEEFC3] text-[#F9A825]" },
     { id: 2, title: "Calcul des indemnités de licenciement", subject: "Paie & Social", date: "Demain", status: "À faire", comments: 0, statusColor: "bg-[#E0E7FF] text-[#6366F1]" },
@@ -31,13 +77,106 @@ function Dashboard() {
     { id: 4, title: "Les instances représentatives du personnel", subject: "Droit du Travail", date: "12 Août 2026", status: "À faire", comments: 5, statusColor: "bg-[#E0E7FF] text-[#6366F1]" },
   ]
 
-  const filteredTasks = tasks.filter(task => {
-    const matchesFilter = activeFilter === 'Tout' || task.status === activeFilter
-    return matchesFilter
-  })
+  const filteredTasks = useMemo(() => {
+    return tasks.filter(task => {
+      const matchesFilter = activeFilter === 'Tout' || task.status === activeFilter
+      const matchesSearch = task.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                           task.subject.toLowerCase().includes(searchTerm.toLowerCase())
+      return matchesFilter && matchesSearch
+    })
+  }, [activeFilter, searchTerm])
+
+  const handleAddNote = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!newNoteTitle || !newNoteContent) return
+
+    setIsAddingNote(true)
+    try {
+      await addNote({ data: { title: newNoteTitle, content: newNoteContent } })
+      setNewNoteTitle('')
+      setNewNoteContent('')
+      toast.success('Note ajoutée avec succès')
+      queryClient.invalidateQueries({ queryKey: ['notes'] })
+    } catch (error) {
+      toast.error("Erreur lors de l'ajout de la note")
+    } finally {
+      setIsAddingNote(false)
+    }
+  }
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 pb-6">
+      {/* Top Row: Charts & Stats */}
+      <div className="lg:col-span-12 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card className="rounded-[32px] border-white/50 shadow-sm overflow-hidden bg-white">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-xl font-bold text-[#2D3142]">Performance Hebdomadaire</CardTitle>
+          </CardHeader>
+          <CardContent className="h-[250px] pt-4">
+            <ResponsiveContainer width="100%" height="100%">
+              <ReBarChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F0F2F5" />
+                <XAxis 
+                  dataKey="name" 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fill: '#94A3B8', fontSize: 12 }} 
+                />
+                <YAxis hide />
+                <ReTooltip 
+                  cursor={{ fill: '#F8F9FA' }}
+                  content={({ active, payload }: any) => {
+                    if (active && payload && payload.length) {
+                      return (
+                        <div className="bg-white p-3 shadow-xl rounded-2xl border border-slate-100">
+                          <p className="text-xs font-bold text-[#2D3142]">{payload[0].payload.name}</p>
+                          <p className="text-sm text-[#8C7CF0] font-bold">{payload[0].value}% de réussite</p>
+                        </div>
+                      )
+                    }
+                    return null
+                  }}
+                />
+                <Bar dataKey="score" radius={[8, 8, 8, 8]} barSize={35}>
+                  {chartData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.score > 80 ? '#A3E635' : '#8C7CF0'} />
+                  ))}
+                </Bar>
+              </ReBarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        <Card className="rounded-[32px] border-white/50 shadow-sm overflow-hidden bg-white">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-xl font-bold text-[#2D3142]">Engagement WhatsApp</CardTitle>
+          </CardHeader>
+          <CardContent className="h-[250px] pt-4">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F0F2F5" />
+                <XAxis 
+                  dataKey="name" 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fill: '#94A3B8', fontSize: 12 }} 
+                />
+                <YAxis hide />
+                <ReTooltip />
+                <Line 
+                  type="monotone" 
+                  dataKey="messages" 
+                  stroke="#2D3142" 
+                  strokeWidth={3} 
+                  dot={{ r: 4, fill: '#2D3142', strokeWidth: 2, stroke: '#fff' }}
+                  activeDot={{ r: 6, fill: '#8C7CF0' }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      </div>
+
       {/* Left Column: Mes objectifs RH */}
       <div className="lg:col-span-7 bg-white rounded-[32px] p-6 md:p-8 shadow-sm border border-white/50 flex flex-col gap-6">
         <div className="flex items-center justify-between">
@@ -60,11 +199,14 @@ function Dashboard() {
         </div>
 
         <div className="space-y-4">
-          {filteredTasks.map(task => (
+          {filteredTasks.map((task: any) => (
             <TaskItem key={task.id} {...task} />
           ))}
           {filteredTasks.length === 0 && (
-            <p className="text-center py-12 text-slate-400 font-medium">Aucun objectif trouvé.</p>
+            <div className="text-center py-12 space-y-2">
+              <Search className="mx-auto text-slate-200 h-12 w-12" />
+              <p className="text-slate-400 font-medium">Aucun objectif trouvé.</p>
+            </div>
           )}
         </div>
 
@@ -100,23 +242,64 @@ function Dashboard() {
         <div className="space-y-4">
           <div className="flex items-center justify-between px-2">
             <h2 className="text-2xl font-bold text-[#2D3142] tracking-tight">Mes notes</h2>
-            <Button size="icon" variant="ghost" className="bg-[#F8F9FA] rounded-xl hover:bg-slate-100 h-10 w-10 border border-slate-100">
-              <Plus size={20} className="text-[#2D3142]" />
-            </Button>
           </div>
+          
+          {/* Quick Add Note */}
+          <Card className="rounded-[24px] border-dashed border-2 border-slate-200 bg-white/50 p-4 shadow-none">
+            <form onSubmit={handleAddNote} className="space-y-3">
+              <Input 
+                placeholder="Titre de la note..." 
+                className="border-none bg-transparent font-bold focus-visible:ring-0 px-0 h-auto text-sm"
+                value={newNoteTitle}
+                onChange={(e) => setNewNoteTitle(e.target.value)}
+              />
+              <textarea 
+                placeholder="Écrivez votre contenu ici..." 
+                className="w-full bg-transparent border-none text-xs text-slate-500 focus:outline-none resize-none min-h-[60px]"
+                value={newNoteContent}
+                onChange={(e) => setNewNoteContent(e.target.value)}
+              />
+              <div className="flex justify-end">
+                <Button 
+                  type="submit" 
+                  size="sm" 
+                  disabled={!newNoteTitle || !newNoteContent || isAddingNote}
+                  className="bg-[#2D3142] hover:bg-[#2D3142]/90 rounded-xl px-4 text-xs h-8"
+                >
+                  {isAddingNote ? <Loader2 className="h-3 w-3 animate-spin" /> : <Send className="h-3 w-3 mr-2" />}
+                  Ajouter
+                </Button>
+              </div>
+            </form>
+          </Card>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <NoteCard 
-              title="Droit de grève" 
-              content="En France, le droit de grève est un droit constitutionnel. Une grève doit être précédée d'un préavis dans le secteur public." 
-              date="5 Août 2026"
-              color="bg-[#D1FAE5] text-[#065F46]"
-            />
-            <NoteCard 
-              title="Période d'essai" 
-              content="CDI : 2 mois (ouvriers/employés), 3 mois (agents de maîtrise), 4 mois (cadres)." 
-              date="4 Août 2026"
-              color="bg-[#E0E7FF] text-[#3730A3]"
-            />
+            {notes && notes.length > 0 ? (
+              notes.map((note: any) => (
+                <NoteCard 
+                  key={note.id}
+                  title={note.title} 
+                  content={note.content} 
+                  date={new Date(note.created_at).toLocaleDateString('fr-FR')}
+                  color={note.color}
+                />
+              ))
+            ) : (
+              <>
+                <NoteCard 
+                  title="Droit de grève" 
+                  content="En France, le droit de grève est un droit constitutionnel. Une grève doit être précédée d'un préavis dans le secteur public." 
+                  date="5 Août 2026"
+                  color="bg-[#D1FAE5] text-[#065F46]"
+                />
+                <NoteCard 
+                  title="Période d'essai" 
+                  content="CDI : 2 mois (ouvriers/employés), 3 mois (agents de maîtrise), 4 mois (cadres)." 
+                  date="4 Août 2026"
+                  color="bg-[#E0E7FF] text-[#3730A3]"
+                />
+              </>
+            )}
           </div>
         </div>
       </div>

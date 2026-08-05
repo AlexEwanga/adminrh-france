@@ -33,3 +33,38 @@ export const getQuizzes = createServerFn({ method: 'GET' })
       .order('created_at', { ascending: false });
     return data || [];
   });
+
+export const getNotes = createServerFn({ method: "GET" })
+  .handler(async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return [];
+
+    const { data } = await supabase
+      .from('notes')
+      .select('*')
+      .eq('user_id', session.user.id)
+      .order('created_at', { ascending: false });
+      
+    return data || [];
+  });
+
+export const addNote = createServerFn({ method: "POST" })
+  .inputValidator((d: { title: string, content: string, color?: string }) => d)
+  .handler(async ({ data }) => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) throw new Error('Unauthorized');
+
+    const { data: note, error } = await supabase
+      .from('notes')
+      .insert({
+        user_id: session.user.id,
+        title: data.title,
+        content: data.content,
+        color: data.color || 'bg-[#D1FAE5] text-[#065F46]'
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+    return note;
+  });

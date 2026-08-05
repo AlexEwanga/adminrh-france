@@ -101,6 +101,33 @@ export type Database = {
         }
         Relationships: []
       }
+      notes: {
+        Row: {
+          color: string | null
+          content: string
+          created_at: string | null
+          id: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          color?: string | null
+          content: string
+          created_at?: string | null
+          id?: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          color?: string | null
+          content?: string
+          created_at?: string | null
+          id?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string | null
