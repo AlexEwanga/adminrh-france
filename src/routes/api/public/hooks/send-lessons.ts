@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { createClient } from '@supabase/supabase-js'
+import { sendWhatsAppMessage } from '@/lib/wpsent.server'
 
 export const Route = createFileRoute('/api/public/hooks/send-lessons')({
   server: {
@@ -48,9 +49,12 @@ export const Route = createFileRoute('/api/public/hooks/send-lessons')({
 
           const messageToSend = messages[messageIndex % messages.length]
 
-          // 3. Simuler l'envoi WhatsApp via WPSent (Logique placeholder car l'API WPSent nécessite une clé externe)
-          console.log(`[WPSent Simulation] Envoi à WhatsApp : ${messageToSend.subject}`)
-          console.log(`Contenu : ${messageToSend.content}`)
+          // 3. Envoi WhatsApp via WPSent
+          const formattedContent = `*${messageToSend.subject}*\n\n${messageToSend.content}\n\n_AdminRH-France_`;
+          
+          // On récupère le numéro de téléphone de l'utilisateur (à adapter selon votre logique d'abonnement)
+          // Ici on simule un envoi général ou on pourrait boucler sur les profils
+          await sendWhatsAppMessage("NUMERO_DESTINATAIRE", formattedContent);
 
           // 4. Mettre à jour le planning pour le prochain envoi
           const nextIndex = (messageIndex + 1) % messages.length
