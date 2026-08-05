@@ -107,11 +107,11 @@ function AdminPage() {
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-3 h-3 rounded-full bg-yellow-500 animate-pulse" />
-              <span className="font-medium">En attente de clé</span>
+              <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse" />
+              <span className="font-medium text-green-600">Configuré</span>
             </div>
             <p className="text-xs text-slate-500">
-              L'envoi est actuellement en mode simulation. Les messages sont loggués dans la console serveur.
+              L'envoi via CallMeBot est actif. Les messages sont envoyés en utilisant votre clé API.
             </p>
           </CardContent>
         </Card>
