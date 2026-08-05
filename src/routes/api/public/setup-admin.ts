@@ -18,7 +18,8 @@ export const Route = createFileRoute('/api/public/setup-admin')({
             headers: { 'Content-Type': 'application/json' }
           });
         } catch (error: any) {
-          return new Response(JSON.stringify({ error: error.message }), { 
+          console.error('API Error:', error);
+          return new Response(JSON.stringify({ error: error.message, stack: error.stack }), { 
             status: 500,
             headers: { 'Content-Type': 'application/json' }
           });
