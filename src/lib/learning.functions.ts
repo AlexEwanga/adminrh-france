@@ -105,3 +105,18 @@ export const addObjective = createServerFn({ method: "POST" })
     if (error) throw error;
     return objective;
   });
+
+export const getProgressionData = createServerFn({ method: "GET" })
+  .handler(async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return [];
+
+    const { data } = await supabase
+      .from('learning_stats')
+      .select('date, avg_score')
+      .eq('user_id', session.user.id)
+      .order('date', { ascending: true })
+      .limit(7);
+      
+    return data || [];
+  });
