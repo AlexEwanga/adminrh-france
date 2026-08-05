@@ -199,7 +199,7 @@ function Dashboard() {
         </div>
 
         <div className="space-y-4">
-          {filteredTasks.map(task => (
+          {filteredTasks.map((task: any) => (
             <TaskItem key={task.id} {...task} />
           ))}
           {filteredTasks.length === 0 && (
