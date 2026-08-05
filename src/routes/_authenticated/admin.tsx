@@ -9,6 +9,9 @@ import { toast } from 'sonner'
 import { useServerFn } from '@tanstack/react-start'
 import { testWhatsAppConnection } from '@/lib/whatsapp.server'
 
+import { getRecentMessages } from '@/lib/learning.functions'
+import { useSuspenseQuery } from '@tanstack/react-query'
+
 export const Route = createFileRoute('/_authenticated/admin')({
   component: AdminPage,
 })
@@ -17,7 +20,10 @@ export const Route = createFileRoute('/_authenticated/admin')({
 function AdminPage() {
   const [testPhone, setTestPhone] = useState('')
   const [isTesting, setIsTesting] = useState(false)
-  const testWhatsApp = useServerFn(testWhatsAppConnection)
+  const { data: messages } = useSuspenseQuery({
+    queryKey: ['recent-messages'],
+    queryFn: () => getRecentMessages()
+  })
 
   const handleTestConnection = async () => {
     if (!testPhone) {
@@ -138,33 +144,43 @@ function AdminPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100/50">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <tr key={i} className="hover:bg-white transition-all group">
-                  <td className="px-8 py-6">
-                    <div className="font-bold text-[#2D3142]">Le licenciement économique</div>
-                    <div className="text-[11px] text-slate-400 mt-0.5">Mis à jour il y a 2 jours</div>
-                  </td>
-                  <td className="px-8 py-6">
-                    <Badge className="bg-white text-[#2D3142] border-none shadow-sm">Droit du travail</Badge>
-                  </td>
-                  <td className="px-8 py-6">
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-[#A3E635]" />
-                      <span className="text-sm font-bold text-[#2D3142]">Actif</span>
-                    </div>
-                  </td>
-                  <td className="px-8 py-6 text-right">
-                    <div className="flex gap-2">
-                      <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl text-slate-400 hover:text-[#8C7CF0] hover:bg-slate-50">
-                        <Edit2 size={16} />
-                      </Button>
-                      <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl text-slate-400 hover:text-red-500 hover:bg-red-50">
-                        <Trash2 size={16} />
-                      </Button>
-                    </div>
+              {messages && messages.length > 0 ? (
+                messages.map((msg: any) => (
+                  <tr key={msg.id} className="hover:bg-white transition-all group">
+                    <td className="px-8 py-6">
+                      <div className="font-bold text-[#2D3142]">{msg.subject}</div>
+                      <div className="text-[11px] text-slate-400 mt-0.5">
+                        {msg.created_at ? new Date(msg.created_at).toLocaleDateString('fr-FR') : 'Date inconnue'}
+                      </div>
+                    </td>
+                    <td className="px-8 py-6">
+                      <Badge className="bg-white text-[#2D3142] border-none shadow-sm">{msg.tag || 'Sans catégorie'}</Badge>
+                    </td>
+                    <td className="px-8 py-6">
+                      <div className="flex items-center gap-2">
+                        <div className={`w-2 h-2 rounded-full ${msg.is_active !== false ? 'bg-[#A3E635]' : 'bg-slate-300'}`} />
+                        <span className="text-sm font-bold text-[#2D3142]">{msg.is_active !== false ? 'Actif' : 'Inactif'}</span>
+                      </div>
+                    </td>
+                    <td className="px-8 py-6 text-right">
+                      <div className="flex gap-2">
+                        <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl text-slate-400 hover:text-[#8C7CF0] hover:bg-slate-50">
+                          <Edit2 size={16} />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl text-slate-400 hover:text-red-500 hover:bg-red-50">
+                          <Trash2 size={16} />
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={4} className="px-8 py-12 text-center text-slate-400 font-medium">
+                    Aucun message dans la base de données.
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </CardContent>
