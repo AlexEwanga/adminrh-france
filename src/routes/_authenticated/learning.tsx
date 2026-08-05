@@ -1,7 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { useSuspenseQuery } from '@tanstack/react-query'
+import { getRecentMessages } from '@/lib/learning.functions'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { BookOpen } from 'lucide-react'
+import { BookOpen, ExternalLink } from 'lucide-react'
+
 
 export const Route = createFileRoute('/_authenticated/learning')({
   component: LearningPage,
@@ -9,6 +12,11 @@ export const Route = createFileRoute('/_authenticated/learning')({
 
 
 function LearningPage() {
+  const { data: messages } = useSuspenseQuery({
+    queryKey: ['learning-messages'],
+    queryFn: () => getRecentMessages()
+  })
+
   const categories = ['Droit du travail', 'Géographie', 'Culture', 'Mode de vie']
 
   return (
@@ -27,22 +35,29 @@ function LearningPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {[1, 2, 3, 4, 5, 6].map((i) => (
-          <Card key={i} className="hover:shadow-lg transition-shadow cursor-pointer">
+        {messages?.map((msg) => (
+          <Card key={msg.id} className="hover:shadow-lg transition-shadow">
             <CardHeader className="pb-2">
               <div className="flex justify-between items-start">
-                <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100 border-none">Droit du travail</Badge>
+                <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100 border-none">{msg.tag}</Badge>
                 <BookOpen size={16} className="text-slate-400" />
               </div>
-              <CardTitle className="text-lg mt-2">Le Contrat à Durée Indéterminée (CDI)</CardTitle>
+              <CardTitle className="text-lg mt-2">{msg.subject}</CardTitle>
             </CardHeader>
-            <CardContent>
-              <p className="text-sm text-slate-600 line-clamp-3">
-                Le CDI est la forme normale et générale de la relation de travail. Il n'a pas de durée limitée et garantit une stabilité au salarié...
+            <CardContent className="space-y-4">
+              <p className="text-sm text-slate-600 line-clamp-4">
+                {msg.content}
               </p>
-              <div className="mt-4 text-xs font-medium text-[#D4AF37] uppercase tracking-wider">
-                Lire la suite →
-              </div>
+              {msg.source && (
+                <a 
+                  href={msg.source} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-xs font-medium text-[#D4AF37] hover:underline uppercase tracking-wider"
+                >
+                  Source officielle <ExternalLink size={12} />
+                </a>
+              )}
             </CardContent>
           </Card>
         ))}
@@ -50,3 +65,4 @@ function LearningPage() {
     </div>
   )
 }
+

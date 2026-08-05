@@ -30,7 +30,7 @@ function AuthenticatedLayout() {
       {/* Sidebar */}
       <aside className="w-64 bg-[#1E2A4A] text-white hidden md:flex flex-col">
         <div className="p-6">
-          <h2 className="text-xl font-bold tracking-tight text-[#D4AF37]">AdminRH</h2>
+          <h2 className="text-xl font-bold tracking-tight text-[#D4AF37]">AdminRH-France</h2>
         </div>
         <nav className="flex-1 px-4 space-y-2">
           <Link
