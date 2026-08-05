@@ -26,9 +26,13 @@ function AuthPage() {
   }
 
   const handleGoogleLogin = async () => {
-    await lovable.auth.signInWithOAuth('google', {
-      redirect_uri: window.location.origin,
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
     })
+    if (error) toast.error(error.message)
   }
 
   return (
@@ -55,7 +59,7 @@ function AuthPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
             />
-            <Button type="submit" className="w-full bg-[#1E2A4A]" disabled={loading}>
+            <Button type="submit" className="w-full bg-[#1E2A4A] hover:bg-[#1E2A4A]/90" disabled={loading}>
               {loading ? 'Connexion...' : 'Se connecter'}
             </Button>
           </form>
