@@ -5,7 +5,7 @@ import { z } from 'zod';
 const setupUserSchema = z.object({
   email: z.string().email(),
   password: z.string().min(6),
-  role: z.enum(['admin', 'moderator', 'user']),
+  role: z.enum(['admin', 'user']),
 });
 
 export const setupAdminUser = createServerFn({ method: 'POST' })
