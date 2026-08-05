@@ -1,9 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { getLearningStats, getRecentMessages } from '@/lib/learning.functions'
-import { setupAdminUser } from '@/lib/setup.functions'
-import { useEffect } from 'react'
-import { toast } from 'sonner'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
@@ -16,22 +13,6 @@ export const Route = createFileRoute('/_authenticated/dashboard')({
 
 
 function Dashboard() {
-  useEffect(() => {
-    const initSetup = async () => {
-      try {
-        await setupAdminUser({
-          data: {
-            email: 'ewangaalex@gmail.com',
-            password: 'AdminRH!France2026',
-            role: 'admin'
-          }
-        });
-      } catch (e) {
-        console.log('Setup skip or already exists');
-      }
-    };
-    initSetup();
-  }, []);
 
   const { data: stats } = useSuspenseQuery({
     queryKey: ['learning-stats'],

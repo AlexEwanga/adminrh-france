@@ -11,43 +11,44 @@ const setupUserSchema = z.object({
 export const setupAdminUser = createServerFn({ method: 'POST' })
   .inputValidator((data) => setupUserSchema.parse(data))
   .handler(async ({ data }) => {
-    // Check if user exists first
-    const { data: { users }, error: listError } = await supabaseAdmin.auth.admin.listUsers();
-    if (listError) throw listError;
-    
-    const existingUser = users.find(u => u.email === data.email);
-    
-    let userId: string;
-    let message: string;
+    try {
+      // 1. Check if user exists
+      const { data: { users }, error: listError } = await supabaseAdmin.auth.admin.listUsers();
+      if (listError) throw listError;
+      
+      const existingUser = users.find(u => u.email === data.email);
+      let userId: string;
 
-    if (existingUser) {
-      userId = existingUser.id;
-      // Update password and confirm email
-      const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(userId, {
-        password: data.password,
-        email_confirm: true
-      });
-      if (updateError) throw updateError;
-      message = 'Existing user updated';
-    } else {
-      // Create new user
-      const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.createUser({
-        email: data.email,
-        password: data.password,
-        email_confirm: true,
-      });
-      if (authError) throw authError;
-      userId = authUser.user.id;
-      message = 'User created';
+      if (existingUser) {
+        userId = existingUser.id;
+        // Update password and confirm
+        const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(userId, {
+          password: data.password,
+          email_confirm: true
+        });
+        if (updateError) throw updateError;
+      } else {
+        // Create new
+        const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.createUser({
+          email: data.email,
+          password: data.password,
+          email_confirm: true,
+        });
+        if (authError) throw authError;
+        userId = authUser.user.id;
+      }
+
+      // 2. Role
+      const { error: roleError } = await supabaseAdmin.from('user_roles').upsert({
+        user_id: userId,
+        role: data.role,
+      }, { onConflict: 'user_id, role' });
+
+      if (roleError) throw roleError;
+
+      return { success: true };
+    } catch (error: any) {
+      console.error('Setup error:', error);
+      throw error;
     }
-
-    // Ensure role is assigned
-    const { error: roleError } = await supabaseAdmin.from('user_roles').upsert({
-      user_id: userId,
-      role: data.role,
-    }, { onConflict: 'user_id, role' });
-
-    if (roleError) throw roleError;
-
-    return { success: true, message: `${message} and assigned as ${data.role}` };
   });
