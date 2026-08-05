@@ -11,11 +11,14 @@ function AuthCallbackPage() {
   useEffect(() => {
     const handleCallback = async () => {
       const { error } = await supabase.auth.getSession()
+      const search = new URLSearchParams(window.location.search)
+      const redirectPath = search.get('redirect') || '/dashboard'
+      
       if (error) {
         toast.error('Erreur lors de la connexion : ' + error.message)
         window.location.href = '/auth'
       } else {
-        window.location.href = '/dashboard'
+        window.location.href = redirectPath
       }
     }
     handleCallback()
