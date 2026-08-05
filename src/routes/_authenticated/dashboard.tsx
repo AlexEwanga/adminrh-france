@@ -125,7 +125,7 @@ function Dashboard() {
                 <YAxis hide />
                 <ReTooltip 
                   cursor={{ fill: '#F8F9FA' }}
-                  content={({ active, payload }) => {
+                  content={({ active, payload }: any) => {
                     if (active && payload && payload.length) {
                       return (
                         <div className="bg-white p-3 shadow-xl rounded-2xl border border-slate-100">
