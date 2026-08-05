@@ -150,7 +150,13 @@ function AuthenticatedLayout() {
                 placeholder="Rechercher partout..." 
                 className="text-sm text-slate-600 font-medium bg-transparent focus:outline-none w-full truncate"
                 value={globalSearch}
-                onChange={(e) => setGlobalSearch(e.target.value)}
+                onInput={(e) => {
+                  const val = (e.target as HTMLInputElement).value
+                  setGlobalSearch(val)
+                  // Dispatch immediately for reactive filtering
+                  window.dispatchEvent(new CustomEvent('global-search-change', { detail: val }))
+                  localStorage.setItem('adminrh-global-search', val)
+                }}
               />
             </form>
             

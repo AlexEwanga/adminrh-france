@@ -65,6 +65,22 @@ function Dashboard() {
     queryFn: () => getObjectives()
   })
 
+  const filteredMessages = useMemo(() => {
+    if (!messages) return []
+    return messages.filter((msg: any) => 
+      msg.subject.toLowerCase().includes(searchTerm.toLowerCase()) || 
+      (msg.tag && msg.tag.toLowerCase().includes(searchTerm.toLowerCase()))
+    )
+  }, [messages, searchTerm])
+
+  const filteredNotes = useMemo(() => {
+    if (!notes) return []
+    return notes.filter((note: any) => 
+      note.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+      note.content.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+  }, [notes, searchTerm])
+
   const chartData = useMemo(() => {
     // Return empty or zeroed data if no stats are available
     if (!stats) return [
@@ -243,8 +259,8 @@ function Dashboard() {
           <div className="space-y-1">
             <ScheduleHeader />
             <div className="divide-y divide-slate-50">
-              {messages && messages.length > 0 ? (
-                messages.map((msg: any) => (
+              {filteredMessages && filteredMessages.length > 0 ? (
+                filteredMessages.map((msg: any) => (
                   <ScheduleItem 
                     key={msg.id}
                     time={msg.scheduled_hour?.substring(0, 5) || '--:--'} 
@@ -298,8 +314,8 @@ function Dashboard() {
           </Card>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {notes && notes.length > 0 ? (
-              notes.map((note: any) => (
+            {filteredNotes && filteredNotes.length > 0 ? (
+              filteredNotes.map((note: any) => (
                 <NoteCard 
                   key={note.id}
                   title={note.title} 
