@@ -3,31 +3,80 @@ import { createClient } from '@supabase/supabase-js'
 
 export const Route = createFileRoute('/api/public/hooks/send-lessons')({
   server: {
-
     handlers: {
       POST: async ({ request }) => {
+        // En Lovable Cloud, la anon key s'utilise comme 'apikey'
         const authHeader = request.headers.get('apikey')
-        if (authHeader !== process.env['SUPABASE_ANON_KEY']) {
+        if (!authHeader || authHeader !== process.env['SUPABASE_PUBLISHABLE_KEY']) {
           return new Response('Unauthorized', { status: 401 })
         }
 
-        const supabase = createClient(
-          process.env['SUPABASE_URL']!,
-          process.env['SUPABASE_SERVICE_ROLE_KEY']!
-        )
+        const supabaseUrl = process.env['SUPABASE_URL']!
+        const supabaseServiceKey = process.env['SUPABASE_SERVICE_ROLE_KEY']!
+        
+        const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
         try {
-          // Logic to find the next message and send via WPSent
-          // This would normally fetch from daily_schedule and messages
-          console.log('Cron triggered: Sending WhatsApp lesson...')
-          
-          return new Response(JSON.stringify({ success: true }), {
+          // 1. Récupérer l'état actuel de la planification
+          const { data: schedule, error: schedError } = await supabase
+            .from('daily_schedule')
+            .select('*')
+            .single()
+
+          if (schedError && schedError.code !== 'PGRST116') throw schedError
+
+          let messageIndex = schedule?.message_index || 0
+          const lastDate = schedule?.last_message_date
+          const today = new Date().toISOString().split('T')[0]
+
+          // Réinitialiser l'index si c'est un nouveau jour (optionnel, selon la logique souhaitée)
+          if (lastDate !== today) {
+            messageIndex = 0
+          }
+
+          // 2. Récupérer le message à envoyer
+          const { data: messages, error: msgError } = await supabase
+            .from('messages')
+            .select('*')
+            .eq('is_active', true)
+            .order('id', { ascending: true })
+
+          if (msgError) throw msgError
+          if (!messages || messages.length === 0) {
+            return new Response(JSON.stringify({ message: 'No active messages found' }), { status: 200 })
+          }
+
+          const messageToSend = messages[messageIndex % messages.length]
+
+          // 3. Simuler l'envoi WhatsApp via WPSent (Logique placeholder car l'API WPSent nécessite une clé externe)
+          console.log(`[WPSent Simulation] Envoi à WhatsApp : ${messageToSend.subject}`)
+          console.log(`Contenu : ${messageToSend.content}`)
+
+          // 4. Mettre à jour le planning pour le prochain envoi
+          const nextIndex = (messageIndex + 1) % messages.length
+          const { error: upsertError } = await supabase
+            .from('daily_schedule')
+            .upsert({
+              id: 1,
+              last_message_date: today,
+              message_index: nextIndex
+            })
+
+          if (upsertError) throw upsertError
+
+          return new Response(JSON.stringify({ 
+            success: true, 
+            sent: messageToSend.subject,
+            next_index: nextIndex 
+          }), {
             headers: { 'Content-Type': 'application/json' }
           })
         } catch (error: any) {
+          console.error('Error in send-lessons hook:', error)
           return new Response(JSON.stringify({ error: error.message }), { status: 500 })
         }
       }
     }
   }
 })
+
