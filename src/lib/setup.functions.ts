@@ -12,41 +12,40 @@ export const setupAdminUser = createServerFn({ method: 'POST' })
   .inputValidator((data) => setupUserSchema.parse(data))
   .handler(async ({ data }) => {
     try {
-      // 1. Check if user exists
-      const { data: { users }, error: listError } = await supabaseAdmin.auth.admin.listUsers();
-      if (listError) throw listError;
-      
-      const existingUser = users.find(u => u.email === data.email);
-      let userId: string;
+      // Create user
+      const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.createUser({
+        email: data.email,
+        password: data.password,
+        email_confirm: true,
+      });
 
-      if (existingUser) {
-        userId = existingUser.id;
-        // Update password and confirm
-        const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(userId, {
-          password: data.password,
-          email_confirm: true
-        });
-        if (updateError) throw updateError;
+      let userId: string;
+      if (authError) {
+        if (authError.message.includes('already registered')) {
+          const { data: { users }, error: listError } = await supabaseAdmin.auth.admin.listUsers();
+          const existingUser = users?.find(u => u.email === data.email);
+          if (!existingUser) throw new Error('Could not find existing user');
+          userId = existingUser.id;
+          
+          // Force update password and confirm email
+          await supabaseAdmin.auth.admin.updateUserById(userId, {
+            password: data.password,
+            email_confirm: true
+          });
+        } else {
+          throw authError;
+        }
       } else {
-        // Create new
-        const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.createUser({
-          email: data.email,
-          password: data.password,
-          email_confirm: true,
-        });
-        if (authError) throw authError;
         userId = authUser.user.id;
       }
 
-      // 2. Role
-      const { error: roleError } = await supabaseAdmin.from('user_roles').upsert({
+      // Role
+      await supabaseAdmin.from('user_roles').upsert({
         user_id: userId,
         role: data.role,
       }, { onConflict: 'user_id, role' });
 
-      if (roleError) throw roleError;
-
-      return { success: true };
+      return { success: true, userId };
     } catch (error: any) {
       console.error('Setup error:', error);
       throw error;
