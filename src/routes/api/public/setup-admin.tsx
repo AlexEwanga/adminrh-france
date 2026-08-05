@@ -15,7 +15,7 @@ function SetupAdminPage() {
         const result = await setupAdminUser({
           data: {
             email: 'ewangaalex@gmail.com',
-            password: '123456789',
+            password: 'AdminRH!France2026',
             role: 'admin'
           }
         })
