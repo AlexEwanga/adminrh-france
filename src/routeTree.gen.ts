@@ -16,6 +16,7 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedLearningRouteImport } from './routes/_authenticated/learning'
 import { Route as AuthenticatedProgressionRouteImport } from './routes/_authenticated/progression'
+import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AuthenticatedQuizIndexRouteImport } from './routes/_authenticated/quiz.index'
 import { Route as ApiPublicHooksSendLessonsRouteImport } from './routes/api/public/hooks/send-lessons'
 
@@ -54,6 +55,11 @@ const AuthenticatedProgressionRoute =
     path: '/progression',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/callback',
+  path: '/callback',
+  getParentRoute: () => AuthRoute,
+} as any)
 const AuthenticatedQuizIndexRoute = AuthenticatedQuizIndexRouteImport.update({
   id: '/quiz/',
   path: '/quiz/',
@@ -68,21 +74,23 @@ const ApiPublicHooksSendLessonsRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/admin': typeof AuthenticatedAdminRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/learning': typeof AuthenticatedLearningRoute
   '/progression': typeof AuthenticatedProgressionRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/quiz/': typeof AuthenticatedQuizIndexRoute
   '/api/public/hooks/send-lessons': typeof ApiPublicHooksSendLessonsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/admin': typeof AuthenticatedAdminRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/learning': typeof AuthenticatedLearningRoute
   '/progression': typeof AuthenticatedProgressionRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/quiz': typeof AuthenticatedQuizIndexRoute
   '/api/public/hooks/send-lessons': typeof ApiPublicHooksSendLessonsRoute
 }
@@ -90,11 +98,12 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/learning': typeof AuthenticatedLearningRoute
   '/_authenticated/progression': typeof AuthenticatedProgressionRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/_authenticated/quiz/': typeof AuthenticatedQuizIndexRoute
   '/api/public/hooks/send-lessons': typeof ApiPublicHooksSendLessonsRoute
 }
@@ -107,6 +116,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/learning'
     | '/progression'
+    | '/auth/callback'
     | '/quiz/'
     | '/api/public/hooks/send-lessons'
   fileRoutesByTo: FileRoutesByTo
@@ -117,6 +127,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/learning'
     | '/progression'
+    | '/auth/callback'
     | '/quiz'
     | '/api/public/hooks/send-lessons'
   id:
@@ -128,6 +139,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/learning'
     | '/_authenticated/progression'
+    | '/auth/callback'
     | '/_authenticated/quiz/'
     | '/api/public/hooks/send-lessons'
   fileRoutesById: FileRoutesById
@@ -135,7 +147,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
-  AuthRoute: typeof AuthRoute
+  AuthRoute: typeof AuthRouteWithChildren
   ApiPublicHooksSendLessonsRoute: typeof ApiPublicHooksSendLessonsRoute
 }
 
@@ -190,6 +202,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProgressionRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/_authenticated/quiz/': {
       id: '/_authenticated/quiz/'
       path: '/quiz'
@@ -227,12 +246,32 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
 )
 
+interface AuthRouteChildren {
+  AuthCallbackRoute: typeof AuthCallbackRoute
+}
+
+const AuthRouteChildren: AuthRouteChildren = {
+  AuthCallbackRoute: AuthCallbackRoute,
+}
+
+const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
-  AuthRoute: AuthRoute,
+  AuthRoute: AuthRouteWithChildren,
   ApiPublicHooksSendLessonsRoute: ApiPublicHooksSendLessonsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
