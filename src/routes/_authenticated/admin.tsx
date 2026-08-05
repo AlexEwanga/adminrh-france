@@ -30,7 +30,7 @@ function AdminPage() {
       if (result.success) {
         toast.success(result.simulated ? "Simulation réussie (Clé API manquante)" : "Message de test envoyé !")
       } else {
-        toast.error(result.error || "Erreur lors du test")
+        toast.error((result as any).error || "Erreur lors du test")
       }
     } catch (err) {
       toast.error("Erreur de connexion")
