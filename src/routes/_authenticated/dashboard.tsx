@@ -1,12 +1,27 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useSuspenseQuery } from '@tanstack/react-query'
-import { getLearningStats, getRecentMessages } from '@/lib/learning.functions'
-import { useState } from 'react'
+import { useSuspenseQuery, useQueryClient } from '@tanstack/react-query'
+import { getLearningStats, getRecentMessages, getNotes, addNote } from '@/lib/learning.functions'
+import { useState, useEffect, useMemo } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
-import { Plus, MoreHorizontal, MessageSquare, Trophy, Target, BookOpen } from 'lucide-react'
+import { Plus, MoreHorizontal, MessageSquare, Trophy, Target, BookOpen, Search, Send, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { 
+  BarChart as ReBarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip as ReTooltip, 
+  ResponsiveContainer,
+  Cell,
+  LineChart,
+  Line
+} from 'recharts'
+import { toast } from 'sonner'
+import { Input } from '@/components/ui/input'
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
 
 export const Route = createFileRoute('/_authenticated/dashboard')({
   component: Dashboard,
@@ -14,6 +29,22 @@ export const Route = createFileRoute('/_authenticated/dashboard')({
 
 function Dashboard() {
   const [activeFilter, setActiveFilter] = useState('Tout')
+  const [searchTerm, setSearchTerm] = useState('')
+  const [newNoteTitle, setNewNoteTitle] = useState('')
+  const [newNoteContent, setNewNoteContent] = useState('')
+  const [isAddingNote, setIsAddingNote] = useState(false)
+  const queryClient = useQueryClient()
+
+  useEffect(() => {
+    const handleSearch = (e: any) => {
+      setSearchTerm(e.detail || '')
+    }
+    window.addEventListener('global-search-change', handleSearch)
+    const initialSearch = localStorage.getItem('adminrh-global-search')
+    if (initialSearch) setSearchTerm(initialSearch)
+    return () => window.removeEventListener('global-search-change', handleSearch)
+  }, [])
+
   const { data: stats } = useSuspenseQuery({
     queryKey: ['learning-stats'],
     queryFn: () => getLearningStats()
@@ -24,6 +55,21 @@ function Dashboard() {
     queryFn: () => getRecentMessages()
   })
 
+  const { data: notes } = useSuspenseQuery({
+    queryKey: ['notes'],
+    queryFn: () => getNotes()
+  })
+
+  const chartData = [
+    { name: 'Lun', score: 65, messages: 5 },
+    { name: 'Mar', score: 78, messages: 5 },
+    { name: 'Mer', score: 45, messages: 3 },
+    { name: 'Jeu', score: 90, messages: 5 },
+    { name: 'Ven', score: 82, messages: 5 },
+    { name: 'Sam', score: 95, messages: 1 },
+    { name: 'Dim', score: 70, messages: 0 },
+  ]
+
   const tasks = [
     { id: 1, title: "Rédaction de contrat de travail", subject: "Droit du Travail", date: "Aujourd'hui", status: "En cours", progress: 65, comments: 3, statusColor: "bg-[#FEEFC3] text-[#F9A825]" },
     { id: 2, title: "Calcul des indemnités de licenciement", subject: "Paie & Social", date: "Demain", status: "À faire", comments: 0, statusColor: "bg-[#E0E7FF] text-[#6366F1]" },
@@ -31,10 +77,32 @@ function Dashboard() {
     { id: 4, title: "Les instances représentatives du personnel", subject: "Droit du Travail", date: "12 Août 2026", status: "À faire", comments: 5, statusColor: "bg-[#E0E7FF] text-[#6366F1]" },
   ]
 
-  const filteredTasks = tasks.filter(task => {
-    const matchesFilter = activeFilter === 'Tout' || task.status === activeFilter
-    return matchesFilter
-  })
+  const filteredTasks = useMemo(() => {
+    return tasks.filter(task => {
+      const matchesFilter = activeFilter === 'Tout' || task.status === activeFilter
+      const matchesSearch = task.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                           task.subject.toLowerCase().includes(searchTerm.toLowerCase())
+      return matchesFilter && matchesSearch
+    })
+  }, [activeFilter, searchTerm])
+
+  const handleAddNote = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!newNoteTitle || !newNoteContent) return
+
+    setIsAddingNote(true)
+    try {
+      await addNote({ data: { title: newNoteTitle, content: newNoteContent } })
+      setNewNoteTitle('')
+      setNewNoteContent('')
+      toast.success('Note ajoutée avec succès')
+      queryClient.invalidateQueries({ queryKey: ['notes'] })
+    } catch (error) {
+      toast.error("Erreur lors de l'ajout de la note")
+    } finally {
+      setIsAddingNote(false)
+    }
+  }
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 pb-6">
