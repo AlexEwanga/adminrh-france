@@ -19,16 +19,16 @@ function ProgressionPage() {
   ]
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-8">
+    <div className="bg-white rounded-[32px] p-8 shadow-sm border border-white/50 flex flex-col gap-8 min-h-[calc(100vh-140px)]">
       <header>
-        <h1 className="text-3xl font-bold text-[#1E2A4A]">Ma Progression</h1>
-        <p className="text-slate-500">Visualisez vos scores et votre temps d'apprentissage.</p>
+        <h1 className="text-3xl font-bold text-[#2D3142]">Ma Progression RH</h1>
+        <p className="text-slate-400 mt-1">Visualisez votre maîtrise de l'écosystème RH français.</p>
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <Card>
+        <Card className="border-none shadow-none bg-[#F8F9FA] rounded-[24px]">
           <CardHeader>
-            <CardTitle>Score Hebdomadaire</CardTitle>
+            <CardTitle className="text-[#2D3142]">Score Hebdomadaire (%)</CardTitle>
           </CardHeader>
           <CardContent className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -37,18 +37,18 @@ function ProgressionPage() {
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip 
-                  contentStyle={{ backgroundColor: '#1E2A4A', color: '#fff', borderRadius: '8px' }}
-                  itemStyle={{ color: '#D4AF37' }}
+                  contentStyle={{ backgroundColor: '#2D3142', color: '#fff', borderRadius: '16px', border: 'none' }}
+                  itemStyle={{ color: '#8C7CF0' }}
                 />
-                <Bar dataKey="score" fill="#1E2A4A" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="score" fill="#8C7CF0" radius={[8, 8, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-none shadow-none bg-[#F8F9FA] rounded-[24px]">
           <CardHeader>
-            <CardTitle>Temps d'apprentissage</CardTitle>
+            <CardTitle className="text-[#2D3142]">Statistiques détaillées</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
