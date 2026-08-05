@@ -52,17 +52,17 @@ function ProgressionPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="flex justify-between items-center p-4 bg-slate-50 rounded-lg">
-                <span className="font-medium">Cette semaine</span>
-                <span className="text-[#D4AF37] font-bold">12h 45m</span>
+              <div className="flex justify-between items-center p-6 bg-white rounded-2xl shadow-sm">
+                <span className="font-bold text-[#2D3142]">Temps d'étude (Semaine)</span>
+                <span className="text-[#8C7CF0] font-black text-lg">12h 45m</span>
               </div>
-              <div className="flex justify-between items-center p-4 bg-slate-50 rounded-lg">
-                <span className="font-medium">Moyenne quotidienne</span>
-                <span className="text-[#D4AF37] font-bold">1h 50m</span>
+              <div className="flex justify-between items-center p-6 bg-white rounded-2xl shadow-sm">
+                <span className="font-bold text-[#2D3142]">Moyenne quotidienne</span>
+                <span className="text-[#8C7CF0] font-black text-lg">1h 50m</span>
               </div>
-              <div className="flex justify-between items-center p-4 bg-slate-50 rounded-lg">
-                <span className="font-medium">Sujet le plus étudié</span>
-                <span className="text-[#D4AF37] font-bold">Droit du travail</span>
+              <div className="flex justify-between items-center p-6 bg-white rounded-2xl shadow-sm">
+                <span className="font-bold text-[#2D3142]">Domaine d'expertise</span>
+                <span className="text-[#8C7CF0] font-black text-lg">Droit du travail</span>
               </div>
             </div>
           </CardContent>
