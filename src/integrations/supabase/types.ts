@@ -128,6 +128,39 @@ export type Database = {
         }
         Relationships: []
       }
+      objectives: {
+        Row: {
+          created_at: string | null
+          due_date: string | null
+          id: number
+          progress: number | null
+          status: string | null
+          subject: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          due_date?: string | null
+          id?: number
+          progress?: number | null
+          status?: string | null
+          subject?: string | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          due_date?: string | null
+          id?: number
+          progress?: number | null
+          status?: string | null
+          subject?: string | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string | null
