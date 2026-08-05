@@ -6,16 +6,24 @@ import { Badge } from '@/components/ui/badge'
 import { BookOpen, Search, Filter } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { useState } from 'react'
 
 export const Route = createFileRoute('/_authenticated/learning')({
   component: Learning,
 })
 
 function Learning() {
+  const [searchQuery, setSearchQuery] = useState('')
   const { data: messages } = useSuspenseQuery({
     queryKey: ['recent-messages'],
     queryFn: () => getRecentMessages()
   })
+
+  const filteredMessages = messages?.filter(msg => 
+    msg.subject.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    msg.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    msg.tag?.toLowerCase().includes(searchQuery.toLowerCase())
+  )
 
   return (
     <div className="bg-white rounded-[32px] p-8 shadow-sm border border-white/50 flex flex-col gap-8 min-h-[calc(100vh-140px)]">
@@ -27,7 +35,12 @@ function Learning() {
         <div className="flex items-center gap-2">
           <div className="relative w-64">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-            <Input className="pl-10 rounded-xl border-slate-100 bg-slate-50 focus-visible:ring-[#8C7CF0]" placeholder="Rechercher..." />
+            <Input 
+              className="pl-10 rounded-xl border-slate-100 bg-slate-50 focus-visible:ring-[#8C7CF0]" 
+              placeholder="Rechercher..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
           </div>
           <Button variant="outline" className="rounded-xl border-slate-100">
             <Filter size={18} className="mr-2" />
@@ -37,7 +50,7 @@ function Learning() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {messages?.map((msg) => (
+        {filteredMessages?.map((msg) => (
           <Card key={msg.id} className="group border-none shadow-none bg-[#F8F9FA] rounded-[24px] overflow-hidden hover:bg-white hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300">
             <CardContent className="p-6 flex flex-col gap-4">
               <div className="flex justify-between items-start">
@@ -59,6 +72,11 @@ function Learning() {
             </CardContent>
           </Card>
         ))}
+        {filteredMessages?.length === 0 && (
+          <div className="col-span-full py-12 text-center text-slate-400 font-medium">
+            Aucun résultat trouvé pour "{searchQuery}"
+          </div>
+        )}
       </div>
     </div>
   )

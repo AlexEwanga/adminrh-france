@@ -1,13 +1,15 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts'
+import { useState } from 'react'
 
 export const Route = createFileRoute('/_authenticated/progression')({
   component: ProgressionPage,
 })
 
-
 function ProgressionPage() {
+  const [activeTab, setActiveTab] = useState('Semaine')
+  
   const data = [
     { name: 'Lun', score: 65 },
     { name: 'Mar', score: 72 },
@@ -20,27 +22,59 @@ function ProgressionPage() {
 
   return (
     <div className="bg-white rounded-[32px] p-8 shadow-sm border border-white/50 flex flex-col gap-8 min-h-[calc(100vh-140px)]">
-      <header>
-        <h1 className="text-3xl font-bold text-[#2D3142]">Ma Progression RH</h1>
-        <p className="text-slate-400 mt-1">Visualisez votre maîtrise de l'écosystème RH français.</p>
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-[#2D3142]">Ma Progression RH</h1>
+          <p className="text-slate-400 mt-1">Visualisez votre maîtrise de l'écosystème RH français.</p>
+        </div>
+        <div className="flex gap-1 bg-slate-50 p-1 rounded-xl border border-slate-100">
+          {['Semaine', 'Mois'].map(tab => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all ${
+                activeTab === tab ? 'bg-white text-[#2D3142] shadow-sm' : 'text-slate-400 hover:text-slate-600'
+              }`}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <Card className="border-none shadow-none bg-[#F8F9FA] rounded-[24px]">
-          <CardHeader>
-            <CardTitle className="text-[#2D3142]">Score Hebdomadaire (%)</CardTitle>
+        <Card className="border-none shadow-none bg-[#F8F9FA] rounded-[24px] overflow-hidden">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-[#2D3142] text-xl font-bold">Score {activeTab} (%)</CardTitle>
           </CardHeader>
-          <CardContent className="h-[300px]">
+          <CardContent className="h-[300px] p-6 pt-0">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={data}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip 
-                  contentStyle={{ backgroundColor: '#2D3142', color: '#fff', borderRadius: '16px', border: 'none' }}
-                  itemStyle={{ color: '#8C7CF0' }}
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                <XAxis 
+                  dataKey="name" 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fill: '#94a3b8', fontSize: 12, fontWeight: 600 }}
+                  dy={10}
                 />
-                <Bar dataKey="score" fill="#8C7CF0" radius={[8, 8, 0, 0]} />
+                <YAxis 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fill: '#94a3b8', fontSize: 12, fontWeight: 600 }}
+                />
+                <Tooltip 
+                  cursor={{ fill: 'rgba(140, 124, 240, 0.05)' }}
+                  contentStyle={{ 
+                    backgroundColor: '#2D3142', 
+                    color: '#fff', 
+                    borderRadius: '16px', 
+                    border: 'none',
+                    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)'
+                  }}
+                  itemStyle={{ color: '#8C7CF0', fontWeight: 'bold' }}
+                />
+                <Bar dataKey="score" fill="#8C7CF0" radius={[8, 8, 0, 0]} barSize={32} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
@@ -48,26 +82,27 @@ function ProgressionPage() {
 
         <Card className="border-none shadow-none bg-[#F8F9FA] rounded-[24px]">
           <CardHeader>
-            <CardTitle className="text-[#2D3142]">Statistiques détaillées</CardTitle>
+            <CardTitle className="text-[#2D3142] text-xl font-bold">Statistiques détaillées</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="flex justify-between items-center p-6 bg-white rounded-2xl shadow-sm">
-                <span className="font-bold text-[#2D3142]">Temps d'étude (Semaine)</span>
-                <span className="text-[#8C7CF0] font-black text-lg">12h 45m</span>
-              </div>
-              <div className="flex justify-between items-center p-6 bg-white rounded-2xl shadow-sm">
-                <span className="font-bold text-[#2D3142]">Moyenne quotidienne</span>
-                <span className="text-[#8C7CF0] font-black text-lg">1h 50m</span>
-              </div>
-              <div className="flex justify-between items-center p-6 bg-white rounded-2xl shadow-sm">
-                <span className="font-bold text-[#2D3142]">Domaine d'expertise</span>
-                <span className="text-[#8C7CF0] font-black text-lg">Droit du travail</span>
-              </div>
+              <StatItem label="Temps d'étude" value="12h 45m" />
+              <StatItem label="Moyenne quotidienne" value="1h 50m" />
+              <StatItem label="Domaine d'expertise" value="Droit du travail" />
+              <StatItem label="Points gagnés" value="+450 pts" />
             </div>
           </CardContent>
         </Card>
       </div>
+    </div>
+  )
+}
+
+function StatItem({ label, value }: { label: string, value: string }) {
+  return (
+    <div className="flex justify-between items-center p-6 bg-white rounded-2xl shadow-sm border border-slate-50 hover:border-[#8C7CF0]/30 transition-colors group">
+      <span className="font-bold text-[#2D3142]">{label}</span>
+      <span className="text-[#8C7CF0] font-black text-lg group-hover:scale-105 transition-transform">{value}</span>
     </div>
   )
 }
