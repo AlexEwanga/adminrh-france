@@ -24,11 +24,11 @@ function Dashboard() {
   })
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-6">
-      {/* Left Column: My Tasks */}
-      <div className="bg-white rounded-[32px] p-8 shadow-sm border border-white/50 flex flex-col gap-6">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 pb-6">
+      {/* Left Column: Mes objectifs RH */}
+      <div className="lg:col-span-7 bg-white rounded-[32px] p-8 shadow-sm border border-white/50 flex flex-col gap-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-[#2D3142]">Mes objectifs RH</h2>
+          <h2 className="text-2xl font-bold text-[#2D3142] tracking-tight">Mes objectifs RH</h2>
           <Button size="icon" variant="ghost" className="bg-[#F8F9FA] rounded-xl hover:bg-slate-100 h-10 w-10 border border-slate-100">
             <Plus size={20} className="text-[#2D3142]" />
           </Button>
