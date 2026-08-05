@@ -1,10 +1,13 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
-import { Plus, Search, Edit2, Trash2 } from 'lucide-react'
+import { Plus, Search, Edit2, Trash2, Send, ExternalLink, ShieldCheck } from 'lucide-react'
+import { useState } from 'react'
+import { toast } from 'sonner'
+import { useServerFn } from '@tanstack/react-start'
+import { testWPSentConnection } from '@/lib/wpsent.server'
 
 export const Route = createFileRoute('/_authenticated/admin')({
   component: AdminPage,
@@ -12,18 +15,105 @@ export const Route = createFileRoute('/_authenticated/admin')({
 
 
 function AdminPage() {
+  const [testPhone, setTestPhone] = useState('')
+  const [isTesting, setIsTesting] = useState(false)
+  const testWPSent = useServerFn(testWPSentConnection)
+
+  const handleTestConnection = async () => {
+    if (!testPhone) {
+      toast.error("Veuillez entrer un numéro de téléphone (ex: +336...)")
+      return
+    }
+    setIsTesting(true)
+    try {
+      const result = await testWPSent({ data: { phone: testPhone } })
+      if (result.success) {
+        toast.success(result.simulated ? "Simulation réussie (Clé API manquante)" : "Message de test envoyé !")
+      } else {
+        toast.error(result.error || "Erreur lors du test")
+      }
+    } catch (err) {
+      toast.error("Erreur de connexion")
+    } finally {
+      setIsTesting(false)
+    }
+  }
+
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-8">
       <header className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-[#1E2A4A]">Administration</h1>
-          <p className="text-slate-500">Gérez les messages, les quiz et les utilisateurs.</p>
+          <p className="text-slate-500">Gérez les messages, les quiz et la configuration WPSent.</p>
         </div>
-        <Button className="bg-[#1E2A4A]">
-          <Plus size={18} className="mr-2" />
-          Ajouter un message
-        </Button>
+        <div className="flex gap-3">
+          <Button variant="outline" className="border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37]/10">
+            <ShieldCheck size={18} className="mr-2" />
+            Vérifier RLS
+          </Button>
+          <Button className="bg-[#1E2A4A]">
+            <Plus size={18} className="mr-2" />
+            Ajouter un message
+          </Button>
+        </div>
       </header>
+
+      {/* Configuration WPSent Section */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card className="md:col-span-2">
+          <CardHeader>
+            <CardTitle className="text-[#1E2A4A] flex items-center gap-2">
+              <Send size={20} className="text-[#D4AF37]" />
+              Configuration WPSent
+            </CardTitle>
+            <CardDescription>
+              Connectez votre compte WPSent pour envoyer les leçons quotidiennes par WhatsApp.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="p-4 bg-slate-50 rounded-lg border border-slate-200">
+              <h4 className="font-semibold text-sm mb-2 text-[#1E2A4A]">Instructions :</h4>
+              <ol className="text-sm text-slate-600 list-decimal ml-4 space-y-1">
+                <li>Allez sur votre dashboard <a href="https://wpsent.com" target="_blank" className="text-blue-600 hover:underline flex-inline items-center">WPSent.com <ExternalLink size={12} className="inline ml-1" /></a></li>
+                <li>Récupérez votre <strong>API Key</strong> dans les paramètres.</li>
+                <li>Dans Lovable Cloud, ajoutez un secret nommé <code className="bg-slate-200 px-1 rounded">WPSENT_API_KEY</code>.</li>
+              </ol>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row gap-3">
+              <div className="flex-1">
+                <Input 
+                  placeholder="Numéro de test (ex: +33612345678)" 
+                  value={testPhone}
+                  onChange={(e) => setTestPhone(e.target.value)}
+                />
+              </div>
+              <Button 
+                onClick={handleTestConnection} 
+                disabled={isTesting}
+                className="bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-white"
+              >
+                {isTesting ? "Envoi..." : "Tester la connexion"}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm uppercase text-slate-500">Statut API</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-3 h-3 rounded-full bg-yellow-500 animate-pulse" />
+              <span className="font-medium">En attente de clé</span>
+            </div>
+            <p className="text-xs text-slate-500">
+              L'envoi est actuellement en mode simulation. Les messages sont loggués dans la console serveur.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
 
       <div className="flex gap-4 items-center">
         <div className="relative flex-1">
