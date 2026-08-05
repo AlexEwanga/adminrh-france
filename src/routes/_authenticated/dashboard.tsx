@@ -82,36 +82,12 @@ function Dashboard() {
         </Button>
       </div>
 
-      {/* Right Column: Notes & Schedule */}
-      <div className="space-y-6 flex flex-col">
-        {/* My Notes section */}
-        <div className="space-y-4">
+      {/* Right Column: Planning & Notes */}
+      <div className="lg:col-span-5 space-y-6 flex flex-col">
+        {/* Mon planning section */}
+        <div className="bg-white rounded-[32px] p-8 shadow-sm border border-white/50 flex flex-col gap-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-[#2D3142]">Mes notes RH</h2>
-            <Button size="icon" variant="ghost" className="bg-[#F8F9FA] rounded-xl hover:bg-slate-100 h-10 w-10 border border-slate-100">
-              <Plus size={20} className="text-[#2D3142]" />
-            </Button>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <NoteCard 
-              title="Droit de grève en France" 
-              content="En France, le droit de grève est un droit constitutionnel. Il s'exerce dans le cadre des lois qui le réglementent. Une grève doit être précédée d'un préavis dans le secteur public." 
-              date="5 Août 2026"
-              color="bg-[#D1FAE5] text-[#065F46]"
-            />
-            <NoteCard 
-              title="Période d'essai (CDI)" 
-              content="La durée initiale maximale de la période d'essai est de : 2 mois pour les ouvriers et employés, 3 mois pour les agents de maîtrise et techniciens, et 4 mois pour les cadres." 
-              date="4 Août 2026"
-              color="bg-[#E0E7FF] text-[#3730A3]"
-            />
-          </div>
-        </div>
-
-        {/* My Schedule section */}
-        <div className="bg-white rounded-[32px] p-8 shadow-sm border border-white/50 flex-1 flex flex-col gap-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-[#2D3142]">Mon planning d'apprentissage</h2>
+            <h2 className="text-2xl font-bold text-[#2D3142] tracking-tight">Mon planning</h2>
             <div className="flex items-center gap-2 bg-[#F8F9FA] px-4 py-2 rounded-xl border border-slate-100 text-sm font-medium text-[#2D3142] cursor-pointer">
               5 Août, Mercredi
               <Target size={14} className="ml-1 rotate-90" />
@@ -127,6 +103,30 @@ function Dashboard() {
               <ScheduleItem time="15:15" lesson="Droit du Travail" teacher="Durée du travail" location="WhatsApp" />
               <ScheduleItem time="18:00" lesson="Culture Générale" teacher="Histoire de France" location="WhatsApp" />
             </div>
+          </div>
+        </div>
+
+        {/* Mes notes section */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between px-2">
+            <h2 className="text-2xl font-bold text-[#2D3142] tracking-tight">Mes notes</h2>
+            <Button size="icon" variant="ghost" className="bg-[#F8F9FA] rounded-xl hover:bg-slate-100 h-10 w-10 border border-slate-100">
+              <Plus size={20} className="text-[#2D3142]" />
+            </Button>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <NoteCard 
+              title="Droit de grève" 
+              content="En France, le droit de grève est un droit constitutionnel. Une grève doit être précédée d'un préavis dans le secteur public." 
+              date="5 Août 2026"
+              color="bg-[#D1FAE5] text-[#065F46]"
+            />
+            <NoteCard 
+              title="Période d'essai" 
+              content="CDI : 2 mois (ouvriers/employés), 3 mois (agents de maîtrise), 4 mois (cadres)." 
+              date="4 Août 2026"
+              color="bg-[#E0E7FF] text-[#3730A3]"
+            />
           </div>
         </div>
       </div>
