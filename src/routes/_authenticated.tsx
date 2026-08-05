@@ -54,9 +54,9 @@ function AuthenticatedLayout() {
         
         <nav className="flex-1 px-4 space-y-1">
           <SidebarLink to="/dashboard" icon={<LayoutDashboard size={20} />} label="Tableau de bord" />
-          <SidebarLink to="/learning" icon={<BookOpen size={20} />} label="Planning" />
-          <SidebarLink to="/quiz" icon={<GraduationCap size={20} />} label="Objectifs" badge="3" />
-          <SidebarLink to="/progression" icon={<BarChart size={20} />} label="Tests & Quiz" />
+          <SidebarLink to="/learning" icon={<BookOpen size={20} />} label="Base de connaissances" />
+          <SidebarLink to="/quiz" icon={<GraduationCap size={20} />} label="Quiz & Tests" />
+          <SidebarLink to="/progression" icon={<BarChart size={20} />} label="Ma Progression" />
           <SidebarLink to="/admin" icon={<Settings size={20} />} label="Administration" />
         </nav>
 

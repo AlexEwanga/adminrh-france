@@ -78,20 +78,19 @@ function Dashboard() {
         <div className="bg-white rounded-[32px] p-8 shadow-sm border border-white/50 flex flex-col gap-6">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold text-[#2D3142] tracking-tight">Mon planning</h2>
-            <div className="flex items-center gap-2 bg-[#F8F9FA] px-4 py-2 rounded-xl border border-slate-100 text-sm font-medium text-[#2D3142] cursor-pointer">
+            <div className="flex items-center gap-2 bg-[#F8F9FA] px-4 py-2 rounded-xl border border-slate-100 text-sm font-medium text-[#2D3142]">
               5 Août, Mercredi
-              <Target size={14} className="ml-1 rotate-90" />
             </div>
           </div>
 
           <div className="space-y-1">
             <ScheduleHeader />
             <div className="divide-y divide-slate-50">
-              <ScheduleItem time="07:00" lesson="Droit du Travail" teacher="Contrat CDI/CDD" location="WhatsApp" />
-              <ScheduleItem time="09:45" lesson="Géographie" teacher="Régions de France" location="WhatsApp" />
-              <ScheduleItem time="12:30" lesson="Culture" teacher="Gastronomie & Codes" location="WhatsApp" />
-              <ScheduleItem time="15:15" lesson="Droit du Travail" teacher="Durée du travail" location="WhatsApp" />
-              <ScheduleItem time="18:00" lesson="Culture Générale" teacher="Histoire de France" location="WhatsApp" />
+              <ScheduleItem time="07:00" lesson="Droit du Travail" theme="Contrat CDI/CDD" channel="WhatsApp" />
+              <ScheduleItem time="09:45" lesson="Géographie" theme="Régions de France" channel="WhatsApp" />
+              <ScheduleItem time="12:30" lesson="Culture" theme="Gastronomie & Codes" channel="WhatsApp" />
+              <ScheduleItem time="15:15" lesson="Droit du Travail" theme="Durée du travail" channel="WhatsApp" />
+              <ScheduleItem time="18:00" lesson="Culture Générale" theme="Histoire de France" channel="WhatsApp" />
             </div>
           </div>
         </div>
@@ -199,18 +198,15 @@ function ScheduleHeader() {
   )
 }
 
-function ScheduleItem({ time, lesson, teacher, location }: any) {
+function ScheduleItem({ time, lesson, theme, channel }: any) {
   return (
     <div className="grid grid-cols-4 px-4 py-4 items-center text-[13px] group hover:bg-slate-50 transition-colors rounded-xl cursor-pointer">
       <span className="font-bold text-[#2D3142]">{time}</span>
       <span className="font-medium text-[#2D3142]">{lesson}</span>
       <div className="flex items-center gap-2">
-        <Avatar className="h-6 w-6">
-          <AvatarFallback className="bg-slate-100 text-[10px]">{teacher[0]}</AvatarFallback>
-        </Avatar>
-        <span className="text-slate-500 font-medium">{teacher}</span>
+        <span className="text-slate-500 font-medium">{theme}</span>
       </div>
-      <span className="text-slate-500 font-medium">{location}</span>
+      <span className="text-slate-500 font-medium">{channel}</span>
     </div>
   )
 }
