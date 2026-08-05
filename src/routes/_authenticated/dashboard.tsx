@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useQuery } from '@tanstack/react-query'
-import { supabase } from '@/integrations/supabase/client'
+import { useSuspenseQuery } from '@tanstack/react-query'
+import { getLearningStats, getRecentMessages } from '@/lib/learning.functions'
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
@@ -12,27 +13,23 @@ export const Route = createFileRoute('/_authenticated/dashboard')({
 
 
 function Dashboard() {
-  const { data: stats } = useQuery({
+  const { data: stats } = useSuspenseQuery({
     queryKey: ['learning-stats'],
-    queryFn: async () => {
-      const { data } = await supabase.from('learning_stats').select('*').single()
-      return data
-    }
+    queryFn: () => getLearningStats()
   })
 
-  const { data: messages } = useQuery({
+  const { data: messages } = useSuspenseQuery({
     queryKey: ['recent-messages'],
-    queryFn: async () => {
-      const { data } = await supabase.from('messages').select('*').limit(5).order('created_at', { ascending: false })
-      return data
-    }
+    queryFn: () => getRecentMessages()
   })
+
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-8 bg-slate-50 min-h-screen">
       <header className="space-y-2">
-        <h1 className="text-3xl font-bold text-[#1E2A4A]">Tableau de Bord RH</h1>
-        <p className="text-slate-500">Suivez votre progression et vos derniers apprentissages.</p>
+        <h1 className="text-3xl font-bold text-[#1E2A4A]">AdminRH-France</h1>
+        <p className="text-slate-500">Bienvenue dans votre assistant personnel d'apprentissage.</p>
+
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

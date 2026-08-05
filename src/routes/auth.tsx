@@ -35,8 +35,9 @@ function AuthPage() {
     <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold text-[#1E2A4A]">Bienvenue sur AdminRH</CardTitle>
-          <CardDescription>Connectez-vous pour accéder à votre parcours</CardDescription>
+          <CardTitle className="text-2xl font-bold text-[#1E2A4A]">AdminRH-France</CardTitle>
+          <CardDescription>Votre assistant d'apprentissage RH en France</CardDescription>
+
         </CardHeader>
         <CardContent className="space-y-4">
           <form onSubmit={handleEmailLogin} className="space-y-4">
