@@ -149,7 +149,12 @@ function AdminPage() {
             className="pl-10 rounded-xl border-slate-100 bg-[#F8F9FA] h-11" 
             placeholder="Rechercher..." 
             value={adminSearch}
-            onChange={(e) => setAdminSearch(e.target.value)}
+            onChange={(e) => {
+              const val = e.target.value
+              setAdminSearch(val)
+              window.dispatchEvent(new CustomEvent('global-search-change', { detail: val }))
+              localStorage.setItem('adminrh-global-search', val)
+            }}
           />
         </div>
         <Button variant="outline" className="rounded-xl border-slate-100 font-bold h-11">Filtrer</Button>

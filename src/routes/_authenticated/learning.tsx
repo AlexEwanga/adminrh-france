@@ -15,6 +15,11 @@ export const Route = createFileRoute('/_authenticated/learning')({
 function Learning() {
   const [searchQuery, setSearchQuery] = useState('')
 
+  const { data: messages } = useSuspenseQuery({
+    queryKey: ['recent-messages'],
+    queryFn: () => getRecentMessages()
+  })
+
   useEffect(() => {
     const handleSearch = (e: any) => {
       setSearchQuery(e.detail || '')
@@ -25,10 +30,10 @@ function Learning() {
     return () => window.removeEventListener('global-search-change', handleSearch)
   }, [])
 
-  const filteredMessages = messages?.filter(msg => 
+  const filteredMessages = messages?.filter((msg: any) => 
     msg.subject.toLowerCase().includes(searchQuery.toLowerCase()) || 
     msg.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    msg.tag?.toLowerCase().includes(searchQuery.toLowerCase())
+    (msg.tag && msg.tag.toLowerCase().includes(searchQuery.toLowerCase()))
   )
 
   return (
@@ -46,10 +51,11 @@ function Learning() {
               placeholder="Rechercher..." 
               value={searchQuery}
               onChange={(e) => {
-                setSearchQuery(e.target.value)
+                const val = e.target.value
+                setSearchQuery(val)
                 // Also update global search to keep header in sync
-                window.dispatchEvent(new CustomEvent('global-search-change', { detail: e.target.value }))
-                localStorage.setItem('adminrh-global-search', e.target.value)
+                window.dispatchEvent(new CustomEvent('global-search-change', { detail: val }))
+                localStorage.setItem('adminrh-global-search', val)
               }}
             />
           </div>
@@ -61,7 +67,7 @@ function Learning() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredMessages?.map((msg) => (
+        {filteredMessages?.map((msg: any) => (
           <Card key={msg.id} className="group border-none shadow-none bg-[#F8F9FA] rounded-[24px] overflow-hidden hover:bg-white hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300">
             <CardContent className="p-6 flex flex-col gap-4">
               <div className="flex justify-between items-start">
