@@ -53,7 +53,7 @@ function Learning() {
                 </p>
               </div>
               <div className="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between">
-                <span className="text-[11px] font-bold text-slate-300 uppercase">Leçon {msg.id.split('-')[0]}</span>
+                <span className="text-[11px] font-bold text-slate-300 uppercase">Leçon {String(msg.id).split('-')[0]}</span>
                 <Button variant="link" className="text-[#8C7CF0] font-bold p-0 h-auto text-xs">Lire la suite</Button>
               </div>
             </CardContent>
