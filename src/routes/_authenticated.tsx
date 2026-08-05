@@ -33,11 +33,41 @@ function AuthenticatedLayout() {
           <h2 className="text-xl font-bold tracking-tight text-[#D4AF37]">AdminRH</h2>
         </div>
         <nav className="flex-1 px-4 space-y-2">
-          <NavItem to="/dashboard" icon={<LayoutDashboard size={20} />} label="Dashboard" />
-          <NavItem to="/learning" icon={<BookOpen size={20} />} label="Apprentissage" />
-          <NavItem to="/quiz" icon={<GraduationCap size={20} />} label="Quiz" />
-          <NavItem to="/progression" icon={<BarChart size={20} />} label="Progression" />
-          <NavItem to="/admin" icon={<Settings size={20} />} label="Administration" />
+          <Link
+            to="/dashboard"
+            className="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition-colors [&.active]:bg-slate-800 [&.active]:text-[#D4AF37]"
+          >
+            <LayoutDashboard size={20} />
+            <span className="font-medium">Dashboard</span>
+          </Link>
+          <Link
+            to="/learning"
+            className="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition-colors [&.active]:bg-slate-800 [&.active]:text-[#D4AF37]"
+          >
+            <BookOpen size={20} />
+            <span className="font-medium">Apprentissage</span>
+          </Link>
+          <Link
+            to="/quiz"
+            className="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition-colors [&.active]:bg-slate-800 [&.active]:text-[#D4AF37]"
+          >
+            <GraduationCap size={20} />
+            <span className="font-medium">Quiz</span>
+          </Link>
+          <Link
+            to="/progression"
+            className="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition-colors [&.active]:bg-slate-800 [&.active]:text-[#D4AF37]"
+          >
+            <BarChart size={20} />
+            <span className="font-medium">Progression</span>
+          </Link>
+          <Link
+            to="/admin"
+            className="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition-colors [&.active]:bg-slate-800 [&.active]:text-[#D4AF37]"
+          >
+            <Settings size={20} />
+            <span className="font-medium">Administration</span>
+          </Link>
         </nav>
         <div className="p-4 border-t border-slate-700">
           <Button 
@@ -59,16 +89,3 @@ function AuthenticatedLayout() {
     </div>
   )
 }
-
-function NavItem({ to, icon, label }: { to: string, icon: React.ReactNode, label: string }) {
-  return (
-    <Link
-      to={to}
-      className="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition-colors [&.active]:bg-slate-800 [&.active]:text-[#D4AF37]"
-    >
-      {icon}
-      <span className="font-medium">{label}</span>
-    </Link>
-  )
-}
-
