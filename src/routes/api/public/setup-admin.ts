@@ -6,16 +6,22 @@ export const Route = createFileRoute('/api/public/setup-admin')({
     handlers: {
       GET: async () => {
         try {
-          await setupAdminUser({
+          const result = await setupAdminUser({
             data: {
               email: 'ewangaalex@gmail.com',
               password: 'AdminRH!France2026',
               role: 'admin'
             }
           });
-          return new Response('Admin created successfully with password: AdminRH!France2026', { status: 200 });
+          return new Response(JSON.stringify(result), { 
+            status: 200,
+            headers: { 'Content-Type': 'application/json' }
+          });
         } catch (error: any) {
-          return new Response('Error: ' + error.message, { status: 500 });
+          return new Response(JSON.stringify({ error: error.message }), { 
+            status: 500,
+            headers: { 'Content-Type': 'application/json' }
+          });
         }
       }
     }
