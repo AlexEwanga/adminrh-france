@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge'
 import { BookOpen, Search, Filter } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 export const Route = createFileRoute('/_authenticated/learning')({
   component: Learning,
@@ -14,10 +14,16 @@ export const Route = createFileRoute('/_authenticated/learning')({
 
 function Learning() {
   const [searchQuery, setSearchQuery] = useState('')
-  const { data: messages } = useSuspenseQuery({
-    queryKey: ['recent-messages'],
-    queryFn: () => getRecentMessages()
-  })
+
+  useEffect(() => {
+    const handleSearch = (e: any) => {
+      setSearchQuery(e.detail || '')
+    }
+    window.addEventListener('global-search-change', handleSearch)
+    const initialSearch = localStorage.getItem('adminrh-global-search')
+    if (initialSearch) setSearchQuery(initialSearch)
+    return () => window.removeEventListener('global-search-change', handleSearch)
+  }, [])
 
   const filteredMessages = messages?.filter(msg => 
     msg.subject.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -39,7 +45,12 @@ function Learning() {
               className="pl-10 rounded-xl border-slate-100 bg-slate-50 focus-visible:ring-[#8C7CF0]" 
               placeholder="Rechercher..." 
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                setSearchQuery(e.target.value)
+                // Also update global search to keep header in sync
+                window.dispatchEvent(new CustomEvent('global-search-change', { detail: e.target.value }))
+                localStorage.setItem('adminrh-global-search', e.target.value)
+              }}
             />
           </div>
           <Button variant="outline" className="rounded-xl border-slate-100">
