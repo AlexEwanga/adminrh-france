@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { getLearningStats, getRecentMessages } from '@/lib/learning.functions'
-
+import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
@@ -13,6 +13,7 @@ export const Route = createFileRoute('/_authenticated/dashboard')({
 })
 
 function Dashboard() {
+  const [activeFilter, setActiveFilter] = useState('Tout')
   const { data: stats } = useSuspenseQuery({
     queryKey: ['learning-stats'],
     queryFn: () => getLearningStats()
@@ -21,6 +22,18 @@ function Dashboard() {
   const { data: messages } = useSuspenseQuery({
     queryKey: ['recent-messages'],
     queryFn: () => getRecentMessages()
+  })
+
+  const tasks = [
+    { id: 1, title: "Rédaction de contrat de travail", subject: "Droit du Travail", date: "Aujourd'hui", status: "En cours", progress: 65, comments: 3, statusColor: "bg-[#FEEFC3] text-[#F9A825]" },
+    { id: 2, title: "Calcul des indemnités de licenciement", subject: "Paie & Social", date: "Demain", status: "À faire", comments: 0, statusColor: "bg-[#E0E7FF] text-[#6366F1]" },
+    { id: 3, title: "Géographie des départements français", subject: "Culture & Géo", date: "10 Août 2026", status: "À faire", comments: 2, statusColor: "bg-[#E0E7FF] text-[#6366F1]" },
+    { id: 4, title: "Les instances représentatives du personnel", subject: "Droit du Travail", date: "12 Août 2026", status: "À faire", comments: 5, statusColor: "bg-[#E0E7FF] text-[#6366F1]" },
+  ]
+
+  const filteredTasks = tasks.filter(task => {
+    if (activeFilter === 'Tout') return true
+    return task.status === activeFilter
   })
 
   return (
@@ -35,46 +48,23 @@ function Dashboard() {
         </div>
 
         <div className="flex gap-2">
-          <TaskFilter label="Tout" active />
-          <TaskFilter label="À faire" />
-          <TaskFilter label="En cours" />
-          <TaskFilter label="Terminé" />
+          {['Tout', 'À faire', 'En cours', 'Terminé'].map(filter => (
+            <TaskFilter 
+              key={filter} 
+              label={filter} 
+              active={activeFilter === filter} 
+              onClick={() => setActiveFilter(filter)}
+            />
+          ))}
         </div>
 
         <div className="space-y-4">
-          <TaskItem 
-            title="Rédaction de contrat de travail" 
-            subject="Droit du Travail" 
-            date="Aujourd'hui" 
-            status="En cours"
-            progress={65}
-            comments={3}
-            statusColor="bg-[#FEEFC3] text-[#F9A825]"
-          />
-          <TaskItem 
-            title="Calcul des indemnités de licenciement" 
-            subject="Paie & Social" 
-            date="Demain" 
-            status="À faire"
-            comments={0}
-            statusColor="bg-[#E0E7FF] text-[#6366F1]"
-          />
-          <TaskItem 
-            title="Géographie des départements français" 
-            subject="Culture & Géo" 
-            date="10 Août 2026" 
-            status="À faire"
-            comments={2}
-            statusColor="bg-[#E0E7FF] text-[#6366F1]"
-          />
-          <TaskItem 
-            title="Les instances représentatives du personnel" 
-            subject="Droit du Travail" 
-            date="12 Août 2026" 
-            status="À faire"
-            comments={5}
-            statusColor="bg-[#E0E7FF] text-[#6366F1]"
-          />
+          {filteredTasks.map(task => (
+            <TaskItem key={task.id} {...task} />
+          ))}
+          {filteredTasks.length === 0 && (
+            <p className="text-center py-12 text-slate-400 font-medium">Aucun objectif trouvé.</p>
+          )}
         </div>
 
         <Button variant="ghost" className="w-full text-slate-400 font-medium py-6 hover:bg-slate-50 mt-2">
@@ -134,11 +124,14 @@ function Dashboard() {
   )
 }
 
-function TaskFilter({ label, active }: { label: string, active?: boolean }) {
+function TaskFilter({ label, active, onClick }: { label: string, active?: boolean, onClick: () => void }) {
   return (
-    <button className={`px-4 py-1.5 rounded-xl text-sm font-medium transition-colors ${
-      active ? 'bg-[#2D3142] text-white shadow-md' : 'text-slate-500 hover:bg-slate-50'
-    }`}>
+    <button 
+      onClick={onClick}
+      className={`px-4 py-1.5 rounded-xl text-sm font-medium transition-colors ${
+        active ? 'bg-[#2D3142] text-white shadow-md' : 'text-slate-500 hover:bg-slate-50'
+      }`}
+    >
       {label}
     </button>
   )
@@ -161,7 +154,7 @@ function TaskItem({ title, subject, date, status, statusColor, progress, comment
         <div className="space-y-2">
           <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
             <div 
-              className="h-full bg-[#A3E635] rounded-full" 
+              className="h-full bg-[#A3E635] rounded-full transition-all duration-1000" 
               style={{ width: `${progress}%`, backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.1) 10px, rgba(255,255,255,0.1) 20px)' }}
             />
           </div>
@@ -179,7 +172,7 @@ function TaskItem({ title, subject, date, status, statusColor, progress, comment
 
 function NoteCard({ title, content, date, color }: any) {
   return (
-    <div className={`${color} rounded-[24px] p-6 flex flex-col gap-4 shadow-sm border border-white/20 h-full relative overflow-hidden group`}>
+    <div className={`${color} rounded-[24px] p-6 flex flex-col gap-4 shadow-sm border border-white/20 h-full relative overflow-hidden group hover:scale-[1.02] transition-transform cursor-pointer`}>
       <div className="flex justify-between items-start">
         <h3 className="font-bold text-base">{title}</h3>
         <Button size="icon" variant="ghost" className="h-6 w-6 rounded-full hover:bg-white/20">
@@ -190,7 +183,6 @@ function NoteCard({ title, content, date, color }: any) {
       <div className="mt-auto pt-4 text-[11px] font-bold opacity-70">
         {date}
       </div>
-      {/* Decorative dot */}
       <div className="absolute top-4 right-4 w-2 h-2 rounded-full bg-current opacity-20 pointer-events-none" />
     </div>
   )
@@ -209,7 +201,7 @@ function ScheduleHeader() {
 
 function ScheduleItem({ time, lesson, teacher, location }: any) {
   return (
-    <div className="grid grid-cols-4 px-4 py-4 items-center text-[13px] group hover:bg-slate-50 transition-colors rounded-xl">
+    <div className="grid grid-cols-4 px-4 py-4 items-center text-[13px] group hover:bg-slate-50 transition-colors rounded-xl cursor-pointer">
       <span className="font-bold text-[#2D3142]">{time}</span>
       <span className="font-medium text-[#2D3142]">{lesson}</span>
       <div className="flex items-center gap-2">

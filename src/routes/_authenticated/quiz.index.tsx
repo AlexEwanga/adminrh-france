@@ -1,11 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { getQuizzes } from '@/lib/learning.functions'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { GraduationCap, Trophy } from 'lucide-react'
-
+import { toast } from 'sonner'
 
 export const Route = createFileRoute('/_authenticated/quiz/')({
   component: QuizSelectionPage,
@@ -17,6 +17,10 @@ function QuizSelectionPage() {
     queryFn: () => getQuizzes()
   })
 
+  const handleStartQuiz = (title: string) => {
+    toast.success(`Démarrage du quiz : ${title}`)
+  }
+
   return (
     <div className="bg-white rounded-[32px] p-8 shadow-sm border border-white/50 flex flex-col gap-8 min-h-[calc(100vh-140px)]">
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -24,7 +28,7 @@ function QuizSelectionPage() {
           <h1 className="text-3xl font-bold text-[#2D3142]">Quiz & Défis RH</h1>
           <p className="text-slate-400 mt-1">Testez vos connaissances et gagnez des points d'expertise.</p>
         </div>
-        <div className="bg-[#FEEFC3] px-6 py-3 rounded-2xl flex items-center gap-3 shadow-sm">
+        <div className="bg-[#FEEFC3] px-6 py-3 rounded-2xl flex items-center gap-3 shadow-sm border border-[#FDE68A]">
           <Trophy className="text-[#F9A825]" size={24} />
           <span className="font-bold text-[#2D3142]">1,250 pts</span>
         </div>
@@ -36,7 +40,9 @@ function QuizSelectionPage() {
             <CardContent className="p-8 flex flex-col gap-6">
               <div className="flex justify-between items-start">
                 <Badge className="bg-white text-[#2D3142] border-none shadow-sm">{quiz.category}</Badge>
-                <Badge className="bg-[#E0E7FF] text-[#6366F1] border-none shadow-sm">{quiz.difficulty === 1 ? 'Débutant' : 'Intermédiaire'}</Badge>
+                <Badge className="bg-[#E0E7FF] text-[#6366F1] border-none shadow-sm">
+                  {quiz.difficulty === 1 ? 'Débutant' : quiz.difficulty === 2 ? 'Intermédiaire' : 'Expert'}
+                </Badge>
               </div>
               <div>
                 <h3 className="text-xl font-bold text-[#2D3142] mb-2">{quiz.title}</h3>
@@ -44,7 +50,10 @@ function QuizSelectionPage() {
                   {Array.isArray(quiz.questions) ? quiz.questions.length : 0} questions • 5-10 minutes
                 </p>
               </div>
-              <Button className="w-full bg-[#2D3142] hover:bg-[#8C7CF0] text-white rounded-2xl py-6 font-bold shadow-lg shadow-slate-200 transition-all">
+              <Button 
+                onClick={() => handleStartQuiz(quiz.title)}
+                className="w-full bg-[#2D3142] hover:bg-[#8C7CF0] text-white rounded-2xl py-6 font-bold shadow-lg shadow-slate-200 transition-all active:scale-95"
+              >
                 <GraduationCap className="mr-2" size={20} />
                 Commencer le Quiz
               </Button>
@@ -55,4 +64,3 @@ function QuizSelectionPage() {
     </div>
   )
 }
-
