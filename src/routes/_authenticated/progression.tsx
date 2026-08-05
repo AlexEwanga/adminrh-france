@@ -12,15 +12,33 @@ export const Route = createFileRoute('/_authenticated/progression')({
 function ProgressionPage() {
   const [activeTab, setActiveTab] = useState('Semaine')
   
-  const data = [
-    { name: 'Lun', score: 65 },
-    { name: 'Mar', score: 72 },
-    { name: 'Mer', score: 85 },
-    { name: 'Jeu', score: 78 },
-    { name: 'Ven', score: 92 },
-    { name: 'Sam', score: 88 },
-    { name: 'Dim', score: 95 },
-  ]
+  const { data: progressionData } = useSuspenseQuery({
+    queryKey: ['progression-data'],
+    queryFn: () => getProgressionData()
+  })
+
+  const { data: stats } = useSuspenseQuery({
+    queryKey: ['learning-stats'],
+    queryFn: () => getLearningStats()
+  })
+
+  const chartData = useMemo(() => {
+    if (!progressionData || progressionData.length === 0) {
+      return [
+        { name: 'Lun', score: 0 },
+        { name: 'Mar', score: 0 },
+        { name: 'Mer', score: 0 },
+        { name: 'Jeu', score: 0 },
+        { name: 'Ven', score: 0 },
+        { name: 'Sam', score: 0 },
+        { name: 'Dim', score: 0 },
+      ]
+    }
+    return progressionData.map((d: any) => ({
+      name: new Date(d.date).toLocaleDateString('fr-FR', { weekday: 'short' }),
+      score: d.avg_score || 0
+    }))
+  }, [progressionData])
 
   return (
     <div className="bg-white rounded-[32px] p-8 shadow-sm border border-white/50 flex flex-col gap-8 min-h-[calc(100vh-140px)]">
@@ -51,7 +69,7 @@ function ProgressionPage() {
           </CardHeader>
           <CardContent className="h-[300px] p-6 pt-0">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={data}>
+              <BarChart data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                 <XAxis 
                   dataKey="name" 
@@ -88,10 +106,10 @@ function ProgressionPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <StatItem label="Temps d'étude" value="12h 45m" />
-              <StatItem label="Moyenne quotidienne" value="1h 50m" />
-              <StatItem label="Domaine d'expertise" value="Droit du travail" />
-              <StatItem label="Points gagnés" value="+450 pts" />
+              <StatItem label="Quiz terminés" value={`${stats?.quiz_taken || 0}`} />
+              <StatItem label="Leçons reçues" value={`${stats?.messages_received || 0}`} />
+              <StatItem label="Domaine d'expertise" value={stats?.tags_covered?.[0] || "Droit du travail"} />
+              <StatItem label="Score moyen" value={`${stats?.avg_score || 0}%`} />
             </div>
           </CardContent>
         </Card>
