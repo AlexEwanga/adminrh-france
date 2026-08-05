@@ -8,14 +8,25 @@ export async function sendWhatsAppMessage(phoneNumber: string, message: string) 
   
   if (callmebotApiKey) {
     try {
-      // CallMeBot format: phone (with international code), text, apikey
-      const cleanPhone = phoneNumber.replace(/\+/g, "");
+      // Nettoyage du numéro : enlever le + et les espaces
+      const cleanPhone = phoneNumber.replace(/[\s+]/g, "");
       const url = `${CALLMEBOT_API_URL}?phone=${cleanPhone}&text=${encodeURIComponent(message)}&apikey=${callmebotApiKey}`;
       
+      console.log(`[WhatsApp] Calling CallMeBot: ${CALLMEBOT_API_URL}?phone=${cleanPhone}&text=...&apikey=${callmebotApiKey}`);
+      
       const response = await fetch(url);
-      if (response.ok) return { success: true, provider: "callmebot" };
+      const responseText = await response.text();
+      
+      if (response.ok) {
+        console.log("[WhatsApp] CallMeBot Success:", responseText);
+        return { success: true, provider: "callmebot" };
+      } else {
+        console.error("[WhatsApp] CallMeBot Error Response:", responseText);
+        throw new Error(`CallMeBot error: ${responseText}`);
+      }
     } catch (error) {
-      console.error("CallMeBot Error:", error);
+      console.error("CallMeBot Fetch Error:", error);
+      throw error;
     }
   }
 
@@ -34,7 +45,11 @@ export const testWhatsAppConnection = createServerFn({ method: "POST" })
   }).parse(data))
   .handler(async ({ data }) => {
     const apiKey = process.env['CALLMEBOT_API_KEY'];
-    if (!apiKey) return { success: false, error: "Clé CALLMEBOT_API_KEY manquante." };
+    if (!apiKey) return { success: false, error: "Clé CALLMEBOT_API_KEY manquante dans Lovable Cloud." };
     
-    return await sendWhatsAppMessage(data.phone, "Test de connexion AdminRH-France via CallMeBot 🚀");
+    try {
+      return await sendWhatsAppMessage(data.phone, "Test de connexion AdminRH-France via CallMeBot 🚀");
+    } catch (error: any) {
+      return { success: false, error: error.message || "Erreur lors de l'envoi" };
+    }
   });
