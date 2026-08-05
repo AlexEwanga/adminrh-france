@@ -80,9 +80,13 @@ function AuthenticatedLayout() {
         {/* Header bar */}
         <header className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="bg-white px-4 py-2.5 rounded-2xl shadow-sm border border-white/50 cursor-pointer hover:bg-slate-50 transition-colors flex items-center gap-2">
+            <div className="bg-white px-4 py-2.5 rounded-2xl shadow-sm border border-white/50 flex items-center gap-2">
               <Search size={18} className="text-slate-400" />
-              <span className="text-sm text-slate-400 font-medium pr-4">Rechercher...</span>
+              <input 
+                type="text" 
+                placeholder="Rechercher..." 
+                className="text-sm text-slate-600 font-medium bg-transparent focus:outline-none w-full"
+              />
             </div>
             <div className="bg-white p-2.5 rounded-2xl shadow-sm border border-white/50 cursor-pointer hover:bg-slate-50 transition-colors relative">
               <Bell size={18} className="text-slate-400" />
