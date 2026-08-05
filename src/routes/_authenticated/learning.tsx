@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge'
 import { BookOpen, Search, Filter } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 export const Route = createFileRoute('/_authenticated/learning')({
   component: Learning,
@@ -14,15 +14,26 @@ export const Route = createFileRoute('/_authenticated/learning')({
 
 function Learning() {
   const [searchQuery, setSearchQuery] = useState('')
+
   const { data: messages } = useSuspenseQuery({
     queryKey: ['recent-messages'],
     queryFn: () => getRecentMessages()
   })
 
-  const filteredMessages = messages?.filter(msg => 
+  useEffect(() => {
+    const handleSearch = (e: any) => {
+      setSearchQuery(e.detail || '')
+    }
+    window.addEventListener('global-search-change', handleSearch)
+    const initialSearch = localStorage.getItem('adminrh-global-search')
+    if (initialSearch) setSearchQuery(initialSearch)
+    return () => window.removeEventListener('global-search-change', handleSearch)
+  }, [])
+
+  const filteredMessages = messages?.filter((msg: any) => 
     msg.subject.toLowerCase().includes(searchQuery.toLowerCase()) || 
     msg.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    msg.tag?.toLowerCase().includes(searchQuery.toLowerCase())
+    (msg.tag && msg.tag.toLowerCase().includes(searchQuery.toLowerCase()))
   )
 
   return (
@@ -39,7 +50,13 @@ function Learning() {
               className="pl-10 rounded-xl border-slate-100 bg-slate-50 focus-visible:ring-[#8C7CF0]" 
               placeholder="Rechercher..." 
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                const val = e.target.value
+                setSearchQuery(val)
+                // Also update global search to keep header in sync
+                window.dispatchEvent(new CustomEvent('global-search-change', { detail: val }))
+                localStorage.setItem('adminrh-global-search', val)
+              }}
             />
           </div>
           <Button variant="outline" className="rounded-xl border-slate-100">
@@ -50,7 +67,7 @@ function Learning() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredMessages?.map((msg) => (
+        {filteredMessages?.map((msg: any) => (
           <Card key={msg.id} className="group border-none shadow-none bg-[#F8F9FA] rounded-[24px] overflow-hidden hover:bg-white hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300">
             <CardContent className="p-6 flex flex-col gap-4">
               <div className="flex justify-between items-start">

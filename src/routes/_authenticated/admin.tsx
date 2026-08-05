@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Plus, Search, Edit2, Trash2, Send, ExternalLink, ShieldCheck } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { toast } from 'sonner'
 import { useServerFn } from '@tanstack/react-start'
 import { testWhatsAppConnection } from '@/lib/whatsapp.server'
@@ -20,11 +20,28 @@ export const Route = createFileRoute('/_authenticated/admin')({
 function AdminPage() {
   const [testPhone, setTestPhone] = useState('')
   const [isTesting, setIsTesting] = useState(false)
+  const [adminSearch, setAdminSearch] = useState('')
+
+  useEffect(() => {
+    const handleSearch = (e: any) => {
+      setAdminSearch(e.detail || '')
+    }
+    window.addEventListener('global-search-change', handleSearch)
+    const initialSearch = localStorage.getItem('adminrh-global-search')
+    if (initialSearch) setAdminSearch(initialSearch)
+    return () => window.removeEventListener('global-search-change', handleSearch)
+  }, [])
+
   const testWhatsApp = useServerFn(testWhatsAppConnection)
   const { data: messages } = useSuspenseQuery({
     queryKey: ['recent-messages'],
     queryFn: () => getRecentMessages()
   })
+
+  const filteredMessages = messages?.filter((msg: any) => 
+    msg.subject.toLowerCase().includes(adminSearch.toLowerCase()) || 
+    (msg.tag && msg.tag.toLowerCase().includes(adminSearch.toLowerCase()))
+  )
 
   const handleTestConnection = async () => {
     if (!testPhone) {
@@ -128,7 +145,17 @@ function AdminPage() {
       <div className="flex gap-4 items-center">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-          <Input className="pl-10 rounded-xl border-slate-100 bg-[#F8F9FA] h-11" placeholder="Rechercher..." />
+          <Input 
+            className="pl-10 rounded-xl border-slate-100 bg-[#F8F9FA] h-11" 
+            placeholder="Rechercher..." 
+            value={adminSearch}
+            onChange={(e) => {
+              const val = e.target.value
+              setAdminSearch(val)
+              window.dispatchEvent(new CustomEvent('global-search-change', { detail: val }))
+              localStorage.setItem('adminrh-global-search', val)
+            }}
+          />
         </div>
         <Button variant="outline" className="rounded-xl border-slate-100 font-bold h-11">Filtrer</Button>
       </div>
@@ -145,8 +172,8 @@ function AdminPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100/50">
-              {messages && messages.length > 0 ? (
-                messages.map((msg: any) => (
+              {filteredMessages && filteredMessages.length > 0 ? (
+                filteredMessages.map((msg: any) => (
                   <tr key={msg.id} className="hover:bg-white transition-all group">
                     <td className="px-8 py-6">
                       <div className="font-bold text-[#2D3142]">{msg.subject}</div>
