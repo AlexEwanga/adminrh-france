@@ -68,3 +68,55 @@ export const addNote = createServerFn({ method: "POST" })
     if (error) throw error;
     return note;
   });
+
+export const getObjectives = createServerFn({ method: "GET" })
+  .handler(async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return [];
+
+    const { data } = await supabase
+      .from('objectives')
+      .select('*')
+      .eq('user_id', session.user.id)
+      .order('created_at', { ascending: false });
+      
+    return data || [];
+  });
+
+export const addObjective = createServerFn({ method: "POST" })
+  .inputValidator((d: { title: string, subject: string, due_date?: string }) => d)
+  .handler(async ({ data }) => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) throw new Error('Unauthorized');
+
+    const { data: objective, error } = await supabase
+      .from('objectives')
+      .insert({
+        user_id: session.user.id,
+        title: data.title,
+        subject: data.subject,
+        due_date: data.due_date || new Date().toISOString(),
+        status: 'À faire',
+        progress: 0
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+    return objective;
+  });
+
+export const getProgressionData = createServerFn({ method: "GET" })
+  .handler(async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return [];
+
+    const { data } = await supabase
+      .from('learning_stats')
+      .select('date, avg_score')
+      .eq('user_id', session.user.id)
+      .order('date', { ascending: true })
+      .limit(7);
+      
+    return data || [];
+  });
