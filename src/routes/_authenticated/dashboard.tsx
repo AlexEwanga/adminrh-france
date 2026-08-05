@@ -39,7 +39,7 @@ function Dashboard() {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 pb-6">
       {/* Left Column: Mes objectifs RH */}
-      <div className="lg:col-span-7 bg-white rounded-[32px] p-8 shadow-sm border border-white/50 flex flex-col gap-6">
+      <div className="lg:col-span-7 bg-white rounded-[32px] p-6 md:p-8 shadow-sm border border-white/50 flex flex-col gap-6">
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-bold text-[#2D3142] tracking-tight">Mes objectifs RH</h2>
           <Button size="icon" variant="ghost" className="bg-[#F8F9FA] rounded-xl hover:bg-slate-100 h-10 w-10 border border-slate-100">
@@ -47,13 +47,14 @@ function Dashboard() {
           </Button>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-2 px-2">
           {['Tout', 'À faire', 'En cours', 'Terminé'].map(filter => (
             <TaskFilter 
               key={filter} 
               label={filter} 
               active={activeFilter === filter} 
               onClick={() => setActiveFilter(filter)}
+              className="shrink-0 whitespace-nowrap"
             />
           ))}
         </div>
@@ -75,7 +76,7 @@ function Dashboard() {
       {/* Right Column: Planning & Notes */}
       <div className="lg:col-span-5 space-y-6 flex flex-col">
         {/* Mon planning section */}
-        <div className="bg-white rounded-[32px] p-8 shadow-sm border border-white/50 flex flex-col gap-6">
+        <div className="bg-white rounded-[32px] p-6 md:p-8 shadow-sm border border-white/50 flex flex-col gap-6">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold text-[#2D3142] tracking-tight">Mon planning</h2>
             <div className="flex items-center gap-2 bg-[#F8F9FA] px-4 py-2 rounded-xl border border-slate-100 text-sm font-medium text-[#2D3142]">
@@ -123,13 +124,13 @@ function Dashboard() {
   )
 }
 
-function TaskFilter({ label, active, onClick }: { label: string, active?: boolean, onClick: () => void }) {
+function TaskFilter({ label, active, onClick, className }: { label: string, active?: boolean, onClick: () => void, className?: string }) {
   return (
     <button 
       onClick={onClick}
       className={`px-4 py-1.5 rounded-xl text-sm font-medium transition-colors ${
         active ? 'bg-[#2D3142] text-white shadow-md' : 'text-slate-500 hover:bg-slate-50'
-      }`}
+      } ${className}`}
     >
       {label}
     </button>
@@ -189,10 +190,11 @@ function NoteCard({ title, content, date, color }: any) {
 
 function ScheduleHeader() {
   return (
-    <div className="grid grid-cols-4 px-4 py-2 text-[11px] font-bold text-slate-300 uppercase tracking-wider">
+    <div className="grid grid-cols-4 px-2 md:px-4 py-2 text-[10px] md:text-[11px] font-bold text-slate-300 uppercase tracking-wider">
       <span>Heure</span>
       <span>Sujet</span>
-      <span>Thème</span>
+      <span className="hidden sm:inline">Thème</span>
+      <span className="sm:hidden">Th.</span>
       <span>Canal</span>
     </div>
   )
@@ -200,13 +202,13 @@ function ScheduleHeader() {
 
 function ScheduleItem({ time, lesson, theme, channel }: any) {
   return (
-    <div className="grid grid-cols-4 px-4 py-4 items-center text-[13px] group hover:bg-slate-50 transition-colors rounded-xl cursor-pointer">
+    <div className="grid grid-cols-4 px-2 md:px-4 py-4 items-center text-[12px] md:text-[13px] group hover:bg-slate-50 transition-colors rounded-xl cursor-pointer">
       <span className="font-bold text-[#2D3142]">{time}</span>
-      <span className="font-medium text-[#2D3142]">{lesson}</span>
-      <div className="flex items-center gap-2">
-        <span className="text-slate-500 font-medium">{theme}</span>
+      <span className="font-medium text-[#2D3142] truncate">{lesson}</span>
+      <div className="flex items-center gap-2 truncate">
+        <span className="text-slate-500 font-medium truncate">{theme}</span>
       </div>
-      <span className="text-slate-500 font-medium">{channel}</span>
+      <span className="text-slate-500 font-medium truncate">{channel}</span>
     </div>
   )
 }

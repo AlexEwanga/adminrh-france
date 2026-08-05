@@ -10,8 +10,14 @@ import {
   LogOut,
   Search,
   Bell,
-  MoreVertical
+  MoreVertical,
+  Menu,
+  X
 } from 'lucide-react'
+import { Toaster } from 'sonner'
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { useState, useEffect } from 'react'
+import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { Toaster } from 'sonner'
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useState } from 'react'
@@ -35,6 +41,7 @@ export const Route = createFileRoute('/_authenticated')({
 
 function AuthenticatedLayout() {
   const [globalSearch, setGlobalSearch] = useState('')
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
@@ -42,7 +49,7 @@ function AuthenticatedLayout() {
   }
 
   return (
-    <div className="flex min-h-screen bg-[#F0F2F5] p-6 gap-6 font-sans">
+    <div className="flex min-h-screen bg-[#F0F2F5] p-4 md:p-6 gap-4 md:gap-6 font-sans">
       {/* Sidebar */}
       <aside className="w-64 bg-white rounded-3xl shadow-sm hidden md:flex flex-col overflow-hidden border border-white/50">
         <div className="p-8 flex items-center gap-3">
@@ -122,11 +129,12 @@ function AuthenticatedLayout() {
   )
 }
 
-function SidebarLink({ to, icon, label, badge }: { to: string, icon: React.ReactNode, label: string, badge?: string }) {
+function SidebarLink({ to, icon, label, badge, onClick }: { to: string, icon: React.ReactNode, label: string, badge?: string, onClick?: () => void }) {
   return (
     <Link
       to={to}
       className="flex items-center justify-between px-6 py-3 rounded-2xl text-slate-500 transition-all hover:bg-slate-50 [&.active]:bg-[#2D3142] [&.active]:text-white [&.active]:shadow-lg active:scale-[0.98]"
+      onClick={onClick}
     >
       <div className="flex items-center gap-3">
         {icon}
