@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useSuspenseQuery, useQueryClient } from '@tanstack/react-query'
-import { getLearningStats, getRecentMessages, getNotes, addNote } from '@/lib/learning.functions'
+import { getLearningStats, getRecentMessages, getNotes, addNote, getObjectives, addObjective } from '@/lib/learning.functions'
 import { useState, useEffect, useMemo } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
