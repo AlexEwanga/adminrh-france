@@ -40,51 +40,52 @@ function AdminPage() {
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-8">
-      <header className="flex justify-between items-center">
+    <div className="bg-white rounded-[32px] p-8 shadow-sm border border-white/50 flex flex-col gap-8 min-h-[calc(100vh-140px)]">
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-[#1E2A4A]">Administration</h1>
-          <p className="text-slate-500">Gérez les messages, les quiz et la configuration WhatsApp (CallMeBot).</p>
+          <h1 className="text-3xl font-bold text-[#2D3142]">Administration RH</h1>
+          <p className="text-slate-400 mt-1">Gérez les messages, les quiz et la configuration de l'assistant.</p>
         </div>
         <div className="flex gap-3">
-          <Button variant="outline" className="border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37]/10">
+          <Button variant="outline" className="rounded-2xl border-slate-100 font-bold text-[#2D3142]">
             <ShieldCheck size={18} className="mr-2" />
             Vérifier RLS
           </Button>
-          <Button className="bg-[#1E2A4A]">
+          <Button className="bg-[#2D3142] hover:bg-[#8C7CF0] text-white rounded-2xl px-6 py-6 font-bold shadow-lg shadow-slate-200 transition-all">
             <Plus size={18} className="mr-2" />
-            Ajouter un message
+            Ajouter un contenu
           </Button>
         </div>
       </header>
 
       {/* Configuration WhatsApp Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="md:col-span-2">
+        <Card className="md:col-span-2 border-none shadow-none bg-[#F8F9FA] rounded-[24px]">
           <CardHeader>
-            <CardTitle className="text-[#1E2A4A] flex items-center gap-2">
-              <Send size={20} className="text-[#D4AF37]" />
+            <CardTitle className="text-[#2D3142] flex items-center gap-2">
+              <Send size={20} className="text-[#8C7CF0]" />
               Configuration WhatsApp (CallMeBot)
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-slate-400">
               Configurez CallMeBot pour envoyer les leçons quotidiennes gratuitement.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="p-4 bg-slate-50 rounded-lg border border-slate-200">
-              <h4 className="font-semibold text-sm mb-2 text-[#1E2A4A]">Instructions CallMeBot :</h4>
-              <ol className="text-sm text-slate-600 list-decimal ml-4 space-y-1">
+            <div className="p-6 bg-white rounded-2xl shadow-sm border border-slate-50">
+              <h4 className="font-bold text-sm mb-3 text-[#2D3142]">Instructions de configuration :</h4>
+              <ol className="text-sm text-slate-500 list-decimal ml-4 space-y-2 font-medium">
                 <li>Ajoutez le numéro CallMeBot à vos contacts WhatsApp.</li>
-                <li>Envoyez <code className="bg-slate-200 px-1 rounded">I allow callmebot to send me messages</code> au +34 621 07 34 86 (ou le numéro indiqué sur le site).</li>
+                <li>Envoyez <code className="bg-[#F0F2F5] px-2 py-0.5 rounded text-[#8C7CF0]">I allow callmebot to send me messages</code> au bot.</li>
                 <li>Récupérez votre <strong>API Key</strong>.</li>
-                <li>L'application utilise actuellement la clé : <code className="bg-[#D4AF37]/20 text-[#1E2A4A] px-2 py-0.5 rounded font-mono">4109899</code></li>
-                <li>Lien : <a href="https://www.callmebot.com/blog/free-api-whatsapp-messages/" target="_blank" className="text-blue-600 hover:underline">Documentation CallMeBot <ExternalLink size={12} className="inline ml-1" /></a></li>
+                <li>Clé configurée : <code className="bg-[#E0E7FF] text-[#6366F1] px-2 py-0.5 rounded font-mono font-bold">4109899</code></li>
+                <li>Lien : <a href="https://www.callmebot.com/blog/free-api-whatsapp-messages/" target="_blank" className="text-[#8C7CF0] hover:underline flex items-center gap-1 inline-flex">Documentation CallMeBot <ExternalLink size={12} /></a></li>
               </ol>
             </div>
             
             <div className="flex flex-col sm:flex-row gap-3">
               <div className="flex-1">
                 <Input 
+                  className="rounded-xl border-slate-100 bg-white h-12"
                   placeholder="Numéro de test (ex: +33612345678)" 
                   value={testPhone}
                   onChange={(e) => setTestPhone(e.target.value)}
@@ -93,7 +94,7 @@ function AdminPage() {
               <Button 
                 onClick={handleTestConnection} 
                 disabled={isTesting}
-                className="bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-white"
+                className="bg-[#8C7CF0] hover:bg-[#8C7CF0]/90 text-white rounded-xl px-8 h-12 font-bold transition-all shadow-md shadow-[#8C7CF0]/20"
               >
                 {isTesting ? "Envoi..." : "Tester l'envoi"}
               </Button>
@@ -101,17 +102,17 @@ function AdminPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-none shadow-none bg-[#F8F9FA] rounded-[24px]">
           <CardHeader>
-            <CardTitle className="text-sm uppercase text-slate-500">Statut API</CardTitle>
+            <CardTitle className="text-[11px] font-black uppercase text-slate-400 tracking-widest">Statut API</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse" />
-              <span className="font-medium text-green-600">Configuré</span>
+            <div className="flex items-center gap-3 mb-4 bg-white p-4 rounded-2xl shadow-sm">
+              <div className="w-3 h-3 rounded-full bg-[#A3E635] shadow-[0_0_12px_rgba(163,230,53,0.5)]" />
+              <span className="font-bold text-[#2D3142]">Connecté</span>
             </div>
-            <p className="text-xs text-slate-500">
-              L'envoi via CallMeBot est actif. Les messages sont envoyés en utilisant votre clé API.
+            <p className="text-xs text-slate-500 font-medium leading-relaxed">
+              L'envoi via CallMeBot est actif. Vos messages quotidiens sont planifiés.
             </p>
           </CardContent>
         </Card>
@@ -120,44 +121,44 @@ function AdminPage() {
       <div className="flex gap-4 items-center">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-          <Input className="pl-10" placeholder="Rechercher un message ou un sujet..." />
+          <Input className="pl-10 rounded-xl border-slate-100 bg-[#F8F9FA] h-11" placeholder="Rechercher..." />
         </div>
-        <Button variant="outline">Filtrer</Button>
+        <Button variant="outline" className="rounded-xl border-slate-100 font-bold h-11">Filtrer</Button>
       </div>
 
-      <Card>
+      <Card className="border-none shadow-none bg-[#F8F9FA] rounded-[32px] overflow-hidden">
         <CardContent className="p-0">
           <table className="w-full text-left">
-            <thead className="bg-slate-50 text-slate-500 text-sm uppercase">
+            <thead className="bg-[#F1F3F6] text-slate-400 text-[11px] font-black uppercase tracking-widest">
               <tr>
-                <th className="px-6 py-4 font-medium">Sujet</th>
-                <th className="px-6 py-4 font-medium">Catégorie</th>
-                <th className="px-6 py-4 font-medium">Status</th>
-                <th className="px-6 py-4 font-medium">Actions</th>
+                <th className="px-8 py-6">Sujet</th>
+                <th className="px-8 py-6">Catégorie</th>
+                <th className="px-8 py-6">Statut</th>
+                <th className="px-8 py-6">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-slate-100/50">
               {[1, 2, 3, 4, 5].map((i) => (
-                <tr key={i} className="hover:bg-slate-50 transition-colors">
-                  <td className="px-6 py-4">
-                    <div className="font-medium text-[#1E2A4A]">Le licenciement économique</div>
-                    <div className="text-xs text-slate-400">Dernière modif: Il y a 2 jours</div>
+                <tr key={i} className="hover:bg-white transition-all group">
+                  <td className="px-8 py-6">
+                    <div className="font-bold text-[#2D3142]">Le licenciement économique</div>
+                    <div className="text-[11px] text-slate-400 mt-0.5">Mis à jour il y a 2 jours</div>
                   </td>
-                  <td className="px-6 py-4">
-                    <Badge variant="secondary">Droit du travail</Badge>
+                  <td className="px-8 py-6">
+                    <Badge className="bg-white text-[#2D3142] border-none shadow-sm">Droit du travail</Badge>
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-8 py-6">
                     <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-green-500" />
-                      <span className="text-sm">Actif</span>
+                      <div className="w-2 h-2 rounded-full bg-[#A3E635]" />
+                      <span className="text-sm font-bold text-[#2D3142]">Actif</span>
                     </div>
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-8 py-6 text-right">
                     <div className="flex gap-2">
-                      <Button variant="ghost" size="icon" className="text-slate-400 hover:text-blue-600">
+                      <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl text-slate-400 hover:text-[#8C7CF0] hover:bg-slate-50">
                         <Edit2 size={16} />
                       </Button>
-                      <Button variant="ghost" size="icon" className="text-slate-400 hover:text-red-600">
+                      <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl text-slate-400 hover:text-red-500 hover:bg-red-50">
                         <Trash2 size={16} />
                       </Button>
                     </div>

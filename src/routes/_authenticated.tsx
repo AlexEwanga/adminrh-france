@@ -45,17 +45,17 @@ function AuthenticatedLayout() {
       <aside className="w-64 bg-white rounded-3xl shadow-sm hidden md:flex flex-col overflow-hidden border border-white/50">
         <div className="p-8 flex items-center gap-3">
           <div className="w-10 h-10 bg-[#2D3142] rounded-xl flex items-center justify-center text-white font-bold italic">
-            A
+            AR
           </div>
-          <h2 className="text-xl font-bold tracking-tight text-[#2D3142]">EduWay</h2>
+          <h2 className="text-xl font-bold tracking-tight text-[#2D3142]">AdminRH</h2>
         </div>
         
         <nav className="flex-1 px-4 space-y-1">
-          <SidebarLink to="/dashboard" icon={<LayoutDashboard size={20} />} label="Dashboard" />
-          <SidebarLink to="/learning" icon={<BookOpen size={20} />} label="Schedule" />
-          <SidebarLink to="/quiz" icon={<GraduationCap size={20} />} label="Tasks" badge="3" />
-          <SidebarLink to="/progression" icon={<BarChart size={20} />} label="Tests" />
-          <SidebarLink to="/admin" icon={<Settings size={20} />} label="Reports" />
+          <SidebarLink to="/dashboard" icon={<LayoutDashboard size={20} />} label="Tableau de bord" />
+          <SidebarLink to="/learning" icon={<BookOpen size={20} />} label="Planning" />
+          <SidebarLink to="/quiz" icon={<GraduationCap size={20} />} label="Objectifs" badge="3" />
+          <SidebarLink to="/progression" icon={<BarChart size={20} />} label="Tests & Quiz" />
+          <SidebarLink to="/admin" icon={<Settings size={20} />} label="Administration" />
           
           <div className="py-4 opacity-0">spacer</div>
           
@@ -64,13 +64,13 @@ function AuthenticatedLayout() {
         </nav>
 
         <div className="p-4 space-y-1 border-t border-slate-50">
-          <SidebarLink to="/admin" icon={<Settings size={20} />} label="Settings" />
+          <SidebarLink to="/admin" icon={<Settings size={20} />} label="Paramètres" />
           <button 
             className="w-full flex items-center gap-3 px-6 py-3 rounded-2xl text-slate-500 hover:text-[#2D3142] hover:bg-slate-50 transition-all"
             onClick={handleLogout}
           >
             <LogOut size={20} />
-            <span className="font-medium text-[15px]">Log out</span>
+            <span className="font-medium text-[15px]">Déconnexion</span>
           </button>
         </div>
       </aside>
@@ -92,8 +92,8 @@ function AuthenticatedLayout() {
                 <AvatarFallback>KM</AvatarFallback>
               </Avatar>
               <div className="text-left">
-                <p className="text-sm font-bold text-[#2D3142]">Kate Malone</p>
-                <p className="text-[10px] text-slate-400">Class 9A</p>
+                <p className="text-sm font-bold text-[#2D3142]">Profil RH</p>
+                <p className="text-[10px] text-slate-400">En formation</p>
               </div>
               <MoreVertical size={14} className="text-slate-400 ml-2" />
             </div>

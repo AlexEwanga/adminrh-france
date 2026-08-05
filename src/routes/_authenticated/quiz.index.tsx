@@ -18,33 +18,34 @@ function QuizSelectionPage() {
   })
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-8">
-      <header className="flex justify-between items-end">
-        <div className="space-y-1">
-          <h1 className="text-3xl font-bold text-[#1E2A4A]">Quiz & Défis</h1>
-          <p className="text-slate-500">Testez vos connaissances et gagnez des points.</p>
+    <div className="bg-white rounded-[32px] p-8 shadow-sm border border-white/50 flex flex-col gap-8 min-h-[calc(100vh-140px)]">
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-[#2D3142]">Quiz & Défis RH</h1>
+          <p className="text-slate-400 mt-1">Testez vos connaissances et gagnez des points d'expertise.</p>
         </div>
-        <div className="bg-[#D4AF37]/10 px-4 py-2 rounded-lg border border-[#D4AF37]/20 flex items-center gap-2">
-          <Trophy className="text-[#D4AF37]" size={20} />
-          <span className="font-bold text-[#1E2A4A]">0 pts</span>
+        <div className="bg-[#FEEFC3] px-6 py-3 rounded-2xl flex items-center gap-3 shadow-sm">
+          <Trophy className="text-[#F9A825]" size={24} />
+          <span className="font-bold text-[#2D3142]">1,250 pts</span>
         </div>
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {quizzes?.map((quiz) => (
-          <Card key={quiz.id} className="relative overflow-hidden group">
-            <div className="absolute top-0 left-0 w-1 h-full bg-[#D4AF37] transition-all group-hover:w-2" />
-            <CardHeader>
+          <Card key={quiz.id} className="group border-none shadow-none bg-[#F8F9FA] rounded-[24px] overflow-hidden hover:bg-white hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300">
+            <CardContent className="p-8 flex flex-col gap-6">
               <div className="flex justify-between items-start">
-                <Badge variant="secondary">{quiz.category}</Badge>
-                <Badge variant="outline">{quiz.difficulty === 1 ? 'Débutant' : 'Intermédiaire'}</Badge>
+                <Badge className="bg-white text-[#2D3142] border-none shadow-sm">{quiz.category}</Badge>
+                <Badge className="bg-[#E0E7FF] text-[#6366F1] border-none shadow-sm">{quiz.difficulty === 1 ? 'Débutant' : 'Intermédiaire'}</Badge>
               </div>
-              <CardTitle className="text-xl mt-4">{quiz.title}</CardTitle>
-              <CardDescription>{Array.isArray(quiz.questions) ? quiz.questions.length : 0} questions • 5-10 minutes</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button className="w-full bg-[#1E2A4A] group-hover:bg-[#D4AF37] transition-colors">
-                <GraduationCap className="mr-2" size={18} />
+              <div>
+                <h3 className="text-xl font-bold text-[#2D3142] mb-2">{quiz.title}</h3>
+                <p className="text-sm text-slate-500 font-medium">
+                  {Array.isArray(quiz.questions) ? quiz.questions.length : 0} questions • 5-10 minutes
+                </p>
+              </div>
+              <Button className="w-full bg-[#2D3142] hover:bg-[#8C7CF0] text-white rounded-2xl py-6 font-bold shadow-lg shadow-slate-200 transition-all">
+                <GraduationCap className="mr-2" size={20} />
                 Commencer le Quiz
               </Button>
             </CardContent>
