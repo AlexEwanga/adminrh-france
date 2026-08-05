@@ -11,40 +11,43 @@ const setupUserSchema = z.object({
 export const setupAdminUser = createServerFn({ method: 'POST' })
   .inputValidator((data) => setupUserSchema.parse(data))
   .handler(async ({ data }) => {
-    // 1. Create user in auth.users
-    const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.createUser({
-      email: data.email,
-      password: data.password,
-      email_confirm: true,
-    });
+    // Check if user exists first
+    const { data: { users }, error: listError } = await supabaseAdmin.auth.admin.listUsers();
+    if (listError) throw listError;
+    
+    const existingUser = users.find(u => u.email === data.email);
+    
+    let userId: string;
+    let message: string;
 
-    if (authError) {
-      // If user already exists, let s update their password just in case
-      const { data: { users }, error: listError } = await supabaseAdmin.auth.admin.listUsers();
-      const existingUser = users.find(u => u.email === data.email);
-      
-      if (existingUser) {
-        await supabaseAdmin.auth.admin.updateUserById(existingUser.id, {
-          password: data.password
-        });
-        
-        await supabaseAdmin.from('user_roles').upsert({
-          user_id: existingUser.id,
-          role: data.role
-        }, { onConflict: 'user_id, role' });
-        
-        return { success: true, message: 'Existing user updated and promoted to ' + data.role };
-      }
-      throw authError;
+    if (existingUser) {
+      userId = existingUser.id;
+      // Update password and confirm email
+      const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(userId, {
+        password: data.password,
+        email_confirm: true
+      });
+      if (updateError) throw updateError;
+      message = 'Existing user updated';
+    } else {
+      // Create new user
+      const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.createUser({
+        email: data.email,
+        password: data.password,
+        email_confirm: true,
+      });
+      if (authError) throw authError;
+      userId = authUser.user.id;
+      message = 'User created';
     }
 
-    // 2. Assign role in user_roles
-    const { error: roleError } = await supabaseAdmin.from('user_roles').insert({
-      user_id: authUser.user.id,
+    // Ensure role is assigned
+    const { error: roleError } = await supabaseAdmin.from('user_roles').upsert({
+      user_id: userId,
       role: data.role,
-    });
+    }, { onConflict: 'user_id, role' });
 
     if (roleError) throw roleError;
 
-    return { success: true, message: 'User created and assigned as ' + data.role };
+    return { success: true, message: `${message} and assigned as ${data.role}` };
   });
