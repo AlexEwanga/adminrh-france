@@ -12,12 +12,24 @@ import {
   Bell,
   MoreVertical,
   Menu,
-  X
+  X,
+  User,
+  Settings as SettingsIcon,
+  LogOut as LogOutIcon
 } from 'lucide-react'
 import { Toaster } from 'sonner'
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useState, useEffect } from 'react'
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet"
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuLabel, 
+  DropdownMenuSeparator, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu"
+import { toast } from 'sonner'
 
 export const Route = createFileRoute('/_authenticated')({
   beforeLoad: async ({ location }) => {

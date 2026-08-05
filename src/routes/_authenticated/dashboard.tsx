@@ -32,8 +32,8 @@ function Dashboard() {
   ]
 
   const filteredTasks = tasks.filter(task => {
-    if (activeFilter === 'Tout') return true
-    return task.status === activeFilter
+    const matchesFilter = activeFilter === 'Tout' || task.status === activeFilter
+    return matchesFilter
   })
 
   return (
