@@ -17,6 +17,11 @@ function QuizSelectionPage() {
     queryFn: () => getQuizzes()
   })
 
+  const { data: stats } = useSuspenseQuery({
+    queryKey: ['learning-stats'],
+    queryFn: () => getLearningStats()
+  })
+
   const handleStartQuiz = (title: string) => {
     toast.success(`Démarrage du quiz : ${title}`)
   }
@@ -30,7 +35,7 @@ function QuizSelectionPage() {
         </div>
         <div className="bg-[#FEEFC3] px-6 py-3 rounded-2xl flex items-center gap-3 shadow-sm border border-[#FDE68A]">
           <Trophy className="text-[#F9A825]" size={24} />
-          <span className="font-bold text-[#2D3142]">1,250 pts</span>
+          <span className="font-bold text-[#2D3142]">{stats?.avg_score ? stats.avg_score * 10 : 0} pts</span>
         </div>
       </header>
 
@@ -60,6 +65,11 @@ function QuizSelectionPage() {
             </CardContent>
           </Card>
         ))}
+        {quizzes?.length === 0 && (
+          <div className="col-span-full py-12 text-center text-slate-400 font-medium">
+            Aucun quiz disponible pour le moment.
+          </div>
+        )}
       </div>
     </div>
   )
