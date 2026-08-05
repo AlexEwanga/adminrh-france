@@ -20,6 +20,7 @@ export const Route = createFileRoute('/_authenticated/admin')({
 function AdminPage() {
   const [testPhone, setTestPhone] = useState('')
   const [isTesting, setIsTesting] = useState(false)
+  const testWhatsApp = useServerFn(testWhatsAppConnection)
   const { data: messages } = useSuspenseQuery({
     queryKey: ['recent-messages'],
     queryFn: () => getRecentMessages()
