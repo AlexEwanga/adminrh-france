@@ -80,16 +80,18 @@ function AuthenticatedLayout() {
         {/* Header bar */}
         <header className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="bg-white p-3 rounded-2xl shadow-sm border border-white/50 cursor-pointer hover:bg-slate-50 transition-colors">
-              <Search size={20} className="text-slate-500" />
+            <div className="bg-white px-4 py-2.5 rounded-2xl shadow-sm border border-white/50 cursor-pointer hover:bg-slate-50 transition-colors flex items-center gap-2">
+              <Search size={18} className="text-slate-400" />
+              <span className="text-sm text-slate-400 font-medium pr-4">Rechercher...</span>
             </div>
-            <div className="bg-[#8C7CF0] p-3 rounded-2xl shadow-sm cursor-pointer hover:opacity-90 transition-opacity">
-              <Bell size={20} className="text-white" />
+            <div className="bg-white p-2.5 rounded-2xl shadow-sm border border-white/50 cursor-pointer hover:bg-slate-50 transition-colors relative">
+              <Bell size={18} className="text-slate-400" />
+              <span className="absolute top-2 right-2 w-2 h-2 bg-[#8C7CF0] rounded-full border-2 border-white"></span>
             </div>
-            <div className="bg-white px-4 py-2 rounded-2xl shadow-sm border border-white/50 flex items-center gap-3 cursor-pointer hover:bg-slate-50 transition-colors">
-              <Avatar className="h-8 w-8">
+            <div className="bg-white px-4 py-1.5 rounded-2xl shadow-sm border border-white/50 flex items-center gap-3 cursor-pointer hover:bg-slate-50 transition-colors">
+              <Avatar className="h-9 w-9 border-2 border-[#F0F2F5]">
                 <AvatarImage src="https://github.com/shadcn.png" />
-                <AvatarFallback>KM</AvatarFallback>
+                <AvatarFallback className="bg-[#2D3142] text-white">RH</AvatarFallback>
               </Avatar>
               <div className="text-left">
                 <p className="text-sm font-bold text-[#2D3142]">Profil RH</p>
@@ -99,8 +101,8 @@ function AuthenticatedLayout() {
             </div>
           </div>
           
-          <div className="bg-white p-3 rounded-2xl shadow-sm border border-white/50 cursor-pointer hover:bg-slate-50 transition-colors">
-            <MoreVertical size={20} className="text-slate-500" />
+          <div className="bg-white p-2.5 rounded-2xl shadow-sm border border-white/50 cursor-pointer hover:bg-slate-50 transition-colors">
+            <MoreVertical size={18} className="text-slate-400" />
           </div>
         </header>
 

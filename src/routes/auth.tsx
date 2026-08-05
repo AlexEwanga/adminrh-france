@@ -5,12 +5,10 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { toast } from 'sonner'
-import { lovable } from '@/integrations/lovable/index'
 
 export const Route = createFileRoute('/auth')({
   component: AuthPage,
 })
-
 
 function AuthPage() {
   const [email, setEmail] = useState('')
@@ -32,53 +30,54 @@ function AuthPage() {
     setLoading(false)
   }
 
-  const handleGoogleLogin = async () => {
-    const search = new URLSearchParams(window.location.search)
-    const redirectPath = search.get('redirect') || '/dashboard'
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback?redirect=${encodeURIComponent(redirectPath)}`,
-      },
-    })
-    if (error) toast.error(error.message)
-  }
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold text-[#1E2A4A]">AdminRH-France</CardTitle>
-          <CardDescription>Votre assistant d'apprentissage RH en France</CardDescription>
-
+    <div className="min-h-screen flex items-center justify-center bg-[#F0F2F5] p-6 font-sans">
+      <Card className="w-full max-w-md bg-white rounded-[32px] shadow-sm border border-white/50 p-4">
+        <CardHeader className="text-center pb-2">
+          <div className="mx-auto w-12 h-12 bg-[#2D3142] rounded-2xl flex items-center justify-center text-white font-bold italic mb-4">
+            AR
+          </div>
+          <CardTitle className="text-3xl font-bold text-[#2D3142] tracking-tight">AdminRH</CardTitle>
+          <CardDescription className="text-slate-400 font-medium mt-1">
+            Votre assistant d'apprentissage RH en France
+          </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="pt-6">
           <form onSubmit={handleEmailLogin} className="space-y-4">
-            <Input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-            <Input
-              type="password"
-              placeholder="Mot de passe"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-            <Button type="submit" className="w-full bg-[#1E2A4A] hover:bg-[#1E2A4A]/90" disabled={loading}>
+            <div className="space-y-2">
+              <Input
+                type="email"
+                placeholder="Email"
+                value={email}
+                className="h-12 rounded-2xl border-slate-100 bg-[#F8F9FA] focus-visible:ring-[#8C7CF0]"
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Input
+                type="password"
+                placeholder="Mot de passe"
+                value={password}
+                className="h-12 rounded-2xl border-slate-100 bg-[#F8F9FA] focus-visible:ring-[#8C7CF0]"
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+            <Button 
+              type="submit" 
+              className="w-full h-12 bg-[#2D3142] hover:bg-[#8C7CF0] text-white rounded-2xl font-bold shadow-lg shadow-slate-200 transition-all mt-4" 
+              disabled={loading}
+            >
               {loading ? 'Connexion...' : 'Se connecter'}
             </Button>
           </form>
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center"><span className="w-full border-t" /></div>
-            <div className="relative flex justify-center text-xs uppercase"><span className="bg-white px-2 text-muted-foreground">Ou continuer avec</span></div>
+          
+          <div className="mt-8 pt-6 border-t border-slate-50 text-center">
+            <p className="text-xs text-slate-400 font-medium">
+              Plateforme sécurisée • AdminRH-France 2026
+            </p>
           </div>
-          <Button variant="outline" className="w-full" onClick={handleGoogleLogin}>
-            Google
-          </Button>
         </CardContent>
       </Card>
     </div>
