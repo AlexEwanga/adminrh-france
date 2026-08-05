@@ -7,6 +7,7 @@ export const Route = createFileRoute('/_authenticated/learning')({
   component: LearningPage,
 })
 
+
 function LearningPage() {
   const categories = ['Droit du travail', 'Géographie', 'Culture', 'Mode de vie']
 

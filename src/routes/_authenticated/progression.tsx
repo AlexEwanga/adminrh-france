@@ -6,6 +6,7 @@ export const Route = createFileRoute('/_authenticated/progression')({
   component: ProgressionPage,
 })
 
+
 function ProgressionPage() {
   const data = [
     { name: 'Lun', score: 65 },

@@ -10,6 +10,7 @@ export const Route = createFileRoute('/_authenticated/admin')({
   component: AdminPage,
 })
 
+
 function AdminPage() {
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-8">

@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 
 export const Route = createFileRoute('/api/public/hooks/send-lessons')({
   server: {
+
     handlers: {
       POST: async ({ request }) => {
         const authHeader = request.headers.get('apikey')

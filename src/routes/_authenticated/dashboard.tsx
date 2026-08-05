@@ -10,6 +10,7 @@ export const Route = createFileRoute('/_authenticated/dashboard')({
   component: Dashboard,
 })
 
+
 function Dashboard() {
   const { data: stats } = useQuery({
     queryKey: ['learning-stats'],
