@@ -14,16 +14,215 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      daily_schedule: {
+        Row: {
+          id: number
+          last_message_date: string | null
+          message_index: number | null
+          next_message_time: string | null
+        }
+        Insert: {
+          id?: number
+          last_message_date?: string | null
+          message_index?: number | null
+          next_message_time?: string | null
+        }
+        Update: {
+          id?: number
+          last_message_date?: string | null
+          message_index?: number | null
+          next_message_time?: string | null
+        }
+        Relationships: []
+      }
+      learning_stats: {
+        Row: {
+          avg_score: number | null
+          date: string | null
+          id: number
+          messages_received: number | null
+          quiz_taken: number | null
+          tags_covered: string[] | null
+          user_id: string
+        }
+        Insert: {
+          avg_score?: number | null
+          date?: string | null
+          id?: number
+          messages_received?: number | null
+          quiz_taken?: number | null
+          tags_covered?: string[] | null
+          user_id: string
+        }
+        Update: {
+          avg_score?: number | null
+          date?: string | null
+          id?: number
+          messages_received?: number | null
+          quiz_taken?: number | null
+          tags_covered?: string[] | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      messages: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: number
+          is_active: boolean | null
+          scheduled_hour: string | null
+          source: string | null
+          subject: string
+          tag: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: number
+          is_active?: boolean | null
+          scheduled_hour?: string | null
+          source?: string | null
+          subject: string
+          tag?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: number
+          is_active?: boolean | null
+          scheduled_hour?: string | null
+          source?: string | null
+          subject?: string
+          tag?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          first_name: string | null
+          id: string
+          last_name: string | null
+          phone_number: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          first_name?: string | null
+          id: string
+          last_name?: string | null
+          phone_number?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          phone_number?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      quiz_results: {
+        Row: {
+          date_taken: string | null
+          id: number
+          quiz_id: number
+          score: number | null
+          time_spent: number | null
+          user_id: string
+        }
+        Insert: {
+          date_taken?: string | null
+          id?: number
+          quiz_id: number
+          score?: number | null
+          time_spent?: number | null
+          user_id: string
+        }
+        Update: {
+          date_taken?: string | null
+          id?: number
+          quiz_id?: number
+          score?: number | null
+          time_spent?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quiz_results_quiz_id_fkey"
+            columns: ["quiz_id"]
+            isOneToOne: false
+            referencedRelation: "quizzes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quizzes: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          difficulty: number | null
+          id: number
+          questions: Json | null
+          title: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string | null
+          difficulty?: number | null
+          id?: number
+          questions?: Json | null
+          title: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string | null
+          difficulty?: number | null
+          id?: number
+          questions?: Json | null
+          title?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +349,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+    },
   },
 } as const
