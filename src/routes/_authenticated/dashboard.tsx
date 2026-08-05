@@ -86,11 +86,11 @@ function Dashboard() {
           <div className="space-y-1">
             <ScheduleHeader />
             <div className="divide-y divide-slate-50">
-              <ScheduleItem time="07:00" lesson="Droit du Travail" teacher="Contrat CDI/CDD" location="WhatsApp" />
-              <ScheduleItem time="09:45" lesson="Géographie" teacher="Régions de France" location="WhatsApp" />
-              <ScheduleItem time="12:30" lesson="Culture" teacher="Gastronomie & Codes" location="WhatsApp" />
-              <ScheduleItem time="15:15" lesson="Droit du Travail" teacher="Durée du travail" location="WhatsApp" />
-              <ScheduleItem time="18:00" lesson="Culture Générale" teacher="Histoire de France" location="WhatsApp" />
+              <ScheduleItem time="07:00" lesson="Droit du Travail" theme="Contrat CDI/CDD" channel="WhatsApp" />
+              <ScheduleItem time="09:45" lesson="Géographie" theme="Régions de France" channel="WhatsApp" />
+              <ScheduleItem time="12:30" lesson="Culture" theme="Gastronomie & Codes" channel="WhatsApp" />
+              <ScheduleItem time="15:15" lesson="Droit du Travail" theme="Durée du travail" channel="WhatsApp" />
+              <ScheduleItem time="18:00" lesson="Culture Générale" theme="Histoire de France" channel="WhatsApp" />
             </div>
           </div>
         </div>
@@ -198,15 +198,15 @@ function ScheduleHeader() {
   )
 }
 
-function ScheduleItem({ time, lesson, teacher, location }: any) {
+function ScheduleItem({ time, lesson, theme, channel }: any) {
   return (
     <div className="grid grid-cols-4 px-4 py-4 items-center text-[13px] group hover:bg-slate-50 transition-colors rounded-xl cursor-pointer">
       <span className="font-bold text-[#2D3142]">{time}</span>
       <span className="font-medium text-[#2D3142]">{lesson}</span>
       <div className="flex items-center gap-2">
-        <span className="text-slate-500 font-medium">{teacher}</span>
+        <span className="text-slate-500 font-medium">{theme}</span>
       </div>
-      <span className="text-slate-500 font-medium">{location}</span>
+      <span className="text-slate-500 font-medium">{channel}</span>
     </div>
   )
 }
