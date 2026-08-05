@@ -12,42 +12,37 @@ export const setupAdminUser = createServerFn({ method: 'POST' })
   .inputValidator((data) => setupUserSchema.parse(data))
   .handler(async ({ data }) => {
     try {
-      // Create user
-      const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.createUser({
-        email: data.email,
-        password: data.password,
-        email_confirm: true,
-      });
-
+      const { data: { users }, error: listError } = await supabaseAdmin.auth.admin.listUsers();
+      if (listError) throw listError;
+      
+      const existingUser = users?.find(u => u.email === data.email);
       let userId: string;
-      if (authError) {
-        if (authError.message.includes('already registered')) {
-          const { data: { users }, error: listError } = await supabaseAdmin.auth.admin.listUsers();
-          const existingUser = users?.find(u => u.email === data.email);
-          if (!existingUser) throw new Error('Could not find existing user');
-          userId = existingUser.id;
-          
-          // Force update password and confirm email
-          await supabaseAdmin.auth.admin.updateUserById(userId, {
-            password: data.password,
-            email_confirm: true
-          });
-        } else {
-          throw authError;
-        }
+
+      if (existingUser) {
+        userId = existingUser.id;
+        const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(userId, {
+          password: data.password,
+          email_confirm: true
+        });
+        if (updateError) throw updateError;
       } else {
+        const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.createUser({
+          email: data.email,
+          password: data.password,
+          email_confirm: true,
+        });
+        if (authError) throw authError;
         userId = authUser.user.id;
       }
 
-      // Role
       await supabaseAdmin.from('user_roles').upsert({
         user_id: userId,
         role: data.role,
       }, { onConflict: 'user_id, role' });
 
-      return { success: true, userId };
+      return { success: true, message: 'User setup complete' };
     } catch (error: any) {
-      console.error('Setup error:', error);
+      console.error('Setup error details:', error);
       throw error;
     }
   });
