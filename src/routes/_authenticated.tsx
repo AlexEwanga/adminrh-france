@@ -101,8 +101,8 @@ function AuthenticatedLayout() {
             </div>
           </div>
           
-          <div className="bg-white p-3 rounded-2xl shadow-sm border border-white/50 cursor-pointer hover:bg-slate-50 transition-colors">
-            <MoreVertical size={20} className="text-slate-500" />
+          <div className="bg-white p-2.5 rounded-2xl shadow-sm border border-white/50 cursor-pointer hover:bg-slate-50 transition-colors">
+            <MoreVertical size={18} className="text-slate-400" />
           </div>
         </header>
 
