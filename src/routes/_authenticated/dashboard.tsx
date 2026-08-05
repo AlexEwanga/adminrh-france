@@ -60,31 +60,45 @@ function Dashboard() {
     queryFn: () => getNotes()
   })
 
-  const chartData = [
-    { name: 'Lun', score: 65, messages: 5 },
-    { name: 'Mar', score: 78, messages: 5 },
-    { name: 'Mer', score: 45, messages: 3 },
-    { name: 'Jeu', score: 90, messages: 5 },
-    { name: 'Ven', score: 82, messages: 5 },
-    { name: 'Sam', score: 95, messages: 1 },
-    { name: 'Dim', score: 70, messages: 0 },
-  ]
+  const { data: objectivesData } = useSuspenseQuery({
+    queryKey: ['objectives'],
+    queryFn: () => getObjectives()
+  })
 
-  const tasks = [
-    { id: 1, title: "Rédaction de contrat de travail", subject: "Droit du Travail", date: "Aujourd'hui", status: "En cours", progress: 65, comments: 3, statusColor: "bg-[#FEEFC3] text-[#F9A825]" },
-    { id: 2, title: "Calcul des indemnités de licenciement", subject: "Paie & Social", date: "Demain", status: "À faire", comments: 0, statusColor: "bg-[#E0E7FF] text-[#6366F1]" },
-    { id: 3, title: "Géographie des départements français", subject: "Culture & Géo", date: "10 Août 2026", status: "À faire", comments: 2, statusColor: "bg-[#E0E7FF] text-[#6366F1]" },
-    { id: 4, title: "Les instances représentatives du personnel", subject: "Droit du Travail", date: "12 Août 2026", status: "À faire", comments: 5, statusColor: "bg-[#E0E7FF] text-[#6366F1]" },
-  ]
+  const chartData = useMemo(() => {
+    // Return empty or zeroed data if no stats are available
+    if (!stats) return [
+      { name: 'Lun', score: 0, messages: 0 },
+      { name: 'Mar', score: 0, messages: 0 },
+      { name: 'Mer', score: 0, messages: 0 },
+      { name: 'Jeu', score: 0, messages: 0 },
+      { name: 'Ven', score: 0, messages: 0 },
+      { name: 'Sam', score: 0, messages: 0 },
+      { name: 'Dim', score: 0, messages: 0 },
+    ]
+    
+    // In a real app, we'd map real history here. 
+    // Since we're cleaning demo data, we return zeroed array.
+    return [
+      { name: 'Lun', score: 0, messages: 0 },
+      { name: 'Mar', score: 0, messages: 0 },
+      { name: 'Mer', score: 0, messages: 0 },
+      { name: 'Jeu', score: 0, messages: 0 },
+      { name: 'Ven', score: 0, messages: 0 },
+      { name: 'Sam', score: 0, messages: 0 },
+      { name: 'Dim', score: 0, messages: 0 },
+    ]
+  }, [stats])
 
   const filteredTasks = useMemo(() => {
-    return tasks.filter(task => {
+    const tasks = objectivesData || []
+    return tasks.filter((task: any) => {
       const matchesFilter = activeFilter === 'Tout' || task.status === activeFilter
       const matchesSearch = task.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                           task.subject.toLowerCase().includes(searchTerm.toLowerCase())
+                           (task.subject && task.subject.toLowerCase().includes(searchTerm.toLowerCase()))
       return matchesFilter && matchesSearch
     })
-  }, [activeFilter, searchTerm])
+  }, [activeFilter, searchTerm, objectivesData])
 
   const handleAddNote = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -229,11 +243,21 @@ function Dashboard() {
           <div className="space-y-1">
             <ScheduleHeader />
             <div className="divide-y divide-slate-50">
-              <ScheduleItem time="07:00" lesson="Droit du Travail" theme="Contrat CDI/CDD" channel="WhatsApp" />
-              <ScheduleItem time="09:45" lesson="Géographie" theme="Régions de France" channel="WhatsApp" />
-              <ScheduleItem time="12:30" lesson="Culture" theme="Gastronomie & Codes" channel="WhatsApp" />
-              <ScheduleItem time="15:15" lesson="Droit du Travail" theme="Durée du travail" channel="WhatsApp" />
-              <ScheduleItem time="18:00" lesson="Culture Générale" theme="Histoire de France" channel="WhatsApp" />
+              {messages && messages.length > 0 ? (
+                messages.map((msg: any) => (
+                  <ScheduleItem 
+                    key={msg.id}
+                    time={msg.scheduled_hour?.substring(0, 5) || '--:--'} 
+                    lesson={msg.tag || 'Leçon'} 
+                    theme={msg.subject} 
+                    channel="WhatsApp" 
+                  />
+                ))
+              ) : (
+                <div className="py-8 text-center text-slate-400 text-sm">
+                  Aucune leçon planifiée.
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -285,20 +309,9 @@ function Dashboard() {
                 />
               ))
             ) : (
-              <>
-                <NoteCard 
-                  title="Droit de grève" 
-                  content="En France, le droit de grève est un droit constitutionnel. Une grève doit être précédée d'un préavis dans le secteur public." 
-                  date="5 Août 2026"
-                  color="bg-[#D1FAE5] text-[#065F46]"
-                />
-                <NoteCard 
-                  title="Période d'essai" 
-                  content="CDI : 2 mois (ouvriers/employés), 3 mois (agents de maîtrise), 4 mois (cadres)." 
-                  date="4 Août 2026"
-                  color="bg-[#E0E7FF] text-[#3730A3]"
-                />
-              </>
+              <div className="col-span-full text-center py-8">
+                <p className="text-slate-400 text-sm italic">Aucune note pour le moment.</p>
+              </div>
             )}
           </div>
         </div>
