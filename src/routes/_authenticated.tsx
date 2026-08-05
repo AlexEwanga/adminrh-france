@@ -6,6 +6,10 @@ import { Toaster } from 'sonner'
 
 export const Route = createFileRoute('/_authenticated')({
   beforeLoad: async ({ location }) => {
+    // On the server, we don't have access to localStorage where the session is stored
+    // So we skip the redirect on the server to allow the client to handle it
+    if (typeof window === 'undefined') return
+
     const { data: { session } } = await supabase.auth.getSession()
     if (!session) {
       throw redirect({
