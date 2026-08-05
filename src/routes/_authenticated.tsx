@@ -139,28 +139,70 @@ function AuthenticatedLayout() {
               />
             </div>
             
-            <div className="bg-white p-2.5 rounded-2xl shadow-sm border border-white/50 cursor-pointer hover:bg-slate-50 transition-colors relative active:scale-95 shrink-0 hidden sm:block">
+            <div 
+              className="bg-white p-2.5 rounded-2xl shadow-sm border border-white/50 cursor-pointer hover:bg-slate-50 transition-colors relative active:scale-95 shrink-0 hidden sm:block"
+              onClick={() => toast.info("Vous n'avez aucune nouvelle notification", { description: "Revenez plus tard pour voir vos messages WhatsApp." })}
+            >
               <Bell size={18} className="text-slate-400" />
               <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-[#8C7CF0] rounded-full border-2 border-white"></span>
             </div>
           </div>
           
           <div className="flex items-center gap-3 shrink-0">
-            <div className="bg-white px-2 sm:px-4 py-1.5 rounded-2xl shadow-sm border border-white/50 flex items-center gap-3 cursor-pointer hover:bg-slate-50 transition-colors active:scale-95">
-              <Avatar className="h-8 w-8 sm:h-9 sm:w-9 border-2 border-[#F0F2F5]">
-                <AvatarImage src="https://github.com/shadcn.png" />
-                <AvatarFallback className="bg-[#2D3142] text-white text-xs">RH</AvatarFallback>
-              </Avatar>
-              <div className="text-left hidden lg:block">
-                <p className="text-sm font-bold text-[#2D3142]">Profil RH</p>
-                <p className="text-[10px] text-slate-400 font-medium">En formation</p>
-              </div>
-              <MoreVertical size={14} className="text-slate-400 ml-0 sm:ml-2 hidden sm:block" />
-            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <div className="bg-white px-2 sm:px-4 py-1.5 rounded-2xl shadow-sm border border-white/50 flex items-center gap-3 cursor-pointer hover:bg-slate-50 transition-colors active:scale-95">
+                  <Avatar className="h-8 w-8 sm:h-9 sm:w-9 border-2 border-[#F0F2F5]">
+                    <AvatarImage src="https://github.com/shadcn.png" />
+                    <AvatarFallback className="bg-[#2D3142] text-white text-xs">RH</AvatarFallback>
+                  </Avatar>
+                  <div className="text-left hidden lg:block">
+                    <p className="text-sm font-bold text-[#2D3142]">Profil RH</p>
+                    <p className="text-[10px] text-slate-400 font-medium">En formation</p>
+                  </div>
+                  <MoreVertical size={14} className="text-slate-400 ml-0 sm:ml-2 hidden sm:block" />
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56 rounded-2xl p-2 mt-2" align="end">
+                <DropdownMenuLabel className="font-bold text-[#2D3142]">Mon Compte</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="rounded-xl focus:bg-slate-50 cursor-pointer py-2.5" onClick={() => toast.info("Accès au profil", { description: "Cette fonctionnalité sera bientôt disponible." })}>
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Profil</span>
+                </DropdownMenuItem>
+                <Link to="/admin">
+                  <DropdownMenuItem className="rounded-xl focus:bg-slate-50 cursor-pointer py-2.5">
+                    <SettingsIcon className="mr-2 h-4 w-4" />
+                    <span>Paramètres</span>
+                  </DropdownMenuItem>
+                </Link>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="rounded-xl focus:bg-red-50 text-red-600 focus:text-red-600 cursor-pointer py-2.5" onClick={handleLogout}>
+                  <LogOutIcon className="mr-2 h-4 w-4" />
+                  <span>Déconnexion</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             
-            <div className="bg-white p-2.5 rounded-2xl shadow-sm border border-white/50 cursor-pointer hover:bg-slate-50 transition-colors active:scale-95 hidden md:block">
-              <MoreVertical size={18} className="text-slate-400" />
-            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <div className="bg-white p-2.5 rounded-2xl shadow-sm border border-white/50 cursor-pointer hover:bg-slate-50 transition-colors active:scale-95 hidden md:block">
+                  <MoreVertical size={18} className="text-slate-400" />
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-48 rounded-2xl p-2 mt-2" align="end">
+                <DropdownMenuItem className="rounded-xl focus:bg-slate-50 cursor-pointer py-2.5" onClick={() => window.print()}>
+                  <span>Imprimer le tableau</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem className="rounded-xl focus:bg-slate-50 cursor-pointer py-2.5" onClick={() => toast.success("Données actualisées")}>
+                  <span>Actualiser</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="rounded-xl focus:bg-slate-50 cursor-pointer py-2.5" onClick={() => toast.info("Aide & Support")}>
+                  <span>Centre d'aide</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </header>
 
