@@ -52,9 +52,9 @@ export const Route = createFileRoute('/api/public/hooks/send-lessons')({
           // 3. Envoi WhatsApp via WPSent
           const formattedContent = `*${messageToSend.subject}*\n\n${messageToSend.content}\n\n_AdminRH-France_`;
           
-          // On récupère le numéro de téléphone de l'utilisateur (à adapter selon votre logique d'abonnement)
-          // Ici on simule un envoi général ou on pourrait boucler sur les profils
-          await sendWhatsAppMessage("NUMERO_DESTINATAIRE", formattedContent);
+          // On envoie au numéro de l'administrateur configuré
+          const targetPhone = "+243821355337";
+          await sendWhatsAppMessage(targetPhone, formattedContent);
 
           // 4. Mettre à jour le planning pour le prochain envoi
           const nextIndex = (messageIndex + 1) % messages.length
