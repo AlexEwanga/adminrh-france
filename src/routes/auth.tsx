@@ -21,7 +21,12 @@ function AuthPage() {
     e.preventDefault()
     setLoading(true)
     const { error } = await supabase.auth.signInWithPassword({ email, password })
-    if (error) toast.error(error.message)
+    if (error) {
+      toast.error(error.message)
+      console.error('Login error:', error)
+    } else {
+      window.location.href = '/dashboard'
+    }
     setLoading(false)
   }
 

@@ -13,6 +13,7 @@ export const Route = createFileRoute('/_authenticated/dashboard')({
 
 
 function Dashboard() {
+
   const { data: stats } = useSuspenseQuery({
     queryKey: ['learning-stats'],
     queryFn: () => getLearningStats()
