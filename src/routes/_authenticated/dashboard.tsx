@@ -78,9 +78,8 @@ function Dashboard() {
         <div className="bg-white rounded-[32px] p-8 shadow-sm border border-white/50 flex flex-col gap-6">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold text-[#2D3142] tracking-tight">Mon planning</h2>
-            <div className="flex items-center gap-2 bg-[#F8F9FA] px-4 py-2 rounded-xl border border-slate-100 text-sm font-medium text-[#2D3142] cursor-pointer">
+            <div className="flex items-center gap-2 bg-[#F8F9FA] px-4 py-2 rounded-xl border border-slate-100 text-sm font-medium text-[#2D3142]">
               5 Août, Mercredi
-              <Target size={14} className="ml-1 rotate-90" />
             </div>
           </div>
 
@@ -205,9 +204,6 @@ function ScheduleItem({ time, lesson, teacher, location }: any) {
       <span className="font-bold text-[#2D3142]">{time}</span>
       <span className="font-medium text-[#2D3142]">{lesson}</span>
       <div className="flex items-center gap-2">
-        <Avatar className="h-6 w-6">
-          <AvatarFallback className="bg-slate-100 text-[10px]">{teacher[0]}</AvatarFallback>
-        </Avatar>
         <span className="text-slate-500 font-medium">{teacher}</span>
       </div>
       <span className="text-slate-500 font-medium">{location}</span>
