@@ -37,7 +37,7 @@ function QuizSelectionPage() {
         </div>
         <div className="bg-[#FEEFC3] px-6 py-3 rounded-2xl flex items-center gap-3 shadow-sm border border-[#FDE68A]">
           <Trophy className="text-[#F9A825]" size={24} />
-          <span className="font-bold text-[#2D3142]">{stats?.avg_score ? stats.avg_score * 10 : 0} pts</span>
+          <span className="font-bold text-[#2D3142]">{Math.round(stats?.avg_score || 0) * 10} pts</span>
         </div>
       </header>
 

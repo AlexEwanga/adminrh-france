@@ -158,26 +158,32 @@ export const submitQuizResult = createServerFn({ method: "POST" })
     if (error) throw error;
     
     // Update learning stats
-    const today = new Date().toISOString().split('T')[0] as string;
+    const today = new Date().toISOString().split('T')[0];
     
-    // Attempt to get existing stat
-    const { data: existingStat } = await supabase
+    // Check if stats table is empty or we need to initialize
+    const { data: existingStat, error: fetchError } = await supabase
       .from('learning_stats')
       .select('id, avg_score, quiz_taken')
       .eq('user_id', userId)
       .eq('date', today)
       .maybeSingle();
       
+    if (fetchError) {
+      console.error('Error fetching stats:', fetchError);
+    }
+      
     if (existingStat) {
       const newQuizCount = (existingStat.quiz_taken || 0) + 1;
-      const newAvg = (((existingStat.avg_score || 0) * (existingStat.quiz_taken || 0)) + data.score) / newQuizCount;
+      const newAvg = Math.round((((existingStat.avg_score || 0) * (existingStat.quiz_taken || 0)) + data.score) / newQuizCount);
       
-      await supabase
+      const { error: updateError } = await supabase
         .from('learning_stats')
         .update({ avg_score: newAvg, quiz_taken: newQuizCount })
         .eq('id', existingStat.id);
+        
+      if (updateError) console.error('Error updating stats:', updateError);
     } else {
-      await supabase
+      const { error: insertError } = await supabase
         .from('learning_stats')
         .insert({
           user_id: userId,
@@ -185,6 +191,8 @@ export const submitQuizResult = createServerFn({ method: "POST" })
           avg_score: data.score,
           quiz_taken: 1
         });
+        
+      if (insertError) console.error('Error inserting stats:', insertError);
     }
 
     return result;
