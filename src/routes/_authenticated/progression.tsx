@@ -1,9 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts'
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, AreaChart, Area } from 'recharts'
 import { useState, useMemo } from 'react'
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { getProgressionData, getLearningStats, getRecentLogs } from '@/lib/learning.functions'
+import { getProgressionData, getLearningStats, getRecentLogs, getWhatsAppStats } from '@/lib/learning.functions'
 import { 
   Table, 
   TableBody, 
@@ -61,6 +61,11 @@ function ProgressionPage() {
         endDate: dateFilter ? `${dateFilter}T23:59:59Z` : undefined
       } 
     })
+  })
+  
+  const { data: whatsappStats } = useSuspenseQuery({
+    queryKey: ['whatsapp-stats'],
+    queryFn: () => getWhatsAppStats()
   })
 
   const chartData = useMemo(() => {
@@ -157,6 +162,96 @@ function ProgressionPage() {
           </CardContent>
         </Card>
       </div>
+
+      <div className="flex flex-col gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-4">
+          <Card className="lg:col-span-2 border-none shadow-none bg-[#F8F9FA] rounded-[24px] overflow-hidden">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-[#2D3142] text-xl font-bold">Activité WhatsApp (7 jours)</CardTitle>
+              <Badge variant="outline" className="rounded-lg border-slate-200 text-slate-500 font-bold">
+                {whatsappStats?.reduce((acc: number, curr: any) => acc + curr.total, 0)} messages
+              </Badge>
+            </CardHeader>
+            <CardContent className="h-[250px] p-6 pt-0">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={whatsappStats}>
+                  <defs>
+                    <linearGradient id="colorSuccess" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.1}/>
+                      <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                  <XAxis 
+                    dataKey="date" 
+                    axisLine={false} 
+                    tickLine={false} 
+                    tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 600 }}
+                    tickFormatter={(str) => format(new Date(str), 'dd MMM', { locale: fr })}
+                    dy={10}
+                  />
+                  <YAxis 
+                    axisLine={false} 
+                    tickLine={false} 
+                    tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 600 }}
+                  />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: '#2D3142', 
+                      color: '#fff', 
+                      borderRadius: '16px', 
+                      border: 'none',
+                      boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)'
+                    }}
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="success" 
+                    stroke="#10b981" 
+                    fillOpacity={1} 
+                    fill="url(#colorSuccess)" 
+                    strokeWidth={3}
+                    name="Succès"
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="failure" 
+                    stroke="#f43f5e" 
+                    fill="transparent"
+                    strokeWidth={2}
+                    strokeDasharray="5 5"
+                    name="Échecs"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+
+          <div className="grid grid-cols-1 gap-4">
+            <div className="bg-[#8C7CF0] rounded-[24px] p-6 text-white flex flex-col justify-between shadow-lg shadow-[#8C7CF0]/20">
+              <div>
+                <p className="text-white/70 text-sm font-bold uppercase tracking-wider mb-1">Taux de délivrabilité</p>
+                <h3 className="text-4xl font-black">
+                  {Math.round((whatsappStats?.reduce((acc: number, curr: any) => acc + curr.success, 0) / (whatsappStats?.reduce((acc: number, curr: any) => acc + curr.total, 0) || 1)) * 100)}%
+                </h3>
+              </div>
+              <div className="mt-4 flex items-center gap-2 text-white/80 text-xs font-bold bg-white/10 p-2 rounded-xl">
+                <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
+                Service CallMeBot Actif
+              </div>
+            </div>
+
+            <div className="bg-white rounded-[24px] p-6 border border-slate-100 flex flex-col justify-between shadow-sm">
+              <div>
+                <p className="text-slate-400 text-sm font-bold uppercase tracking-wider mb-1">Moyenne quotidienne</p>
+                <h3 className="text-3xl font-black text-[#2D3142]">
+                  {(whatsappStats?.reduce((acc: number, curr: any) => acc + curr.total, 0) / 7).toFixed(1)}
+                </h3>
+              </div>
+              <p className="text-slate-400 text-xs font-medium mt-2">Leçons par jour sur la semaine</p>
+            </div>
+          </div>
+        </div>
 
       <div className="flex flex-col gap-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -317,6 +412,7 @@ function ProgressionPage() {
               </Button>
             </div>
           </div>
+        </div>
         </div>
       </div>
     </div>

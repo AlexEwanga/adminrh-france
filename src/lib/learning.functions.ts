@@ -49,6 +49,55 @@ export const getRecentLogs = createServerFn({ method: 'GET' })
     return { logs: logs || [], total: count || 0 };
   });
 
+export const getWhatsAppStats = createServerFn({ method: 'GET' })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase } = context;
+    
+    // Get last 7 days stats
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    
+    const { data: logs, error } = await supabase
+      .from('whatsapp_logs')
+      .select('created_at, status')
+      .gte('created_at', sevenDaysAgo.toISOString())
+      .order('created_at', { ascending: true });
+
+    if (error) throw error;
+
+    // Process data for charts
+    const statsByDay: Record<string, { date: string, success: number, failure: number, total: number }> = {};
+    
+    // Initialize last 7 days
+    for (let i = 0; i < 7; i++) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const dateStr = d.toISOString().split('T')[0]!;
+      statsByDay[dateStr] = { 
+        date: dateStr, 
+        success: 0, 
+        failure: 0, 
+        total: 0 
+      };
+    }
+
+    logs?.forEach((log: any) => {
+      const dateStr = new Date(log.created_at).toISOString().split('T')[0]!;
+      const dayStat = statsByDay[dateStr];
+      if (dayStat) {
+        dayStat.total++;
+        if (log.status === 'success') {
+          dayStat.success++;
+        } else {
+          dayStat.failure++;
+        }
+      }
+    });
+
+    return Object.values(statsByDay).sort((a, b) => a.date.localeCompare(b.date));
+  });
+
 export const getRecentMessages = createServerFn({ method: 'GET' })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
