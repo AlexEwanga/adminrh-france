@@ -27,9 +27,23 @@ function QuizTakePage() {
   const [finished, setFinished] = useState(false)
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [shuffledQuestions, setShuffledQuestions] = useState<any[]>([])
 
   const questions = (quiz?.questions as any[]) || []
-  const currentQuestion = questions[currentIdx]
+
+  // Shuffle questions once on load
+  useState(() => {
+    if (questions.length > 0) {
+      setShuffledQuestions([...questions].sort(() => Math.random() - 0.5))
+    }
+  })
+
+  // Sync shuffled questions if quiz data arrives late
+  if (questions.length > 0 && shuffledQuestions.length === 0) {
+    setShuffledQuestions([...questions].sort(() => Math.random() - 0.5))
+  }
+
+  const currentQuestion = shuffledQuestions[currentIdx]
 
   const handleSelect = async (idx: number) => {
     setSelectedIdx(idx)
@@ -37,19 +51,19 @@ function QuizTakePage() {
     const isCorrect = idx === currentQuestion.correct_index
     if (isCorrect) {
       setScore(s => s + 1)
-      toast.success("Bonne réponse !", { duration: 1000 })
+      toast.success("Bonne réponse !", { duration: 2000 })
     } else {
-      toast.error("Mauvaise réponse.", { duration: 1000 })
+      toast.error(`Mauvaise réponse. La bonne réponse était : ${currentQuestion.options[currentQuestion.correct_index]}`, { duration: 3000 })
     }
 
     setTimeout(async () => {
-      if (currentIdx + 1 < questions.length) {
+      if (currentIdx + 1 < shuffledQuestions.length) {
         setCurrentIdx(c => c + 1)
         setSelectedIdx(null)
       } else {
         setIsSubmitting(true)
         try {
-          const finalScore = Math.round(((score + (isCorrect ? 1 : 0)) / questions.length) * 100)
+          const finalScore = Math.round(((score + (isCorrect ? 1 : 0)) / shuffledQuestions.length) * 100)
           await submitResult({ 
             data: { 
               quiz_id: Number(quizId), 
@@ -64,11 +78,11 @@ function QuizTakePage() {
           setIsSubmitting(false)
         }
       }
-    }, 1200)
+    }, 3000)
   }
 
   if (finished) {
-    const finalPercentage = Math.round((score / questions.length) * 100)
+    const finalPercentage = Math.round((score / shuffledQuestions.length) * 100)
     return (
       <div className="bg-white rounded-[32px] p-12 text-center flex flex-col items-center gap-8 shadow-sm border border-white/50 min-h-[500px] justify-center max-w-2xl mx-auto">
         <div className="p-6 bg-[#FEEFC3] rounded-full">
@@ -80,7 +94,7 @@ function QuizTakePage() {
         </div>
         <div className="flex gap-8">
           <div className="text-center">
-            <div className="text-3xl font-black text-[#2D3142]">{score} / {questions.length}</div>
+            <div className="text-3xl font-black text-[#2D3142]">{score} / {shuffledQuestions.length}</div>
             <div className="text-xs uppercase tracking-widest font-bold text-slate-400">Réponses</div>
           </div>
           <div className="text-center">
@@ -117,7 +131,7 @@ function QuizTakePage() {
           <div className="w-32 h-2 bg-slate-100 rounded-full overflow-hidden">
             <div 
               className="h-full bg-[#8C7CF0] transition-all duration-500" 
-              style={{ width: `${((currentIdx) / questions.length) * 100}%` }}
+              style={{ width: `${((currentIdx) / shuffledQuestions.length) * 100}%` }}
             />
           </div>
         </div>
@@ -126,7 +140,7 @@ function QuizTakePage() {
       <div className="flex-1 flex flex-col gap-8">
         <div>
           <span className="inline-block px-3 py-1 bg-slate-100 rounded-lg text-[11px] font-black uppercase tracking-widest text-slate-500 mb-4">
-            Question {currentIdx + 1} sur {questions.length}
+            Question {currentIdx + 1} sur {shuffledQuestions.length}
           </span>
           <h2 className="text-2xl font-bold text-[#2D3142] leading-tight">
             {currentQuestion.question}
