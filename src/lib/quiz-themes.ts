@@ -1,0 +1,198 @@
+// Découpage thématique de la banque de 1000 dossiers (100 thèmes x 10 questions)
+// en 10 quiz thématiques de 100 questions chacun.
+
+export type QuizGroup = {
+  id: number
+  title: string
+  category: string
+  difficulty: number
+  themes: string[]
+}
+
+const T = (list: string[]) => list
+
+export const QUIZ_GROUPS: QuizGroup[] = [
+  {
+    id: 101,
+    title: 'Contrat de travail & exécution',
+    category: 'Contrat',
+    difficulty: 1,
+    themes: T([
+      'la formation du contrat de travail',
+      "la période d'essai du contrat à durée indéterminée",
+      "le renouvellement de la période d'essai",
+      "le délai de prévenance en cas de rupture de la période d'essai par l'employeur",
+      "l'exécution de bonne foi du contrat de travail",
+      'le télétravail',
+      'la protection de la salariée à son retour de congé de maternité',
+      'la durée du congé de maternité',
+      'le maintien de salaire en cas de maladie',
+      'le reclassement du salarié déclaré inapte',
+    ]),
+  },
+  {
+    id: 102,
+    title: 'Licenciement & rupture du CDI',
+    category: 'Rupture',
+    difficulty: 2,
+    themes: T([
+      'la rupture du contrat à durée indéterminée',
+      'la cause réelle et sérieuse du licenciement personnel',
+      "la convocation à l'entretien préalable",
+      'la notification du licenciement',
+      'le motif économique de licenciement',
+      "l'obligation de reclassement en matière économique",
+      'le préavis de licenciement',
+      "l'indemnité légale de licenciement",
+      "l'indemnisation du licenciement sans cause réelle et sérieuse",
+      'la rupture conventionnelle',
+    ]),
+  },
+  {
+    id: 103,
+    title: 'Rupture conventionnelle, CDD & intérim',
+    category: 'Contrats précaires',
+    difficulty: 2,
+    themes: T([
+      'le délai de rétractation de la rupture conventionnelle',
+      "l'homologation de la rupture conventionnelle",
+      'le recours au contrat à durée déterminée',
+      'la forme écrite du CDD',
+      'la rupture anticipée du CDD',
+      "l'indemnité de fin de contrat",
+      'le délai de carence entre deux CDD',
+      'le recours au travail temporaire',
+      'la non-discrimination',
+      'la charge de la preuve en matière de discrimination',
+    ]),
+  },
+  {
+    id: 104,
+    title: 'Discrimination, harcèlement & libertés',
+    category: 'Droits fondamentaux',
+    difficulty: 3,
+    themes: T([
+      "l'égalité professionnelle entre les femmes et les hommes",
+      'le harcèlement moral',
+      'la prévention du harcèlement moral',
+      'le harcèlement sexuel',
+      "l'obligation de prévention du harcèlement sexuel",
+      'la preuve en matière de harcèlement',
+      'les restrictions aux libertés individuelles',
+      "l'information préalable sur les dispositifs de contrôle",
+      'la sanction disciplinaire',
+      "l'interdiction des sanctions pécuniaires",
+    ]),
+  },
+  {
+    id: 105,
+    title: 'Discipline & représentation du personnel',
+    category: 'Relations sociales',
+    difficulty: 3,
+    themes: T([
+      'la procédure disciplinaire',
+      'la prescription des faits fautifs',
+      'le contrôle judiciaire de la sanction',
+      'les attributions du comité social et économique',
+      'le seuil de mise en place du CSE',
+      'la consultation du CSE sur les décisions importantes',
+      'la désignation du délégué syndical',
+      "l'interdiction de la discrimination syndicale",
+      'la protection des représentants du personnel',
+      "l'exercice du droit de grève",
+    ]),
+  },
+  {
+    id: 106,
+    title: 'Négociation collective & durée du travail',
+    category: 'Temps de travail',
+    difficulty: 2,
+    themes: T([
+      "la négociation collective d'entreprise",
+      "l'articulation branche / entreprise",
+      'les cadres dirigeants',
+      'la définition du temps de travail effectif',
+      'la durée légale hebdomadaire de travail',
+      'la durée quotidienne maximale de travail',
+      'la durée hebdomadaire maximale absolue',
+      'la durée hebdomadaire maximale moyenne',
+      'le temps de pause',
+      "le contingent d'heures supplémentaires",
+    ]),
+  },
+  {
+    id: 107,
+    title: 'Heures supplémentaires, repos & jours fériés',
+    category: 'Temps de travail',
+    difficulty: 2,
+    themes: T([
+      'la majoration des heures supplémentaires',
+      'le repos quotidien',
+      'le repos hebdomadaire',
+      'la durée du repos hebdomadaire',
+      'le repos dominical',
+      'les jours fériés',
+      'le 1er mai',
+      "l'acquisition des congés payés",
+      'la période de prise des congés',
+      'ordre-des-departs',
+    ]).map((t) => (t === 'ordre-des-departs' ? "l'ordre des départs en congés" : t)),
+  },
+  {
+    id: 108,
+    title: 'Congés, rémunération & paie',
+    category: 'Paie',
+    difficulty: 2,
+    themes: T([
+      "l'indemnité de congés payés",
+      'le congé pour événements familiaux',
+      'le décompte de la durée du travail',
+      'la preuve des heures de travail',
+      "l'égalité de rémunération entre les femmes et les hommes",
+      'le SMIC',
+      'le paiement du salaire',
+      'la mensualisation du salaire',
+      'le bulletin de paie',
+      'la compensation sur le salaire',
+    ]),
+  },
+  {
+    id: 109,
+    title: 'Santé, sécurité & prévention',
+    category: 'Santé & Sécurité',
+    difficulty: 3,
+    themes: T([
+      'le privilège des salaires',
+      'la prise en charge des frais de transport public',
+      "l'obligation de sécurité de l'employeur",
+      'les principes généraux de prévention',
+      "l'évaluation des risques et le document unique",
+      'le droit de retrait',
+      'la protection du salarié exerçant son droit de retrait',
+      'la formation à la sécurité',
+      "le suivi individuel de l'état de santé",
+      'les missions du service de prévention et de santé au travail',
+    ]),
+  },
+  {
+    id: 110,
+    title: 'Formation, handicap & fin de carrière',
+    category: 'Développement RH',
+    difficulty: 3,
+    themes: T([
+      'les sanctions pénales en matière de santé et sécurité',
+      "l'obligation d'adaptation et de formation",
+      "l'entretien professionnel",
+      'le compte personnel de formation',
+      "l'aménagement du poste du travailleur handicapé",
+      "l'obligation d'emploi des travailleurs handicapés",
+      'le transfert des contrats de travail',
+      'la mise à la retraite',
+      "l'indemnité de départ volontaire à la retraite",
+      "la prescription des actions portant sur l'exécution du contrat",
+    ]),
+  },
+]
+
+export const getQuizGroup = (id: number | string) =>
+  QUIZ_GROUPS.find((g) => String(g.id) === String(id))

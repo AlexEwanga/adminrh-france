@@ -1,21 +1,18 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { getQuizzes, getLearningStats } from '@/lib/learning.functions'
+import { getLearningStats } from '@/lib/learning.functions'
+import { QUIZ_GROUPS } from '@/lib/quiz-themes'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { GraduationCap, Trophy } from 'lucide-react'
-import { toast } from 'sonner'
 
 export const Route = createFileRoute('/_authenticated/quiz/')({
   component: QuizSelectionPage,
 })
 
 function QuizSelectionPage() {
-  const { data: quizzes } = useSuspenseQuery({
-    queryKey: ['learning-quizzes'],
-    queryFn: () => getQuizzes()
-  })
+  const quizzes = QUIZ_GROUPS
 
   const { data: stats } = useSuspenseQuery({
     queryKey: ['learning-stats'],
@@ -33,7 +30,7 @@ function QuizSelectionPage() {
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-[#2D3142]">Quiz & Défis RH</h1>
-          <p className="text-slate-400 mt-1">Méthodologie : 1000 questions structurées par thèmes (CDI, Durée, Rupture) basées sur la Partie Législative.</p>
+          <p className="text-slate-400 mt-1">10 quiz thématiques • 1000 dossiers uniques (Casus + Référence + Article) issus de la Partie Législative.</p>
         </div>
         <div className="bg-[#FEEFC3] px-6 py-3 rounded-2xl flex items-center gap-3 shadow-sm border border-[#FDE68A]">
           <Trophy className="text-[#F9A825]" size={24} />
@@ -54,7 +51,7 @@ function QuizSelectionPage() {
               <div>
                 <h3 className="text-xl font-bold text-[#2D3142] mb-2">{quiz.title}</h3>
                 <p className="text-sm text-slate-500 font-medium">
-                  {quiz.id === 8 ? '1000' : (Array.isArray(quiz.questions) ? quiz.questions.length : 0)} questions • 5-10 minutes
+                  100 questions dans ce thème • 10 tirées par session
                 </p>
               </div>
               <Button 

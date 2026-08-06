@@ -71,6 +71,7 @@ export type Database = {
       messages: {
         Row: {
           article: string | null
+          best_practice: string | null
           casus: string | null
           content: string
           created_at: string | null
@@ -85,6 +86,7 @@ export type Database = {
         }
         Insert: {
           article?: string | null
+          best_practice?: string | null
           casus?: string | null
           content: string
           created_at?: string | null
@@ -99,6 +101,7 @@ export type Database = {
         }
         Update: {
           article?: string | null
+          best_practice?: string | null
           casus?: string | null
           content?: string
           created_at?: string | null
