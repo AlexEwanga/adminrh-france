@@ -15,9 +15,18 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Search, Calendar, ChevronLeft, ChevronRight, MessageCircle } from 'lucide-react'
+import { Search, Calendar, ChevronLeft, ChevronRight, MessageCircle, Eye } from 'lucide-react'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { ScrollArea } from "@/components/ui/scroll-area"
+
 
 export const Route = createFileRoute('/_authenticated/progression')({
   component: ProgressionPage,
@@ -215,10 +224,65 @@ function ProgressionPage() {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button variant="ghost" size="sm" className="text-[#8C7CF0] font-bold hover:text-[#8C7CF0] hover:bg-[#8C7CF0]/5">
-                      Visualiser
-                    </Button>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="ghost" size="sm" className="text-[#8C7CF0] font-bold hover:text-[#8C7CF0] hover:bg-[#8C7CF0]/5 gap-2">
+                          <Eye size={14} />
+                          Visualiser
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-[600px] rounded-[32px] border-none shadow-2xl p-0 overflow-hidden bg-white">
+                        <DialogHeader className="p-8 bg-[#2D3142] text-white">
+                          <div className="flex items-center gap-3 mb-2">
+                            <div className="p-2 bg-white/10 rounded-xl">
+                              <MessageCircle size={20} className="text-[#8C7CF0]" />
+                            </div>
+                            <DialogTitle className="text-xl font-bold tracking-tight">Détails du message</DialogTitle>
+                          </div>
+                          <div className="flex flex-col gap-1 opacity-80 text-sm">
+                            <p>Envoyé le : {format(new Date(log.created_at), 'PPPP à HH:mm', { locale: fr })}</p>
+                            <p>Destinataire : {log.phone_number}</p>
+                          </div>
+                        </DialogHeader>
+                        <div className="p-8">
+                          <div className="mb-6">
+                            <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Sujet de la leçon</h4>
+                            <p className="text-lg font-bold text-[#2D3142] leading-tight">{log.subject}</p>
+                          </div>
+                          <div>
+                            <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Contenu intégral</h4>
+                            <ScrollArea className="h-[300px] w-full rounded-2xl border border-slate-100 bg-slate-50/50 p-6">
+                              <div className="text-[#2D3142] font-medium leading-relaxed whitespace-pre-wrap text-[15px]">
+                                {log.content}
+                              </div>
+                            </ScrollArea>
+                          </div>
+                          {log.error_message && (
+                            <div className="mt-6 p-4 rounded-2xl bg-rose-50 border border-rose-100">
+                              <h4 className="text-[10px] font-black uppercase tracking-widest text-rose-400 mb-1">Erreur technique</h4>
+                              <p className="text-rose-600 text-xs font-bold">{log.error_message}</p>
+                            </div>
+                          )}
+                        </div>
+                        <div className="px-8 py-6 bg-slate-50 border-t border-slate-100 flex justify-end">
+                          <Button 
+                            variant="outline" 
+                            className="rounded-xl border-slate-200 text-[#2D3142] font-bold"
+                            onClick={(e) => {
+                              const target = e.currentTarget.closest('[role="dialog"]');
+                              if (target) {
+                                const closeButton = target.querySelector('button[aria-label="Close"]');
+                                if (closeButton instanceof HTMLButtonElement) closeButton.click();
+                              }
+                            }}
+                          >
+                            Fermer
+                          </Button>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
                   </TableCell>
+
                 </TableRow>
               ))}
               {logsData?.logs.length === 0 && (
