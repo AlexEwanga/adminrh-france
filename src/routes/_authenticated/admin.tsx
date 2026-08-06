@@ -9,7 +9,7 @@ import { toast } from 'sonner'
 import { useServerFn } from '@tanstack/react-start'
 import { testWhatsAppConnection } from '@/lib/whatsapp.server'
 
-import { getRecentMessages } from '@/lib/learning.functions'
+import { getRecentMessages, getQuizzes } from '@/lib/learning.functions'
 import { useSuspenseQuery } from '@tanstack/react-query'
 
 export const Route = createFileRoute('/_authenticated/admin')({
@@ -37,6 +37,12 @@ function AdminPage() {
     queryKey: ['recent-messages'],
     queryFn: () => getRecentMessages()
   })
+
+  const { data: quizzes } = useSuspenseQuery({
+    queryKey: ['learning-quizzes'],
+    queryFn: () => getQuizzes()
+  })
+
 
   const filteredMessages = messages?.filter((msg: any) => 
     msg.subject.toLowerCase().includes(adminSearch.toLowerCase()) || 
@@ -75,12 +81,16 @@ function AdminPage() {
             <ShieldCheck size={18} className="mr-2" />
             Vérifier RLS
           </Button>
-          <Button className="bg-[#2D3142] hover:bg-[#8C7CF0] text-white rounded-2xl px-6 py-6 font-bold shadow-lg shadow-slate-200 transition-all">
+          <Button 
+            onClick={() => toast.info("Formulaire d'ajout en cours de développement")}
+            className="bg-[#2D3142] hover:bg-[#8C7CF0] text-white rounded-2xl px-6 py-6 font-bold shadow-lg shadow-slate-200 transition-all"
+          >
             <Plus size={18} className="mr-2" />
             Ajouter un contenu
           </Button>
         </div>
       </header>
+
 
       {/* Configuration WhatsApp Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
