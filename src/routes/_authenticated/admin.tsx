@@ -24,7 +24,7 @@ import {
 import { useState, useMemo, useEffect } from 'react'
 import { toast } from 'sonner'
 import allQuestions from '@/lib/all_questions.json'
-import { testWhatsAppConnection, getWhatsAppLogs, getWhatsAppTemplates, updateWhatsAppTemplate } from '@/lib/whatsapp.server'
+import { testWhatsAppConnection, getWhatsAppLogs, getWhatsAppTemplates, updateWhatsAppTemplate, resendDailyMessages } from '@/lib/whatsapp.server'
 import { useServerFn } from '@tanstack/react-start'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
@@ -50,9 +50,11 @@ function AdminEditorPage() {
   const fetchLogs = useServerFn(getWhatsAppLogs)
   const fetchTemplates = useServerFn(getWhatsAppTemplates)
   const saveTemplate = useServerFn(updateWhatsAppTemplate)
+  const resendMessages = useServerFn(resendDailyMessages)
 
   const [whatsappLogs, setWhatsappLogs] = useState<any[]>([])
   const [templates, setTemplates] = useState<any[]>([])
+  const [isResending, setIsResending] = useState(false)
   const [selectedTab, setSelectedTab] = useState<'editor' | 'logs' | 'templates'>('editor')
 
   const loadWhatsApp = async () => {
@@ -106,6 +108,23 @@ function AdminEditorPage() {
       toast.error("Erreur technique: " + error.message)
     } finally {
       setIsTesting(false)
+    }
+  }
+
+  const handleResendDaily = async () => {
+    setIsResending(true)
+    try {
+      const result = await resendMessages()
+      if (result.success) {
+        toast.success(`${result.sentCount} message(s) envoyé(s) !`)
+        loadWhatsApp()
+      } else {
+        toast.info(result.message || "Aucun message à renvoyer pour le moment.")
+      }
+    } catch (error: any) {
+      toast.error("Erreur de renvoi: " + error.message)
+    } finally {
+      setIsResending(false)
     }
   }
 
@@ -193,8 +212,12 @@ function AdminEditorPage() {
                   />
                 </div>
               </div>
-              <div className="flex gap-2 w-full md:w-auto">
+              <div className="flex flex-wrap gap-2 w-full md:w-auto">
                 <Button onClick={handleSavePhone} variant="outline" className="rounded-xl border-slate-200 font-bold">Enregistrer</Button>
+                <Button onClick={handleResendDaily} disabled={isResending} variant="secondary" className="rounded-xl font-bold bg-[#1E2A4A] text-[#D4AF37] hover:bg-[#1E2A4A]/90">
+                  {isResending ? <RefreshCw className="mr-2 animate-spin" size={16} /> : <RefreshCw size={16} className="mr-2" />} 
+                  Rattrapage Journée
+                </Button>
                 <Button onClick={handleTestWhatsApp} disabled={isTesting} className="bg-[#25D366] text-white rounded-xl font-bold">
                   {isTesting ? "Envoi..." : <><Send size={16} className="mr-2" /> Tester</>}
                 </Button>
@@ -302,6 +325,9 @@ function TemplateEditor({ template, onSave }: { template: any, onSave: (id: stri
   const [localTemplate, setLocalTemplate] = useState(template.content_template);
   const preview = localTemplate
     .replace('{{subject}}', 'Exemple de Titre')
+    .replace('{{casus}}', 'Un salarié dans une entreprise de logistique effectue 39 heures de travail effectif. Comment sont décomptées les heures au-delà de la durée légale ?')
+    .replace('{{reference}}', 'Art. L3121-27')
+    .replace('{{article}}', 'La durée légale du travail effectif des salariés à temps complet est fixée à trente-cinq heures par semaine.')
     .replace('{{content}}', 'Ceci est un exemple de contenu pour la leçon du jour.');
 
   return (
@@ -328,9 +354,9 @@ function TemplateEditor({ template, onSave }: { template: any, onSave: (id: stri
             value={localTemplate} 
             onChange={(e) => setLocalTemplate(e.target.value)}
             className="rounded-xl min-h-[150px] font-mono text-sm bg-slate-50 border-none" 
-            placeholder="Utilisez {{subject}} et {{content}}"
+            placeholder="Utilisez {{subject}}, {{casus}}, {{reference}} et {{article}}"
           />
-          <p className="text-[10px] text-slate-400">Variables : {"{{subject}}"}, {"{{content}}"}</p>
+          <p className="text-[10px] text-slate-400">Variables : {"{{subject}}"}, {"{{casus}}"}, {"{{reference}}"}, {"{{article}}"}</p>
         </div>
         
         <div className="space-y-2">

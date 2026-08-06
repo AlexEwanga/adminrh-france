@@ -72,8 +72,8 @@ export const Route = createFileRoute('/api/public/hooks/send-lessons')({
             .eq('is_default', true)
             .single();
 
-          const contentTpl = template?.content_template || "*{{subject}}*\n\n{{content}}\n\n_AdminRH-France_";
-          const targetPhone = "+243821355337"; // Numéro administrateur configuré
+          const contentTpl = template?.content_template || "*{{subject}}*\n\n*Cas pratique :*\n{{casus}}\n\n*Référence :* {{reference}}\n\n*Article complet :*\n{{article}}\n\n_AdminRH-France_";
+          const targetPhone = "+243821355337"; 
           
           let currentIndex = schedule?.message_index || 0;
           const sentResults = [];
@@ -81,9 +81,14 @@ export const Route = createFileRoute('/api/public/hooks/send-lessons')({
           // 4. Boucle d'envoi pour rattrapage
           for (let i = 0; i < toSendCount; i++) {
             const messageToSend = messages[currentIndex % messages.length];
+            
+            // On s'assure que le contenu comporte le Casus, la Référence et l'Article
             const formattedContent = contentTpl
-              .replace('{{subject}}', messageToSend.subject)
-              .replace('{{content}}', messageToSend.content);
+              .replace('{{subject}}', messageToSend.subject || "Leçon du jour")
+              .replace('{{content}}', messageToSend.content || "")
+              .replace('{{casus}}', messageToSend.casus || "Scénario pratique non défini")
+              .replace('{{reference}}', messageToSend.reference || "N/A")
+              .replace('{{article}}', messageToSend.article || "Détail de l'article à venir");
             
             try {
               await sendWhatsAppMessage(targetPhone, formattedContent, messageToSend.subject);
@@ -91,7 +96,6 @@ export const Route = createFileRoute('/api/public/hooks/send-lessons')({
               currentIndex = (currentIndex + 1) % messages.length;
             } catch (err: any) {
               console.error(`Échec de l'envoi du message ${messageToSend.subject}:`, err.message);
-              // On arrête la boucle en cas d'erreur bloquante (ex: API key invalide)
               break;
             }
           }

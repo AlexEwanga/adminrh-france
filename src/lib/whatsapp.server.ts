@@ -102,6 +102,30 @@ export const updateWhatsAppTemplate = createServerFn({ method: "POST" })
   });
 
 
+export const resendDailyMessages = createServerFn({ method: "POST" })
+  .handler(async () => {
+    // On appelle le hook interne de manière sécurisée
+    const baseUrl = process.env['NODE_ENV'] === 'production' 
+      ? `https://project--${process.env['VITE_LOVABLE_PROJECT_ID']}.lovable.app`
+      : 'http://localhost:8080';
+      
+    // Pour forcer le renvoi sans attendre le CRON, on peut appeler l'API
+    // Mais ici on va implémenter la logique directement ou via fetch
+    const response = await fetch(`${baseUrl}/api/public/hooks/send-lessons`, {
+      method: 'POST',
+      headers: {
+        'apikey': process.env['SUPABASE_PUBLISHABLE_KEY'] || ''
+      }
+    });
+    
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`Erreur lors du renvoi: ${error}`);
+    }
+    
+    return await response.json();
+  });
+
 export const testWhatsAppConnection = createServerFn({ method: "POST" })
   .inputValidator((data) => z.object({ 
     phone: z.string()
