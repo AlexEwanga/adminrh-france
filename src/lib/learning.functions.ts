@@ -11,6 +11,8 @@ export const getLearningStats = createServerFn({ method: 'GET' })
       .from('learning_stats')
       .select('*')
       .eq('user_id', userId)
+      .order('date', { ascending: false })
+      .limit(1)
       .maybeSingle();
       
     return data;
@@ -155,22 +157,35 @@ export const submitQuizResult = createServerFn({ method: "POST" })
 
     if (error) throw error;
     
-    // Update learning stats for today
+    // Update learning stats
     const today = new Date().toISOString().split('T')[0] as string;
-    // Call the function in the private schema (PostgREST will find it via search_path)
-    const { error: rpcError } = await (supabase.rpc as any)('update_learning_stats', {
-      _user_id: userId,
-      _date: today,
-      _score: data.score
-    });
-
-
-
-    if (rpcError) {
-      console.error('Error updating learning stats:', rpcError);
+    
+    // Attempt to get existing stat
+    const { data: existingStat } = await supabase
+      .from('learning_stats')
+      .select('id, avg_score, quiz_taken')
+      .eq('user_id', userId)
+      .eq('date', today)
+      .maybeSingle();
+      
+    if (existingStat) {
+      const newQuizCount = (existingStat.quiz_taken || 0) + 1;
+      const newAvg = (((existingStat.avg_score || 0) * (existingStat.quiz_taken || 0)) + data.score) / newQuizCount;
+      
+      await supabase
+        .from('learning_stats')
+        .update({ avg_score: newAvg, quiz_taken: newQuizCount })
+        .eq('id', existingStat.id);
+    } else {
+      await supabase
+        .from('learning_stats')
+        .insert({
+          user_id: userId,
+          date: today,
+          avg_score: data.score,
+          quiz_taken: 1
+        });
     }
 
     return result;
   });
-
-
