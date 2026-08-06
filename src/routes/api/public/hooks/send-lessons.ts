@@ -2,6 +2,10 @@ import { createFileRoute } from '@tanstack/react-router'
 import { createClient } from '@supabase/supabase-js'
 import { sendWhatsAppMessage } from '@/lib/whatsapp.server'
 
+// Configuration : 5 messages par jour à répartir
+// 08h, 10h, 12h, 14h, 16h (GMT)
+const PLANNED_SLOTS = [8, 10, 12, 14, 16];
+
 export const Route = createFileRoute('/api/public/hooks/send-lessons')({
   server: {
     handlers: {
@@ -18,7 +22,16 @@ export const Route = createFileRoute('/api/public/hooks/send-lessons')({
         const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
         try {
-          // 1. Récupérer l'état actuel de la planification
+          // 1. Déterminer combien de messages devraient avoir été envoyés aujourd'hui
+          const now = new Date();
+          const currentHour = now.getUTCHours();
+          const slotsElapsed = PLANNED_SLOTS.filter(h => h <= currentHour).length;
+
+          if (slotsElapsed === 0) {
+            return new Response(JSON.stringify({ message: 'Trop tôt pour le premier envoi' }), { status: 200 });
+          }
+
+          // 2. Vérifier l'état actuel (index du prochain message)
           const { data: schedule, error: schedError } = await supabase
             .from('daily_schedule')
             .select('*')
@@ -26,16 +39,22 @@ export const Route = createFileRoute('/api/public/hooks/send-lessons')({
 
           if (schedError && schedError.code !== 'PGRST116') throw schedError
 
-          let messageIndex = schedule?.message_index || 0
+          const today = now.toISOString().split('T')[0]
           const lastDate = schedule?.last_message_date
-          const today = new Date().toISOString().split('T')[0]
+          const lastSentCount = (lastDate === today) ? (schedule?.sent_count_today || 0) : 0;
+          
+          // Nombre de messages à envoyer pour rattraper le retard
+          const toSendCount = slotsElapsed - lastSentCount;
 
-          // Réinitialiser l'index si c'est un nouveau jour (optionnel, selon la logique souhaitée)
-          if (lastDate !== today) {
-            messageIndex = 0
+          if (toSendCount <= 0) {
+            return new Response(JSON.stringify({ 
+              message: 'Tous les messages prévus jusqu\'à cette heure ont déjà été envoyés',
+              slotsElapsed,
+              lastSentCount
+            }), { status: 200 });
           }
 
-          // 2. Récupérer le message à envoyer
+          // 3. Récupérer les messages et le modèle
           const { data: messages, error: msgError } = await supabase
             .from('messages')
             .select('*')
@@ -44,12 +63,9 @@ export const Route = createFileRoute('/api/public/hooks/send-lessons')({
 
           if (msgError) throw msgError
           if (!messages || messages.length === 0) {
-            return new Response(JSON.stringify({ message: 'No active messages found' }), { status: 200 })
+            return new Response(JSON.stringify({ error: 'Aucun message actif trouvé' }), { status: 404 })
           }
 
-          const messageToSend = messages[messageIndex % messages.length]
-
-          // 3. Récupérer le modèle WhatsApp
           const { data: template } = await supabase
             .from('whatsapp_templates')
             .select('content_template')
@@ -57,39 +73,55 @@ export const Route = createFileRoute('/api/public/hooks/send-lessons')({
             .single();
 
           const contentTpl = template?.content_template || "*{{subject}}*\n\n{{content}}\n\n_AdminRH-France_";
-          const formattedContent = contentTpl
-            .replace('{{subject}}', messageToSend.subject)
-            .replace('{{content}}', messageToSend.content);
+          const targetPhone = "+243821355337"; // Numéro administrateur configuré
           
-          // On envoie au numéro de l'administrateur configuré ou par défaut
-          const targetPhone = "+243821355337";
-          await sendWhatsAppMessage(targetPhone, formattedContent, messageToSend.subject);
+          let currentIndex = schedule?.message_index || 0;
+          const sentResults = [];
 
-          // 4. Mettre à jour le planning pour le prochain envoi
-          const nextIndex = (messageIndex + 1) % messages.length
+          // 4. Boucle d'envoi pour rattrapage
+          for (let i = 0; i < toSendCount; i++) {
+            const messageToSend = messages[currentIndex % messages.length];
+            const formattedContent = contentTpl
+              .replace('{{subject}}', messageToSend.subject)
+              .replace('{{content}}', messageToSend.content);
+            
+            try {
+              await sendWhatsAppMessage(targetPhone, formattedContent, messageToSend.subject);
+              sentResults.push(messageToSend.subject);
+              currentIndex = (currentIndex + 1) % messages.length;
+            } catch (err: any) {
+              console.error(`Échec de l'envoi du message ${messageToSend.subject}:`, err.message);
+              // On arrête la boucle en cas d'erreur bloquante (ex: API key invalide)
+              break;
+            }
+          }
+
+          // 5. Mise à jour du planning
           const { error: upsertError } = await supabase
             .from('daily_schedule')
             .upsert({
               id: 1,
               last_message_date: today,
-              message_index: nextIndex
+              message_index: currentIndex,
+              sent_count_today: lastSentCount + sentResults.length
             })
 
           if (upsertError) throw upsertError
 
           return new Response(JSON.stringify({ 
             success: true, 
-            sent: messageToSend.subject,
-            next_index: nextIndex 
+            sentCount: sentResults.length,
+            sentMessages: sentResults,
+            nextIndex: currentIndex,
+            totalSentToday: lastSentCount + sentResults.length
           }), {
             headers: { 'Content-Type': 'application/json' }
           })
         } catch (error: any) {
-          console.error('Error in send-lessons hook:', error)
+          console.error('Erreur dans le hook send-lessons:', error)
           return new Response(JSON.stringify({ error: error.message }), { status: 500 })
         }
       }
     }
   }
 })
-
