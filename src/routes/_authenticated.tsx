@@ -179,11 +179,12 @@ function AuthenticatedLayout() {
               <DropdownMenuTrigger asChild>
                 <div className="bg-white px-2 sm:px-4 py-1.5 rounded-2xl shadow-sm border border-white/50 flex items-center gap-3 cursor-pointer hover:bg-slate-50 transition-colors active:scale-95">
                   <Avatar className="h-8 w-8 sm:h-9 sm:w-9 border-2 border-[#F0F2F5]">
-                    <AvatarImage src="https://github.com/shadcn.png" />
-                    <AvatarFallback className="bg-[#2D3142] text-white text-xs">RH</AvatarFallback>
+                    <AvatarImage src="https://api.dicebear.com/7.x/avataaars/svg?seed=Alex" />
+                    <AvatarFallback className="bg-[#2D3142] text-white text-xs">AE</AvatarFallback>
                   </Avatar>
+
                   <div className="text-left hidden lg:block">
-                    <p className="text-sm font-bold text-[#2D3142]">Profil RH</p>
+                    <p className="text-sm font-bold text-[#2D3142]">Alex Ewanga</p>
                     <p className="text-[10px] text-slate-400 font-medium">0 pts</p>
                   </div>
                   <MoreVertical size={14} className="text-slate-400 ml-0 sm:ml-2 hidden sm:block" />

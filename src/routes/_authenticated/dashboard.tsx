@@ -430,11 +430,14 @@ function ScheduleItem({ time, lesson, theme, channel }: any) {
   return (
     <div className="grid grid-cols-4 px-2 md:px-4 py-4 items-center text-[12px] md:text-[13px] group hover:bg-slate-50 transition-colors rounded-xl cursor-pointer">
       <span className="font-bold text-[#2D3142]">{time}</span>
-      <span className="font-medium text-[#2D3142] truncate">{lesson}</span>
-      <div className="flex items-center gap-2 truncate">
-        <span className="text-slate-500 font-medium truncate">{theme}</span>
+      <span className="font-medium text-[#2D3142] truncate mr-2" title={lesson}>{lesson}</span>
+      <div className="flex items-center gap-2 truncate mr-2">
+        <span className="text-slate-500 font-medium truncate" title={theme}>{theme}</span>
       </div>
-      <span className="text-slate-500 font-medium truncate">{channel}</span>
+      <Badge className="bg-green-50 text-green-600 hover:bg-green-100 border-none px-2 py-0.5 text-[10px] w-fit">
+        {channel}
+      </Badge>
+
     </div>
   )
 }
