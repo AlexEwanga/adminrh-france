@@ -206,7 +206,8 @@ function Learning() {
                 </section>
 
                 {/* Casus Section */}
-                {selectedLesson.exus && (
+                {(selectedLesson.casus || selectedLesson.exus) && (
+
                   <section>
                     <div className="flex items-center gap-2 mb-4 text-[#2D3142]">
                       <div className="p-2 bg-[#8C7CF0]/10 rounded-lg">
@@ -215,8 +216,9 @@ function Learning() {
                       <h4 className="font-bold text-lg">Cas pratique (Casus)</h4>
                     </div>
                     <div className="text-slate-600 leading-relaxed whitespace-pre-wrap pl-4 border-l-4 border-[#8C7CF0]/30 py-1">
-                      {selectedLesson.exus}
+                      {selectedLesson.casus || selectedLesson.exus}
                     </div>
+
                   </section>
                 )}
 
