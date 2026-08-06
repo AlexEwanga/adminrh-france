@@ -41,6 +41,37 @@ function AdminEditorPage() {
   const [whatsappPhone, setWhatsappPhone] = useState('')
   const [isTesting, setIsTesting] = useState(false)
   const sendTest = useServerFn(testWhatsAppConnection)
+  const fetchLogs = useServerFn(getWhatsAppLogs)
+  const fetchTemplates = useServerFn(getWhatsAppTemplates)
+  const saveTemplate = useServerFn(updateWhatsAppTemplate)
+
+  const [whatsappLogs, setWhatsappLogs] = useState<any[]>([])
+  const [templates, setTemplates] = useState<any[]>([])
+  const [selectedTab, setSelectedTab] = useState<'editor' | 'logs' | 'templates'>('editor')
+
+  useEffect(() => {
+    const loadWhatsApp = async () => {
+      try {
+        const [l, t] = await Promise.all([fetchLogs(), fetchTemplates()])
+        setWhatsappLogs(l)
+        setTemplates(t)
+      } catch (err) {
+        console.error("Error loading WhatsApp data:", err)
+      }
+    }
+    loadWhatsApp()
+  }, [])
+
+  const handleUpdateTemplate = async (id: string, content: string) => {
+    try {
+      await saveTemplate({ data: { id, content_template: content } })
+      toast.success("Modèle mis à jour")
+      const updated = await fetchTemplates()
+      setTemplates(updated)
+    } catch (err) {
+      toast.error("Erreur de mise à jour")
+    }
+  }
 
   useEffect(() => {
     const savedPhone = localStorage.getItem('admin_whatsapp_phone')
