@@ -117,6 +117,7 @@ function Learning() {
         <h2 className="text-xl font-bold text-[#2D3142]">Base de connaissances</h2>
       </div>
 
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredMessages?.map((msg: any) => (
           <Card key={msg.id} className="group border-none shadow-none bg-[#F8F9FA] rounded-[24px] overflow-hidden hover:bg-white hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300">
             <CardContent className="p-6 flex flex-col gap-4">
