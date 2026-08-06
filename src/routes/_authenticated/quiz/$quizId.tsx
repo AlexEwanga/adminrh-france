@@ -49,7 +49,9 @@ function QuizTakePage() {
       
       if (pool.length > 0) {
         const uniquePool = [...pool].sort(() => Math.random() - 0.5);
+        // Ensure no repeats by slicing from the unique shuffled pool
         setShuffledQuestions(uniquePool.slice(0, 10));
+
       }
     };
     init();
