@@ -413,6 +413,7 @@ function ProgressionPage() {
             </div>
           </div>
         </div>
+        </div>
       </div>
     </div>
   )
