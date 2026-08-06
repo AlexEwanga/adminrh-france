@@ -123,43 +123,45 @@ function Learning() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredMessages?.map((msg: any) => (
           <Card key={msg.id} className="group border-none shadow-none bg-[#F8F9FA] rounded-[24px] overflow-hidden hover:bg-white hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300">
-            <CardContent className="p-6 flex flex-col gap-4">
-              <div className="flex justify-between items-start">
-                <div className="p-3 bg-white rounded-2xl shadow-sm group-hover:bg-[#8C7CF0] group-hover:text-white transition-colors">
+            <CardContent className="p-6 flex flex-col h-full">
+              <div className="flex justify-between items-start mb-4">
+                <div className="p-3 bg-white rounded-2xl shadow-sm group-hover:bg-[#1E2A4A] group-hover:text-white transition-colors">
                   <BookOpen size={20} />
                 </div>
-                <Badge className="bg-white text-[#2D3142] border-none shadow-sm hover:bg-white">{msg.tag}</Badge>
+                <Badge className="bg-white text-[#2D3142] border border-slate-100 shadow-sm hover:bg-white px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider">{msg.tag || 'Législatif'}</Badge>
               </div>
-              <div>
-                <h3 className="text-lg font-bold text-[#2D3142] mb-2">{msg.subject}</h3>
-                <p className="text-sm text-slate-500 leading-relaxed line-clamp-3 font-medium">
+              <div className="flex-1">
+                <h3 className="text-lg font-bold text-[#2D3142] mb-2 group-hover:text-[#1E2A4A] transition-colors line-clamp-2">{msg.subject}</h3>
+                <p className="text-sm text-slate-500 leading-relaxed line-clamp-3 font-medium mb-4">
                   {msg.content}
                 </p>
               </div>
-              <div className="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between">
-                <span className="text-[11px] font-bold text-slate-300 uppercase">Leçon {String(msg.id).split('-')[0]}</span>
+              <div className="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between">
+                <div className="flex flex-col">
+                  <span className="text-[10px] font-bold text-slate-300 uppercase tracking-tighter">Référence</span>
+                  <span className="text-[11px] font-bold text-[#2D3142] truncate max-w-[120px]">{msg.reference || msg.source}</span>
+                </div>
                 <div className="flex items-center gap-2">
-                  {msg.source && (
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="h-8 w-8 text-slate-400 hover:text-[#8C7CF0]"
-                      asChild
-                    >
-                      <a href={msg.source} target="_blank" rel="noopener noreferrer">
-                        <Search size={14} />
-                      </a>
-                    </Button>
-                  )}
-                  <Button variant="link" className="text-[#8C7CF0] font-bold p-0 h-auto text-xs">Lire la suite</Button>
+                  <Button 
+                    variant="link" 
+                    className="text-[#8C7CF0] font-bold p-0 h-auto text-xs hover:text-[#1E2A4A] transition-colors"
+                    onClick={() => {
+                      // Logic to view details could be added here
+                      toast.info("Détails de la leçon", { description: msg.content })
+                    }}
+                  >
+                    Lire la suite
+                  </Button>
                 </div>
               </div>
             </CardContent>
           </Card>
         ))}
         {filteredMessages?.length === 0 && (
-          <div className="col-span-full py-12 text-center text-slate-400 font-medium">
-            Aucun résultat trouvé pour "{searchQuery}"
+          <div className="col-span-full py-20 flex flex-col items-center justify-center bg-slate-50 rounded-[32px] border-2 border-dashed border-slate-100">
+            <Search className="text-slate-200 mb-4" size={48} />
+            <h3 className="text-xl font-bold text-slate-400">Aucun résultat trouvé</h3>
+            <p className="text-slate-300 mt-2">Essayez de rechercher avec d'autres mots-clés comme "contrat", "essai" ou un numéro d'article.</p>
           </div>
         )}
       </div>
