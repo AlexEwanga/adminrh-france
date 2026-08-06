@@ -225,8 +225,40 @@ function AdminEditorPage() {
           </Card>
         </div>
 
-        {/* Liste & Filtres */}
-        <div className="lg:col-span-4 space-y-6">
+        {/* Onglets */}
+        <div className="lg:col-span-12">
+          <div className="flex bg-[#F8F9FA] p-1 rounded-2xl gap-1">
+            <button 
+              onClick={() => setSelectedTab('editor')}
+              className={`flex-1 py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all ${
+                selectedTab === 'editor' ? 'bg-[#2D3142] text-white shadow-md' : 'text-slate-500 hover:bg-slate-100'
+              }`}
+            >
+              <FileText size={18} /> Éditeur de Banque
+            </button>
+            <button 
+              onClick={() => setSelectedTab('logs')}
+              className={`flex-1 py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all ${
+                selectedTab === 'logs' ? 'bg-[#2D3142] text-white shadow-md' : 'text-slate-500 hover:bg-slate-100'
+              }`}
+            >
+              <History size={18} /> Historique WhatsApp
+            </button>
+            <button 
+              onClick={() => setSelectedTab('templates')}
+              className={`flex-1 py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all ${
+                selectedTab === 'templates' ? 'bg-[#2D3142] text-white shadow-md' : 'text-slate-500 hover:bg-slate-100'
+              }`}
+            >
+              <Settings size={18} /> Modèles de Message
+            </button>
+          </div>
+        </div>
+
+        {selectedTab === 'editor' && (
+          <>
+            {/* Liste & Filtres */}
+            <div className="lg:col-span-4 space-y-6">
           <div className="space-y-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
