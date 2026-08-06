@@ -48,7 +48,7 @@ function Learning() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
             <Input 
               className="pl-10 rounded-xl border-slate-100 bg-slate-50 focus-visible:ring-[#8C7CF0]" 
-              placeholder="Rechercher..." 
+              placeholder="Dsi moi, le Code du travail français a combien d'articles au total ?" 
               value={searchQuery}
               onChange={(e) => {
                 const val = e.target.value

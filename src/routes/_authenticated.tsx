@@ -147,7 +147,7 @@ function AuthenticatedLayout() {
               <Search size={18} className="text-slate-400 shrink-0" />
               <input 
                 type="text" 
-                placeholder="Rechercher partout..." 
+                placeholder="Dsi moi, le Code du travail français a combien d'articles au total ?" 
                 className="text-sm text-slate-600 font-medium bg-transparent focus:outline-none w-full truncate"
                 value={globalSearch}
                 onInput={(e) => {
