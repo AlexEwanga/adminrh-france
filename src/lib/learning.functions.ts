@@ -156,7 +156,8 @@ export const submitQuizResult = createServerFn({ method: "POST" })
     
     // Update learning stats for today
     const today = new Date().toISOString().split('T')[0] as string;
-    const { error: rpcError } = await (supabase.rpc as any)('update_learning_stats', {
+    // Call the function in the private schema
+    const { error: rpcError } = await (supabase.rpc as any)('private_update_learning_stats', {
       _user_id: session.user.id,
       _date: today,
       _score: data.score
