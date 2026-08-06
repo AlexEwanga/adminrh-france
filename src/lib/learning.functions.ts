@@ -110,6 +110,58 @@ export const getRecentMessages = createServerFn({ method: 'GET' })
     return data || [];
   });
 
+export const getDashboardSummary = createServerFn({ method: 'GET' })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const today = new Date().toISOString().split('T')[0]!;
+
+    const [statsRes, resultsRes, messagesRes, logsRes, scheduleRes] = await Promise.all([
+      supabase.from('learning_stats').select('*').eq('user_id', userId),
+      supabase.from('quiz_results').select('score, created_at').eq('user_id', userId),
+      supabase.from('messages').select('id', { count: 'exact', head: true }),
+      supabase
+        .from('whatsapp_logs')
+        .select('subject, status, created_at')
+        .gte('created_at', `${today}T00:00:00.000Z`)
+        .order('created_at', { ascending: true }),
+      supabase.from('daily_schedule').select('*').limit(1).maybeSingle(),
+    ]);
+
+    const stats = statsRes.data || [];
+    const results = resultsRes.data || [];
+
+    const quizTaken = results.length;
+    const avgScore = quizTaken
+      ? Math.round(results.reduce((s: number, r: any) => s + (r.score || 0), 0) / quizTaken)
+      : 0;
+    const points = results.reduce((s: number, r: any) => s + Math.round((r.score || 0) / 10) * 10, 0);
+
+    // Learning streak: consecutive days with activity
+    const activeDays = new Set<string>([
+      ...stats.map((s: any) => s.date),
+      ...results.map((r: any) => new Date(r.created_at).toISOString().split('T')[0]),
+    ].filter(Boolean) as string[]);
+
+    let streak = 0;
+    const cursor = new Date();
+    while (activeDays.has(cursor.toISOString().split('T')[0]!)) {
+      streak++;
+      cursor.setDate(cursor.getDate() - 1);
+    }
+
+    return {
+      quizTaken,
+      avgScore,
+      points,
+      streak,
+      totalLessons: messagesRes.count || 0,
+      todayLogs: logsRes.data || [],
+      schedule: scheduleRes.data || null,
+    };
+  });
+
+
 export const getQuizzes = createServerFn({ method: 'GET' })
   .handler(async () => {
     const { data } = await supabase
