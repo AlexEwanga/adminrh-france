@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { getQuizById, submitQuizResult } from '@/lib/learning.functions'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Trophy, ArrowLeft, CheckCircle2, AlertCircle, BookOpen } from 'lucide-react'
@@ -31,31 +31,40 @@ function QuizTakePage() {
   const [shuffledQuestions, setShuffledQuestions] = useState<any[]>([])
   const [showCasus, setShowCasus] = useState(false)
 
-  // For the Ultimate session (id 8), use the local file if the DB is incomplete
   const questions = (quiz?.questions as any[]) || []
 
-  // Initialize and shuffle once
-  useState(() => {
+  // Tirage de 10 dossiers strictement uniques dans la banque de 1000
+  useEffect(() => {
+    let cancelled = false
     const init = async () => {
-      let pool = questions;
-      if (quizId === '8' && pool.length < 1000) {
+      let pool = questions
+      if (quizId === '8') {
         try {
-          const allQuestions = await import('@/lib/all_questions.json').then(m => m.default);
-          pool = allQuestions;
+          pool = await import('@/lib/all_questions.json').then((m) => m.default as any[])
         } catch (e) {
-          console.error("Failed to load questions from file", e);
+          console.error('Impossible de charger la banque de questions', e)
         }
       }
-      
-      if (pool.length > 0) {
-        const uniquePool = [...pool].sort(() => Math.random() - 0.5);
-        // Ensure no repeats by slicing from the unique shuffled pool
-        setShuffledQuestions(uniquePool.slice(0, 10));
 
-      }
-    };
-    init();
-  })
+      // Déduplication stricte (id + intitulé) avant tirage
+      const seen = new Set<string>()
+      const unique = pool.filter((q: any) => {
+        const key = `${q.id}|${q.question}`
+        if (seen.has(key)) return false
+        seen.add(key)
+        return true
+      })
+
+      const shuffled = [...unique].sort(() => Math.random() - 0.5).slice(0, 10)
+      if (!cancelled) setShuffledQuestions(shuffled)
+    }
+    init()
+    return () => {
+      cancelled = true
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [quizId])
+
 
 
 

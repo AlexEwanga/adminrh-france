@@ -70,10 +70,13 @@ export type Database = {
       }
       messages: {
         Row: {
+          article: string | null
+          casus: string | null
           content: string
           created_at: string | null
           id: number
           is_active: boolean | null
+          reference: string | null
           scheduled_hour: string | null
           source: string | null
           subject: string
@@ -81,10 +84,13 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          article?: string | null
+          casus?: string | null
           content: string
           created_at?: string | null
           id?: number
           is_active?: boolean | null
+          reference?: string | null
           scheduled_hour?: string | null
           source?: string | null
           subject: string
@@ -92,10 +98,13 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          article?: string | null
+          casus?: string | null
           content?: string
           created_at?: string | null
           id?: number
           is_active?: boolean | null
+          reference?: string | null
           scheduled_hour?: string | null
           source?: string | null
           subject?: string

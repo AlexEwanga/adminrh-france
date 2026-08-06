@@ -1,0 +1,6 @@
+ALTER TABLE public.messages
+  ADD COLUMN IF NOT EXISTS casus text,
+  ADD COLUMN IF NOT EXISTS reference text,
+  ADD COLUMN IF NOT EXISTS article text;
+CREATE EXTENSION IF NOT EXISTS pg_cron;
+CREATE EXTENSION IF NOT EXISTS pg_net;
