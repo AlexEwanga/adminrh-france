@@ -171,8 +171,8 @@ function QuizTakePage() {
               btnClass += "bg-[#F8F9FA] border-transparent hover:border-[#8C7CF0] hover:bg-white text-[#2D3142]"
             } else if (isSelected) {
               btnClass += isCorrect ? "bg-[#DCFCE7] border-[#22C55E] text-[#166534]" : "bg-[#FEE2E2] border-[#EF4444] text-[#991B1B]"
-            } else if (isCorrect) {
-              btnClass += "bg-[#DCFCE7] border-[#22C55E] text-[#166534]"
+            } else if (isCorrect && selectedIdx !== null) {
+              btnClass += "bg-[#DCFCE7] border-[#22C55E] text-[#166534] ring-4 ring-[#22C55E]/20"
             } else {
               btnClass += "bg-[#F8F9FA] border-transparent opacity-50 text-slate-400"
             }
