@@ -67,10 +67,13 @@ function Dashboard() {
 
   const filteredMessages = useMemo(() => {
     if (!messages) return []
-    return messages.filter((msg: any) => 
+    const results = messages.filter((msg: any) => 
       msg.subject.toLowerCase().includes(searchTerm.toLowerCase()) || 
-      (msg.tag && msg.tag.toLowerCase().includes(searchTerm.toLowerCase()))
+      (msg.tag && msg.tag.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (msg.content && msg.content.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (msg.reference && msg.reference.toLowerCase().includes(searchTerm.toLowerCase()))
     )
+    return results
   }, [messages, searchTerm])
 
   const filteredNotes = useMemo(() => {
