@@ -138,6 +138,15 @@ function QuizTakePage() {
       </div>
 
       <div className="flex-1 flex flex-col gap-8">
+        {quiz?.casus && (
+          <div className="bg-[#E0E7FF]/30 p-6 rounded-[24px] border border-[#E0E7FF]">
+            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#6366F1] mb-2">Cas pratique (Casus)</h4>
+            <p className="text-[#2D3142] italic leading-relaxed">
+              "{quiz.casus}"
+            </p>
+          </div>
+        )}
+
         <div>
           <span className="inline-block px-3 py-1 bg-slate-100 rounded-lg text-[11px] font-black uppercase tracking-widest text-slate-500 mb-4">
             Question {currentIdx + 1} sur {shuffledQuestions.length}
