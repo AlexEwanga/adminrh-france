@@ -155,12 +155,13 @@ export const submitQuizResult = createServerFn({ method: "POST" })
     if (error) throw error;
     
     // Update learning stats for today
-    const today = new Date().toISOString().split('T')[0];
-    const { error: rpcError } = await supabase.rpc('update_learning_stats', {
+    const today = new Date().toISOString().split('T')[0] as string;
+    const { error: rpcError } = await (supabase.rpc as any)('update_learning_stats', {
       _user_id: session.user.id,
       _date: today,
       _score: data.score
     });
+
 
 
     if (rpcError) {
