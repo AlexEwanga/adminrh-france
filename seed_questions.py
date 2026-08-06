@@ -2,8 +2,6 @@ import json
 import random
 
 questions = []
-
-# Topics to cover in Droit du Travail
 topics = [
     {
         "topic": "Harcèlement moral",
@@ -40,39 +38,25 @@ topics = [
 for i in range(950):
     base = random.choice(topics)
     q_id = i + 1
-    
     options = [
         f"Réponse correcte selon {base['ref']} pour le cas {q_id}",
-        f"Interprétation erronée du droit du travail ({q_id})",
-        f"Application non conforme à la jurisprudence ({q_id})",
-        f"Règle applicable uniquement au secteur public ({q_id})"
+        f"Interprétation erronée ({q_id})",
+        f"Application non conforme ({q_id})",
+        f"Règle sectorielle différente ({q_id})"
     ]
-    # Always keep index 0 as correct for simplification in generation, but shuffle later in UI
     correct_idx = 0
-    
     question = {
         "id": q_id,
-        "question": f"Question {q_id}: En vous basant sur l'{base['ref']}, comment qualifiez-vous la situation de {base['topic']} présentée ?",
+        "question": f"Question {q_id}: Selon l'{base['ref']}, comment qualifiez-vous la situation de {base['topic']} ?",
         "options": options,
         "correct_index": correct_idx,
-        "casus": f"Scénario Pratique {q_id}: {base['casus']}",
+        "casus": f"Scénario {q_id}: {base['casus']}",
         "reference": base['ref'],
         "article": base['article']
     }
     questions.append(question)
 
-# Create SQL
-with open("seed_quiz.sql", "w") as f:
+# I'll create the SQL query but I'll execute it via a script to handle the large payload.
+with open("query.sql", "w") as f:
     json_data = json.dumps(questions).replace("'", "''")
-    f.write(f"""
-DELETE FROM public.quizzes WHERE title = 'Droit du travail - Session Ultime';
-
-INSERT INTO public.quizzes (title, description, category, difficulty, questions)
-VALUES (
-  'Droit du travail - Session Ultime',
-  'Une banque massive de 950 questions réelles sur le Droit du Travail. 10 questions sont tirées aléatoirement à chaque session avec leur Casus et Référence.',
-  'Droit du travail',
-  2,
-  '{json_data}'::jsonb
-);
-""")
+    f.write(f"DELETE FROM public.quizzes WHERE title = 'Droit du travail - Session Ultime'; INSERT INTO public.quizzes (title, category, difficulty, questions) VALUES ('Droit du travail - Session Ultime', 'Droit du travail', 2, '{json_data}'::jsonb);")
