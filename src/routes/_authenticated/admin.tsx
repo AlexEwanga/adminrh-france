@@ -285,25 +285,66 @@ function AdminEditorPage() {
         {selectedTab === 'templates' && (
           <div className="lg:col-span-12 space-y-6">
             {templates.map(tpl => (
-              <Card key={tpl.id} className="rounded-[32px] border-none shadow-sm p-6 space-y-4">
-                <div className="flex justify-between items-center">
-                  <h3 className="font-bold text-[#2D3142]">{tpl.name} ({tpl.theme})</h3>
-                  <Badge variant="outline">{tpl.is_default ? 'Par défaut' : ''}</Badge>
-                </div>
-                <Textarea 
-                  defaultValue={tpl.content_template} 
-                  onBlur={(e) => handleUpdateTemplate(tpl.id, e.target.value)}
-                  className="rounded-xl min-h-[100px] font-mono text-sm" 
-                  placeholder="Utilisez {{subject}} et {{content}}"
-                />
-                <p className="text-[10px] text-slate-400">Variables disponibles : {"{{subject}}"}, {"{{content}}"}</p>
-              </Card>
+              <TemplateEditor 
+                key={tpl.id} 
+                template={tpl} 
+                onSave={handleUpdateTemplate} 
+              />
             ))}
           </div>
         )}
       </div>
     </div>
   )
+}
+
+function TemplateEditor({ template, onSave }: { template: any, onSave: (id: string, content: string) => Promise<void> }) {
+  const [localTemplate, setLocalTemplate] = useState(template.content_template);
+  const preview = localTemplate
+    .replace('{{subject}}', 'Exemple de Titre')
+    .replace('{{content}}', 'Ceci est un exemple de contenu pour la leçon du jour.');
+
+  return (
+    <Card className="rounded-[32px] border-none shadow-sm p-6 space-y-6">
+      <div className="flex justify-between items-center">
+        <h3 className="font-bold text-[#2D3142]">{template.name} ({template.theme})</h3>
+        <div className="flex gap-2">
+          <Badge variant="outline">{template.is_default ? 'Par défaut' : ''}</Badge>
+          <Button 
+            size="sm" 
+            variant="ghost" 
+            className="h-7 text-xs font-bold"
+            onClick={() => onSave(template.id, localTemplate)}
+          >
+            <Save size={14} className="mr-1" /> Enregistrer
+          </Button>
+        </div>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-2">
+          <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Édition du modèle</label>
+          <Textarea 
+            value={localTemplate} 
+            onChange={(e) => setLocalTemplate(e.target.value)}
+            className="rounded-xl min-h-[150px] font-mono text-sm bg-slate-50 border-none" 
+            placeholder="Utilisez {{subject}} et {{content}}"
+          />
+          <p className="text-[10px] text-slate-400">Variables : {"{{subject}}"}, {"{{content}}"}</p>
+        </div>
+        
+        <div className="space-y-2">
+          <label className="text-[10px] font-black uppercase tracking-widest text-[#25D366] ml-1">Prévisualisation WhatsApp</label>
+          <div className="bg-[#E7F3F3] rounded-2xl p-4 min-h-[150px] relative">
+            <div className="bg-white rounded-lg p-3 shadow-sm text-sm whitespace-pre-wrap break-words max-w-[90%] border-l-4 border-[#25D366]">
+              {preview}
+            </div>
+            <div className="absolute bottom-2 right-4 text-[9px] text-slate-400">12:00</div>
+          </div>
+        </div>
+      </div>
+    </Card>
+  );
 }
 
 function Edit2(props: any) {
