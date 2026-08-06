@@ -1,9 +1,12 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { useSuspenseQuery } from '@tanstack/react-query'
+import { getQuizById, submitQuizResult } from '@/lib/learning.functions'
 import { useState } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { ArrowRight, CheckCircle2, XCircle } from 'lucide-react'
+import { Trophy, ArrowLeft, CheckCircle2, AlertCircle } from 'lucide-react'
 import { toast } from 'sonner'
+import { useServerFn } from '@tanstack/react-start'
 
 export const Route = createFileRoute('/_authenticated/quiz/$quizId')({
   component: QuizTakePage,
@@ -12,72 +15,164 @@ export const Route = createFileRoute('/_authenticated/quiz/$quizId')({
 function QuizTakePage() {
   const { quizId } = Route.useParams()
   const navigate = useNavigate()
+  const submitResult = useServerFn(submitQuizResult)
   
-  // In a real app, load this via query
-  const quiz = {
-    id: quizId,
-    title: "Bases du Droit du Travail",
-    questions: [
-      { question: "En France, la durée légale du travail est de :", options: ["35h", "37h", "39h", "40h"], correct_index: 0 },
-      { question: "La durée maximale d'un CDD est de :", options: ["12 mois", "18 mois", "24 mois", "36 mois"], correct_index: 1 }
-    ]
-  }
+  const { data: quiz } = useSuspenseQuery({
+    queryKey: ['quiz', quizId],
+    queryFn: () => getQuizById({ data: { id: quizId } })
+  })
 
   const [currentIdx, setCurrentIdx] = useState(0)
   const [score, setScore] = useState(0)
   const [finished, setFinished] = useState(false)
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleSelect = (idx: number) => {
+  const questions = (quiz?.questions as any[]) || []
+  const currentQuestion = questions[currentIdx]
+
+  const handleSelect = async (idx: number) => {
     setSelectedIdx(idx)
-    setTimeout(() => {
-      if (idx === quiz.questions[currentIdx].correct_index) {
-        setScore(s => s + 1)
-        toast.success("Bonne réponse !")
-      } else {
-        toast.error("Mauvaise réponse.")
-      }
+    
+    const isCorrect = idx === currentQuestion.correct_index
+    if (isCorrect) {
+      setScore(s => s + 1)
+      toast.success("Bonne réponse !", { duration: 1000 })
+    } else {
+      toast.error("Mauvaise réponse.", { duration: 1000 })
+    }
 
-      if (currentIdx + 1 < quiz.questions.length) {
+    setTimeout(async () => {
+      if (currentIdx + 1 < questions.length) {
         setCurrentIdx(c => c + 1)
         setSelectedIdx(null)
       } else {
-        setFinished(true)
+        setIsSubmitting(true)
+        try {
+          const finalScore = Math.round(((score + (isCorrect ? 1 : 0)) / questions.length) * 100)
+          await submitResult({ 
+            data: { 
+              quiz_id: Number(quizId), 
+              score: finalScore 
+            } 
+          })
+          setFinished(true)
+        } catch (error) {
+          toast.error("Erreur lors de l'enregistrement du score")
+          setFinished(true)
+        } finally {
+          setIsSubmitting(false)
+        }
       }
-    }, 1000)
+    }, 1200)
   }
 
   if (finished) {
+    const finalPercentage = Math.round((score / questions.length) * 100)
     return (
-      <div className="bg-white rounded-[32px] p-8 text-center flex flex-col items-center gap-6">
-        <h2 className="text-3xl font-bold">Quiz terminé !</h2>
-        <p className="text-xl">Votre score : {score} / {quiz.questions.length}</p>
-        <Button onClick={() => navigate({ to: '/quiz' })} className="rounded-2xl">Retour aux quiz</Button>
+      <div className="bg-white rounded-[32px] p-12 text-center flex flex-col items-center gap-8 shadow-sm border border-white/50 min-h-[500px] justify-center max-w-2xl mx-auto">
+        <div className="p-6 bg-[#FEEFC3] rounded-full">
+          <Trophy className="text-[#F9A825]" size={64} />
+        </div>
+        <div>
+          <h2 className="text-4xl font-bold text-[#2D3142]">Quiz terminé !</h2>
+          <p className="text-slate-500 mt-2 text-lg">Félicitations pour avoir complété ce défi.</p>
+        </div>
+        <div className="flex gap-8">
+          <div className="text-center">
+            <div className="text-3xl font-black text-[#2D3142]">{score} / {questions.length}</div>
+            <div className="text-xs uppercase tracking-widest font-bold text-slate-400">Réponses</div>
+          </div>
+          <div className="text-center">
+            <div className="text-3xl font-black text-[#8C7CF0]">{finalPercentage}%</div>
+            <div className="text-xs uppercase tracking-widest font-bold text-slate-400">Score</div>
+          </div>
+        </div>
+        <Button 
+          onClick={() => navigate({ to: '/quiz' })} 
+          className="rounded-2xl bg-[#2D3142] hover:bg-[#8C7CF0] text-white px-10 py-6 font-bold text-lg shadow-xl transition-all"
+        >
+          Retour aux quiz
+        </Button>
       </div>
     )
   }
 
-  const q = quiz.questions[currentIdx]
+  if (!currentQuestion) {
+    return <div className="p-8 text-center">Chargement des questions...</div>
+  }
 
   return (
-    <div className="bg-white rounded-[32px] p-8 shadow-sm border border-white/50 max-w-2xl mx-auto">
-      <div className="mb-8">
-        <span className="text-sm font-bold text-[#8C7CF0]">Question {currentIdx + 1} / {quiz.questions.length}</span>
-        <h2 className="text-2xl font-bold mt-2">{q.question}</h2>
+    <div className="bg-white rounded-[32px] p-8 shadow-sm border border-white/50 max-w-3xl mx-auto min-h-[500px] flex flex-col">
+      <div className="flex items-center justify-between mb-8">
+        <Button 
+          variant="ghost" 
+          onClick={() => navigate({ to: '/quiz' })}
+          className="rounded-xl text-slate-400 hover:text-[#2D3142]"
+        >
+          <ArrowLeft size={18} className="mr-2" /> Quitter
+        </Button>
+        <div className="flex items-center gap-2">
+          <div className="text-sm font-bold text-slate-400">Progression</div>
+          <div className="w-32 h-2 bg-slate-100 rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-[#8C7CF0] transition-all duration-500" 
+              style={{ width: `${((currentIdx) / questions.length) * 100}%` }}
+            />
+          </div>
+        </div>
       </div>
-      <div className="flex flex-col gap-4">
-        {q.options.map((opt, i) => (
-          <Button
-            key={i}
-            variant={selectedIdx === null ? "outline" : i === q.correct_index ? "default" : "destructive"}
-            className="justify-start text-left h-auto py-4 px-6 rounded-2xl"
-            onClick={() => handleSelect(i)}
-            disabled={selectedIdx !== null}
-          >
-            {opt}
-          </Button>
-        ))}
+
+      <div className="flex-1 flex flex-col gap-8">
+        <div>
+          <span className="inline-block px-3 py-1 bg-slate-100 rounded-lg text-[11px] font-black uppercase tracking-widest text-slate-500 mb-4">
+            Question {currentIdx + 1} sur {questions.length}
+          </span>
+          <h2 className="text-2xl font-bold text-[#2D3142] leading-tight">
+            {currentQuestion.question}
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4">
+          {currentQuestion.options.map((opt: string, i: number) => {
+            const isSelected = selectedIdx === i
+            const isCorrect = i === currentQuestion.correct_index
+            
+            let btnClass = "justify-start text-left h-auto py-6 px-8 rounded-[24px] text-lg font-medium transition-all duration-300 border-2 "
+            
+            if (selectedIdx === null) {
+              btnClass += "bg-[#F8F9FA] border-transparent hover:border-[#8C7CF0] hover:bg-white text-[#2D3142]"
+            } else if (isSelected) {
+              btnClass += isCorrect ? "bg-[#DCFCE7] border-[#22C55E] text-[#166534]" : "bg-[#FEE2E2] border-[#EF4444] text-[#991B1B]"
+            } else if (isCorrect) {
+              btnClass += "bg-[#DCFCE7] border-[#22C55E] text-[#166534]"
+            } else {
+              btnClass += "bg-[#F8F9FA] border-transparent opacity-50 text-slate-400"
+            }
+
+            return (
+              <button
+                key={i}
+                className={btnClass}
+                onClick={() => handleSelect(i)}
+                disabled={selectedIdx !== null || isSubmitting}
+              >
+                <div className="flex items-center justify-between w-full">
+                  <span>{opt}</span>
+                  {selectedIdx !== null && isCorrect && <CheckCircle2 size={24} />}
+                  {selectedIdx !== null && isSelected && !isCorrect && <AlertCircle size={24} />}
+                </div>
+              </button>
+            )
+          })}
+        </div>
       </div>
+      
+      {isSubmitting && (
+        <div className="mt-8 text-center text-slate-400 font-medium animate-pulse">
+          Enregistrement de votre score...
+        </div>
+      )}
     </div>
   )
 }
