@@ -147,7 +147,7 @@ function AuthenticatedLayout() {
               <Search size={18} className="text-slate-400 shrink-0" />
               <input 
                 type="text" 
-                placeholder="Je comprends votre demande de créer 1000 questions avec casus et références. Cependant, je dois être réaliste : générer 1000 questions juridiquement exactes dans une seule réponse n'est pas possible..." 
+                placeholder="For the code present, I get the error below.\n\nPlease think step-by-step in order to resolve it.\n```\nTemporary infrastructure issue while preparing the build environment.\n```" 
                 className="text-sm text-slate-600 font-medium bg-transparent focus:outline-none w-full truncate"
                 value={globalSearch}
                 onInput={(e) => {
