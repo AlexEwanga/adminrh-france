@@ -33,7 +33,7 @@ function QuizSelectionPage() {
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-[#2D3142]">Quiz & Défis RH</h1>
-          <p className="text-slate-400 mt-1">Testez vos connaissances et gagnez des points d'expertise.</p>
+          <p className="text-slate-400 mt-1">Méthodologie : 1000 questions structurées par thèmes (CDI, Durée, Rupture) basées sur la Partie Législative.</p>
         </div>
         <div className="bg-[#FEEFC3] px-6 py-3 rounded-2xl flex items-center gap-3 shadow-sm border border-[#FDE68A]">
           <Trophy className="text-[#F9A825]" size={24} />
