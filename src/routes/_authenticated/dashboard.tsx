@@ -1,11 +1,10 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { useSuspenseQuery, useQueryClient } from '@tanstack/react-query'
-import { getLearningStats, getRecentMessages, getNotes, addNote, getObjectives, addObjective } from '@/lib/learning.functions'
+import { createFileRoute, Link } from '@tanstack/react-router'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { getLearningStats, getRecentMessages, getNotes, addNote, getObjectives, getDashboardSummary } from '@/lib/learning.functions'
 import { useState, useEffect, useMemo } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
-import { Plus, MoreHorizontal, MessageSquare, Trophy, Target, BookOpen, Search, Send, Loader2 } from 'lucide-react'
+import { Plus, MoreHorizontal, Trophy, Target, BookOpen, Search, Send, Loader2, Flame, CheckCircle2, Clock, TrendingUp, GraduationCap } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { 
   BarChart as ReBarChart, 
@@ -21,11 +20,13 @@ import {
 } from 'recharts'
 import { toast } from 'sonner'
 import { Input } from '@/components/ui/input'
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
 
 export const Route = createFileRoute('/_authenticated/dashboard')({
   component: Dashboard,
 })
+
+// Créneaux quotidiens d'envoi WhatsApp (UTC)
+const DAILY_SLOTS = ['07:00', '10:00', '13:00', '16:00', '19:00']
 
 function Dashboard() {
   const [activeFilter, setActiveFilter] = useState('Tout')
@@ -45,37 +46,41 @@ function Dashboard() {
     return () => window.removeEventListener('global-search-change', handleSearch)
   }, [])
 
-  const { data: stats } = useSuspenseQuery({
+  const { data: stats } = useQuery({
     queryKey: ['learning-stats'],
     queryFn: () => getLearningStats()
   })
 
-  const { data: messagesData } = useSuspenseQuery({
+  const { data: summary } = useQuery({
+    queryKey: ['dashboard-summary'],
+    queryFn: () => getDashboardSummary()
+  })
+
+  const { data: messagesData } = useQuery({
     queryKey: ['recent-messages'],
     queryFn: () => getRecentMessages()
   })
   const messages = messagesData || []
 
-  const { data: notes } = useSuspenseQuery({
+  const { data: notes } = useQuery({
     queryKey: ['notes'],
     queryFn: () => getNotes()
   })
 
-  const { data: objectivesData } = useSuspenseQuery({
+  const { data: objectivesData } = useQuery({
     queryKey: ['objectives'],
     queryFn: () => getObjectives()
   })
 
   const filteredMessages = useMemo(() => {
     if (!messages) return []
-    const results = messages.filter((msg: any) => 
+    return messages.filter((msg: any) => 
       msg.subject.toLowerCase().includes(searchTerm.toLowerCase()) || 
       (msg.tag && msg.tag.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (msg.content && msg.content.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (msg.reference && msg.reference.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (msg.article && msg.article.toLowerCase().includes(searchTerm.toLowerCase()))
     )
-    return results
   }, [messages, searchTerm])
 
   const filteredNotes = useMemo(() => {
@@ -86,39 +91,40 @@ function Dashboard() {
     )
   }, [notes, searchTerm])
 
+  // Planning du jour : 5 créneaux réels, statut calculé sur les envois WhatsApp
+  const todaySchedule = useMemo(() => {
+    const logs = summary?.todayLogs || []
+    const nowMinutes = new Date().getUTCHours() * 60 + new Date().getUTCMinutes()
+    return DAILY_SLOTS.map((slot, i) => {
+      const log = logs[i]
+      const [h, m] = slot.split(':').map(Number)
+      const slotMinutes = (h || 0) * 60 + (m || 0)
+      return {
+        time: slot,
+        subject: log?.subject || (messages[i]?.subject ?? 'Leçon à programmer'),
+        status: log
+          ? (log.status === 'success' ? 'Envoyé' : 'Échec')
+          : slotMinutes <= nowMinutes ? 'En attente' : 'Planifié',
+      }
+    })
+  }, [summary, messages])
+
   const chartData = useMemo(() => {
-    if (!stats) return [
-      { name: 'Lun', score: 0, messages: 0 },
-      { name: 'Mar', score: 0, messages: 0 },
-      { name: 'Mer', score: 0, messages: 0 },
-      { name: 'Jeu', score: 0, messages: 0 },
-      { name: 'Ven', score: 0, messages: 0 },
-      { name: 'Sam', score: 0, messages: 0 },
-      { name: 'Dim', score: 0, messages: 0 },
-    ]
-    
-    // Create actual progression data from stats if available, or return recent history
-    // For now, we simulate a week view where the last day is today's score
-    const days = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
-    const today = new Date();
-    const result = [];
-    
+    const days = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam']
+    const today = new Date()
+    const result = []
     for (let i = 6; i >= 0; i--) {
-      const d = new Date();
-      d.setDate(today.getDate() - i);
-      const dayName = days[d.getDay()];
-      
-      // If today, use actual stats
-      const isToday = i === 0;
+      const d = new Date()
+      d.setDate(today.getDate() - i)
+      const isToday = i === 0
       result.push({
-        name: dayName,
-        score: isToday ? (stats.avg_score || 0) : 0,
-        messages: isToday ? (stats.messages_received || 0) : 0
-      });
+        name: days[d.getDay()],
+        score: isToday ? (stats?.avg_score || 0) : 0,
+        messages: isToday ? (summary?.todayLogs?.length || 0) : 0
+      })
     }
-    
-    return result;
-  }, [stats])
+    return result
+  }, [stats, summary])
 
   const filteredTasks = useMemo(() => {
     const tasks = objectivesData || []
@@ -129,6 +135,7 @@ function Dashboard() {
       return matchesFilter && matchesSearch
     })
   }, [activeFilter, searchTerm, objectivesData])
+
 
   const handleAddNote = async (e: React.FormEvent) => {
     e.preventDefault()
