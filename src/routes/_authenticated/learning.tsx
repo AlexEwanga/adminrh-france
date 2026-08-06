@@ -33,7 +33,9 @@ function Learning() {
   const filteredMessages = messages?.filter((msg: any) => 
     msg.subject.toLowerCase().includes(searchQuery.toLowerCase()) || 
     msg.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (msg.tag && msg.tag.toLowerCase().includes(searchQuery.toLowerCase()))
+    (msg.tag && msg.tag.toLowerCase().includes(searchQuery.toLowerCase())) ||
+    (msg.reference && msg.reference.toLowerCase().includes(searchQuery.toLowerCase())) ||
+    (msg.article && msg.article.toLowerCase().includes(searchQuery.toLowerCase()))
   )
 
   return (

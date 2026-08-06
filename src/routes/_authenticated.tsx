@@ -49,6 +49,11 @@ export const Route = createFileRoute('/_authenticated')({
 })
 
 function AuthenticatedLayout() {
+  const navigate = Route.useNavigate()
+  useEffect(() => {
+    (window as any).router = { navigate }
+  }, [navigate])
+
   const [globalSearch, setGlobalSearch] = useState('')
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
@@ -139,21 +144,21 @@ function AuthenticatedLayout() {
               className="bg-white px-4 py-2.5 rounded-2xl shadow-sm border border-white/50 flex items-center gap-2 flex-1 focus-within:ring-2 focus-within:ring-[#8C7CF0]/50 transition-all min-w-0"
               onSubmit={(e) => {
                 e.preventDefault();
-                // If search is submitted, we ensure it's propagated
-                localStorage.setItem('adminrh-global-search', globalSearch)
-                window.dispatchEvent(new CustomEvent('global-search-change', { detail: globalSearch }))
+                const navigate = (window as any).router?.navigate;
+                if (navigate) {
+                  navigate({ to: '/learning' });
+                }
               }}
             >
               <Search size={18} className="text-slate-400 shrink-0" />
               <input 
                 type="text" 
-                placeholder="Rechercher un article (ex: L3121-27)..." 
+                placeholder="Rechercher par sujet, article (ex: L3121-27) ou contenu..." 
                 className="text-sm text-slate-600 font-medium bg-transparent focus:outline-none w-full truncate"
                 value={globalSearch}
                 onInput={(e) => {
                   const val = (e.target as HTMLInputElement).value
                   setGlobalSearch(val)
-                  // Dispatch immediately for reactive filtering
                   window.dispatchEvent(new CustomEvent('global-search-change', { detail: val }))
                   localStorage.setItem('adminrh-global-search', val)
                 }}
