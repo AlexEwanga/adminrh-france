@@ -73,7 +73,7 @@ export const getWhatsAppStats = createServerFn({ method: 'GET' })
     for (let i = 0; i < 7; i++) {
       const d = new Date();
       d.setDate(d.getDate() - i);
-      const dateStr = d.toISOString().split('T')[0];
+      const dateStr = d.toISOString().split('T')[0]!;
       statsByDay[dateStr] = { 
         date: dateStr, 
         success: 0, 
@@ -87,9 +87,9 @@ export const getWhatsAppStats = createServerFn({ method: 'GET' })
       if (statsByDay[dateStr]) {
         statsByDay[dateStr].total++;
         if (log.status === 'success') {
-          statsByDay[dateStr].success++;
+          dayStat.success++;
         } else {
-          statsByDay[dateStr].failure++;
+          dayStat.failure++;
         }
       }
     });
