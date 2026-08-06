@@ -82,7 +82,7 @@ export const getWhatsAppStats = createServerFn({ method: 'GET' })
       };
     }
 
-    logs?.forEach(log => {
+    logs?.forEach((log: any) => {
       const dateStr = new Date(log.created_at).toISOString().split('T')[0];
       if (statsByDay[dateStr]) {
         statsByDay[dateStr].total++;
