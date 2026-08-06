@@ -57,29 +57,32 @@ function QuizTakePage() {
       toast.error(`Mauvaise réponse. La bonne réponse était : ${currentQuestion.options[currentQuestion.correct_index]}`, { duration: 3000 })
     }
 
-    setTimeout(async () => {
-      if (currentIdx + 1 < shuffledQuestions.length) {
-        setCurrentIdx(c => c + 1)
-        setSelectedIdx(null)
-      } else {
-        setIsSubmitting(true)
-        try {
-          const finalScore = Math.round(((score + (isCorrect ? 1 : 0)) / shuffledQuestions.length) * 100)
-          await submitResult({ 
-            data: { 
-              quiz_id: Number(quizId), 
-              score: finalScore 
-            } 
-          })
-          setFinished(true)
-        } catch (error) {
-          toast.error("Erreur lors de l'enregistrement du score")
-          setFinished(true)
-        } finally {
-          setIsSubmitting(false)
-        }
+    setShowNextButton(true)
+  }
+
+  const handleNext = async () => {
+    if (currentIdx + 1 < shuffledQuestions.length) {
+      setCurrentIdx(c => c + 1)
+      setSelectedIdx(null)
+      setShowNextButton(false)
+    } else {
+      setIsSubmitting(true)
+      try {
+        const finalScore = Math.round((score / shuffledQuestions.length) * 100)
+        await submitResult({ 
+          data: { 
+            quiz_id: Number(quizId), 
+            score: finalScore 
+          } 
+        })
+        setFinished(true)
+      } catch (error) {
+        toast.error("Erreur lors de l'enregistrement du score")
+        setFinished(true)
+      } finally {
+        setIsSubmitting(false)
       }
-    }, 3000)
+    }
   }
 
   if (finished) {
