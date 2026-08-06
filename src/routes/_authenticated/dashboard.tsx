@@ -268,11 +268,39 @@ function Dashboard() {
       {/* Left Column: Mes objectifs RH */}
       <div className="lg:col-span-7 bg-white rounded-[32px] p-6 md:p-8 shadow-sm border border-white/50 flex flex-col gap-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-[#2D3142] tracking-tight">Mes objectifs RH</h2>
-          <Button size="icon" variant="ghost" className="bg-[#F8F9FA] rounded-xl hover:bg-slate-100 h-10 w-10 border border-slate-100">
-            <Plus size={20} className="text-[#2D3142]" />
+          <div>
+            <h2 className="text-2xl font-bold text-[#2D3142] tracking-tight">Mes objectifs RH</h2>
+            <p className="text-xs text-slate-400 font-medium mt-1">{filteredTasks.length} objectif(s) affiché(s)</p>
+          </div>
+          <Button
+            size="icon"
+            variant="ghost"
+            className="bg-[#F8F9FA] rounded-xl hover:bg-slate-100 h-10 w-10 border border-slate-100"
+            onClick={() => setShowObjectiveForm((v) => !v)}
+          >
+            <Plus size={20} className={`text-[#2D3142] transition-transform ${showObjectiveForm ? 'rotate-45' : ''}`} />
           </Button>
         </div>
+
+        {showObjectiveForm && (
+          <form onSubmit={handleAddObjective} className="bg-[#F8F9FA] rounded-2xl p-4 border border-slate-100 flex flex-col sm:flex-row gap-3">
+            <Input
+              placeholder="Nouvel objectif (ex: Maîtriser la rupture conventionnelle)"
+              className="bg-white border-slate-100 rounded-xl"
+              value={newObjectiveTitle}
+              onChange={(e) => setNewObjectiveTitle(e.target.value)}
+            />
+            <Input
+              placeholder="Thème"
+              className="bg-white border-slate-100 rounded-xl sm:w-40"
+              value={newObjectiveSubject}
+              onChange={(e) => setNewObjectiveSubject(e.target.value)}
+            />
+            <Button type="submit" disabled={!newObjectiveTitle || isAddingObjective} className="bg-[#1E2A4A] hover:bg-[#1E2A4A]/90 rounded-xl font-bold px-6">
+              {isAddingObjective ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Ajouter'}
+            </Button>
+          </form>
+        )}
 
         <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-2 px-2">
           {['Tout', 'À faire', 'En cours', 'Terminé'].map(filter => (
@@ -291,17 +319,50 @@ function Dashboard() {
             <TaskItem key={task.id} {...task} />
           ))}
           {filteredTasks.length === 0 && (
-            <div className="text-center py-12 space-y-2">
-              <Search className="mx-auto text-slate-200 h-12 w-12" />
-              <p className="text-slate-400 font-medium">Aucun objectif trouvé.</p>
+            <div className="text-center py-12 space-y-3 bg-slate-50/60 rounded-[24px] border-2 border-dashed border-slate-100">
+              <Target className="mx-auto text-slate-200 h-12 w-12" />
+              <p className="text-slate-400 font-medium">Aucun objectif pour le moment.</p>
+              <Button
+                variant="link"
+                className="text-[#8C7CF0] font-bold"
+                onClick={() => setShowObjectiveForm(true)}
+              >
+                Créer mon premier objectif
+              </Button>
             </div>
           )}
         </div>
 
-        <Button variant="ghost" className="w-full text-slate-400 font-medium py-6 hover:bg-slate-50 mt-2">
-          Voir tous les objectifs RH
-        </Button>
+        {/* Leçons récentes */}
+        <div className="pt-4 border-t border-slate-50">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-bold text-[#2D3142] flex items-center gap-2">
+              <BookOpen size={18} className="text-[#8C7CF0]" />
+              Dernières leçons reçues
+            </h3>
+            <Button asChild variant="link" className="text-[#8C7CF0] font-bold text-xs p-0 h-auto">
+              <Link to="/learning">Tout voir</Link>
+            </Button>
+          </div>
+          <div className="space-y-2">
+            {filteredMessages.slice(0, 4).map((msg: any) => (
+              <div key={msg.id} className="flex items-center gap-3 p-3 rounded-2xl hover:bg-slate-50 transition-colors">
+                <div className="w-9 h-9 rounded-xl bg-[#1E2A4A]/5 flex items-center justify-center shrink-0">
+                  <BookOpen size={16} className="text-[#1E2A4A]" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-bold text-[#2D3142] truncate">{msg.subject}</p>
+                  <p className="text-[11px] text-slate-400 font-medium truncate">{msg.reference || 'Code du travail'}</p>
+                </div>
+              </div>
+            ))}
+            {filteredMessages.length === 0 && (
+              <p className="text-sm text-slate-400 italic py-4 text-center">Aucune leçon disponible.</p>
+            )}
+          </div>
+        </div>
       </div>
+
 
       {/* Right Column: Planning & Notes */}
       <div className="lg:col-span-5 space-y-6 flex flex-col">
