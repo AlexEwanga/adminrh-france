@@ -153,7 +153,7 @@ function AuthenticatedLayout() {
               <Search size={18} className="text-slate-400 shrink-0" />
               <input 
                 type="text" 
-                placeholder="Rechercher par sujet, article (ex: L3121-27) ou contenu..." 
+                placeholder="Rechercher dans la base de connaissances" 
                 className="text-sm text-slate-600 font-medium bg-transparent focus:outline-none w-full truncate"
                 value={globalSearch}
                 onInput={(e) => {
