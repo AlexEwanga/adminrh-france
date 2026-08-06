@@ -1,15 +1,16 @@
 import { supabase } from '@/integrations/supabase/client';
+import { requireSupabaseAuth } from '@/integrations/supabase/auth-middleware';
 import { createServerFn } from '@tanstack/react-start';
 
 export const getLearningStats = createServerFn({ method: 'GET' })
-  .handler(async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) return null;
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
 
     const { data } = await supabase
       .from('learning_stats')
       .select('*')
-      .eq('user_id', session.user.id)
+      .eq('user_id', userId)
       .maybeSingle();
       
     return data;
@@ -35,29 +36,29 @@ export const getQuizzes = createServerFn({ method: 'GET' })
   });
 
 export const getNotes = createServerFn({ method: "GET" })
-  .handler(async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) return [];
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
 
     const { data } = await supabase
       .from('notes')
       .select('*')
-      .eq('user_id', session.user.id)
+      .eq('user_id', userId)
       .order('created_at', { ascending: false });
       
     return data || [];
   });
 
 export const addNote = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((d: { title: string, content: string, color?: string }) => d)
-  .handler(async ({ data }) => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) throw new Error('Unauthorized');
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
 
     const { data: note, error } = await supabase
       .from('notes')
       .insert({
-        user_id: session.user.id,
+        user_id: userId,
         title: data.title,
         content: data.content,
         color: data.color || 'bg-[#D1FAE5] text-[#065F46]'
@@ -70,29 +71,29 @@ export const addNote = createServerFn({ method: "POST" })
   });
 
 export const getObjectives = createServerFn({ method: "GET" })
-  .handler(async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) return [];
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
 
     const { data } = await supabase
       .from('objectives')
       .select('*')
-      .eq('user_id', session.user.id)
+      .eq('user_id', userId)
       .order('created_at', { ascending: false });
       
     return data || [];
   });
 
 export const addObjective = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((d: { title: string, subject: string, due_date?: string }) => d)
-  .handler(async ({ data }) => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) throw new Error('Unauthorized');
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
 
     const { data: objective, error } = await supabase
       .from('objectives')
       .insert({
-        user_id: session.user.id,
+        user_id: userId,
         title: data.title,
         subject: data.subject,
         due_date: data.due_date || new Date().toISOString(),
@@ -107,14 +108,14 @@ export const addObjective = createServerFn({ method: "POST" })
   });
 
 export const getProgressionData = createServerFn({ method: "GET" })
-  .handler(async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) return [];
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
 
     const { data } = await supabase
       .from('learning_stats')
       .select('date, avg_score')
-      .eq('user_id', session.user.id)
+      .eq('user_id', userId)
       .order('date', { ascending: true })
       .limit(7);
       
@@ -136,15 +137,15 @@ export const getQuizById = createServerFn({ method: "GET" })
   });
 
 export const submitQuizResult = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((d: { quiz_id: number, score: number, time_spent?: number }) => d)
-  .handler(async ({ data }) => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) throw new Error('Unauthorized');
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
 
     const { data: result, error } = await supabase
       .from('quiz_results')
       .insert({
-        user_id: session.user.id,
+        user_id: userId,
         quiz_id: data.quiz_id,
         score: data.score,
         time_spent: data.time_spent || 0
@@ -158,7 +159,7 @@ export const submitQuizResult = createServerFn({ method: "POST" })
     const today = new Date().toISOString().split('T')[0] as string;
     // Call the function in the private schema (PostgREST will find it via search_path)
     const { error: rpcError } = await (supabase.rpc as any)('update_learning_stats', {
-      _user_id: session.user.id,
+      _user_id: userId,
       _date: today,
       _score: data.score
     });
