@@ -120,3 +120,55 @@ export const getProgressionData = createServerFn({ method: "GET" })
       
     return data || [];
   });
+
+export const getQuizById = createServerFn({ method: "GET" })
+  .inputValidator((d: { id: string | number }) => d)
+  .handler(async ({ data }) => {
+    const quizId = typeof data.id === 'string' ? parseInt(data.id, 10) : data.id;
+    const { data: quiz, error } = await supabase
+      .from('quizzes')
+      .select('*')
+      .eq('id', quizId)
+      .single();
+      
+    if (error) throw error;
+    return quiz;
+  });
+
+export const submitQuizResult = createServerFn({ method: "POST" })
+  .inputValidator((d: { quiz_id: number, score: number, time_spent?: number }) => d)
+  .handler(async ({ data }) => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) throw new Error('Unauthorized');
+
+    const { data: result, error } = await supabase
+      .from('quiz_results')
+      .insert({
+        user_id: session.user.id,
+        quiz_id: data.quiz_id,
+        score: data.score,
+        time_spent: data.time_spent || 0
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+    
+    // Update learning stats for today
+    const today = new Date().toISOString().split('T')[0] as string;
+    const { error: rpcError } = await (supabase.rpc as any)('update_learning_stats', {
+      _user_id: session.user.id,
+      _date: today,
+      _score: data.score
+    });
+
+
+
+    if (rpcError) {
+      console.error('Error updating learning stats:', rpcError);
+    }
+
+    return result;
+  });
+
+

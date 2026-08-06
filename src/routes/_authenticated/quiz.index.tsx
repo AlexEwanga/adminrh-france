@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { getQuizzes, getLearningStats } from '@/lib/learning.functions'
 import { Card, CardContent } from '@/components/ui/card'
@@ -22,9 +22,11 @@ function QuizSelectionPage() {
     queryFn: () => getLearningStats()
   })
 
-  const handleStartQuiz = (title: string) => {
-    toast.success(`Démarrage du quiz : ${title}`)
+  const navigate = useNavigate()
+  const handleStartQuiz = (id: number) => {
+    navigate({ to: `/quiz/${id}` })
   }
+
 
   return (
     <div className="bg-white rounded-[32px] p-8 shadow-sm border border-white/50 flex flex-col gap-8 min-h-[calc(100vh-140px)]">
@@ -56,7 +58,7 @@ function QuizSelectionPage() {
                 </p>
               </div>
               <Button 
-                onClick={() => handleStartQuiz(quiz.title)}
+                onClick={() => handleStartQuiz(quiz.id)}
                 className="w-full bg-[#2D3142] hover:bg-[#8C7CF0] text-white rounded-2xl py-6 font-bold shadow-lg shadow-slate-200 transition-all active:scale-95"
               >
                 <GraduationCap className="mr-2" size={20} />

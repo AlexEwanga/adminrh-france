@@ -18,6 +18,7 @@ import { Route as AuthenticatedLearningRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedProgressionRouteImport } from './routes/_authenticated/progression'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AuthenticatedQuizIndexRouteImport } from './routes/_authenticated/quiz.index'
+import { Route as AuthenticatedQuizQuizIdRouteImport } from './routes/_authenticated/quiz/$quizId'
 import { Route as ApiPublicHooksSendLessonsRouteImport } from './routes/api/public/hooks/send-lessons'
 
 const IndexRoute = IndexRouteImport.update({
@@ -65,6 +66,11 @@ const AuthenticatedQuizIndexRoute = AuthenticatedQuizIndexRouteImport.update({
   path: '/quiz/',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedQuizQuizIdRoute = AuthenticatedQuizQuizIdRouteImport.update({
+  id: '/quiz/$quizId',
+  path: '/quiz/$quizId',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const ApiPublicHooksSendLessonsRoute =
   ApiPublicHooksSendLessonsRouteImport.update({
     id: '/api/public/hooks/send-lessons',
@@ -80,6 +86,7 @@ export interface FileRoutesByFullPath {
   '/learning': typeof AuthenticatedLearningRoute
   '/progression': typeof AuthenticatedProgressionRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/quiz/$quizId': typeof AuthenticatedQuizQuizIdRoute
   '/quiz/': typeof AuthenticatedQuizIndexRoute
   '/api/public/hooks/send-lessons': typeof ApiPublicHooksSendLessonsRoute
 }
@@ -91,6 +98,7 @@ export interface FileRoutesByTo {
   '/learning': typeof AuthenticatedLearningRoute
   '/progression': typeof AuthenticatedProgressionRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/quiz/$quizId': typeof AuthenticatedQuizQuizIdRoute
   '/quiz': typeof AuthenticatedQuizIndexRoute
   '/api/public/hooks/send-lessons': typeof ApiPublicHooksSendLessonsRoute
 }
@@ -104,6 +112,7 @@ export interface FileRoutesById {
   '/_authenticated/learning': typeof AuthenticatedLearningRoute
   '/_authenticated/progression': typeof AuthenticatedProgressionRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/_authenticated/quiz/$quizId': typeof AuthenticatedQuizQuizIdRoute
   '/_authenticated/quiz/': typeof AuthenticatedQuizIndexRoute
   '/api/public/hooks/send-lessons': typeof ApiPublicHooksSendLessonsRoute
 }
@@ -117,6 +126,7 @@ export interface FileRouteTypes {
     | '/learning'
     | '/progression'
     | '/auth/callback'
+    | '/quiz/$quizId'
     | '/quiz/'
     | '/api/public/hooks/send-lessons'
   fileRoutesByTo: FileRoutesByTo
@@ -128,6 +138,7 @@ export interface FileRouteTypes {
     | '/learning'
     | '/progression'
     | '/auth/callback'
+    | '/quiz/$quizId'
     | '/quiz'
     | '/api/public/hooks/send-lessons'
   id:
@@ -140,6 +151,7 @@ export interface FileRouteTypes {
     | '/_authenticated/learning'
     | '/_authenticated/progression'
     | '/auth/callback'
+    | '/_authenticated/quiz/$quizId'
     | '/_authenticated/quiz/'
     | '/api/public/hooks/send-lessons'
   fileRoutesById: FileRoutesById
@@ -216,6 +228,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedQuizIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/quiz/$quizId': {
+      id: '/_authenticated/quiz/$quizId'
+      path: '/quiz/$quizId'
+      fullPath: '/quiz/$quizId'
+      preLoaderRoute: typeof AuthenticatedQuizQuizIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/api/public/hooks/send-lessons': {
       id: '/api/public/hooks/send-lessons'
       path: '/api/public/hooks/send-lessons'
@@ -231,6 +250,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedLearningRoute: typeof AuthenticatedLearningRoute
   AuthenticatedProgressionRoute: typeof AuthenticatedProgressionRoute
+  AuthenticatedQuizQuizIdRoute: typeof AuthenticatedQuizQuizIdRoute
   AuthenticatedQuizIndexRoute: typeof AuthenticatedQuizIndexRoute
 }
 
@@ -239,6 +259,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedLearningRoute: AuthenticatedLearningRoute,
   AuthenticatedProgressionRoute: AuthenticatedProgressionRoute,
+  AuthenticatedQuizQuizIdRoute: AuthenticatedQuizQuizIdRoute,
   AuthenticatedQuizIndexRoute: AuthenticatedQuizIndexRoute,
 }
 

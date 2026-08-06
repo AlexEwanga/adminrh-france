@@ -9,7 +9,7 @@ import { toast } from 'sonner'
 import { useServerFn } from '@tanstack/react-start'
 import { testWhatsAppConnection } from '@/lib/whatsapp.server'
 
-import { getRecentMessages } from '@/lib/learning.functions'
+import { getRecentMessages, getQuizzes } from '@/lib/learning.functions'
 import { useSuspenseQuery } from '@tanstack/react-query'
 
 export const Route = createFileRoute('/_authenticated/admin')({
@@ -37,6 +37,12 @@ function AdminPage() {
     queryKey: ['recent-messages'],
     queryFn: () => getRecentMessages()
   })
+
+  const { data: quizzes } = useSuspenseQuery({
+    queryKey: ['learning-quizzes'],
+    queryFn: () => getQuizzes()
+  })
+
 
   const filteredMessages = messages?.filter((msg: any) => 
     msg.subject.toLowerCase().includes(adminSearch.toLowerCase()) || 
@@ -75,12 +81,16 @@ function AdminPage() {
             <ShieldCheck size={18} className="mr-2" />
             Vérifier RLS
           </Button>
-          <Button className="bg-[#2D3142] hover:bg-[#8C7CF0] text-white rounded-2xl px-6 py-6 font-bold shadow-lg shadow-slate-200 transition-all">
+          <Button 
+            onClick={() => toast.info("Formulaire d'ajout en cours de développement")}
+            className="bg-[#2D3142] hover:bg-[#8C7CF0] text-white rounded-2xl px-6 py-6 font-bold shadow-lg shadow-slate-200 transition-all"
+          >
             <Plus size={18} className="mr-2" />
             Ajouter un contenu
           </Button>
         </div>
       </header>
+
 
       {/* Configuration WhatsApp Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -213,6 +223,64 @@ function AdminPage() {
           </table>
         </CardContent>
       </Card>
+
+      <div className="flex flex-col gap-4">
+        <h2 className="text-xl font-bold text-[#2D3142]">Gestion des Quiz</h2>
+      </div>
+
+      <Card className="border-none shadow-none bg-[#F8F9FA] rounded-[32px] overflow-hidden">
+        <CardContent className="p-0">
+          <table className="w-full text-left">
+            <thead className="bg-[#F1F3F6] text-slate-400 text-[11px] font-black uppercase tracking-widest">
+              <tr>
+                <th className="px-8 py-6">Titre</th>
+                <th className="px-8 py-6">Catégorie</th>
+                <th className="px-8 py-6">Difficulté</th>
+                <th className="px-8 py-6">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100/50">
+              {quizzes && quizzes.length > 0 ? (
+                quizzes.map((quiz: any) => (
+                  <tr key={quiz.id} className="hover:bg-white transition-all group">
+                    <td className="px-8 py-6">
+                      <div className="font-bold text-[#2D3142]">{quiz.title}</div>
+                      <div className="text-[11px] text-slate-400 mt-0.5">
+                        {Array.isArray(quiz.questions) ? quiz.questions.length : 0} questions
+                      </div>
+                    </td>
+                    <td className="px-8 py-6">
+                      <Badge className="bg-white text-[#2D3142] border-none shadow-sm">{quiz.category}</Badge>
+                    </td>
+                    <td className="px-8 py-6">
+                      <Badge className="bg-[#E0E7FF] text-[#6366F1] border-none shadow-sm">
+                        {quiz.difficulty === 1 ? 'Débutant' : quiz.difficulty === 2 ? 'Intermédiaire' : 'Expert'}
+                      </Badge>
+                    </td>
+                    <td className="px-8 py-6 text-right">
+                      <div className="flex gap-2">
+                        <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl text-slate-400 hover:text-[#8C7CF0] hover:bg-slate-50">
+                          <Edit2 size={16} />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl text-slate-400 hover:text-red-500 hover:bg-red-50">
+                          <Trash2 size={16} />
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={4} className="px-8 py-12 text-center text-slate-400 font-medium">
+                    Aucun quiz dans la base de données.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </CardContent>
+      </Card>
     </div>
   )
 }
+
