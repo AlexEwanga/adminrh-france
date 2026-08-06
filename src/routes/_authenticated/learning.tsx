@@ -66,6 +66,57 @@ function Learning() {
         </div>
       </div>
 
+      {/* Section des Sources Officielles */}
+      <div className="bg-[#1E2A4A] text-white rounded-[24px] p-6 shadow-lg">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="p-2 bg-[#D4AF37] rounded-lg">
+            <Search className="text-[#1E2A4A]" size={20} />
+          </div>
+          <h2 className="text-xl font-bold">Les trois sources officielles à connaître absolument</h2>
+        </div>
+        <p className="text-slate-300 mb-6 text-sm leading-relaxed">
+          Ces sites sont la base de toute information fiable en droit du travail. Ils sont publics, gratuits et régulièrement mis à jour.
+        </p>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-sm">
+            <thead>
+              <tr className="border-b border-white/10">
+                <th className="pb-3 pr-4 font-bold text-[#D4AF37]">Source</th>
+                <th className="pb-3 pr-4 font-bold text-[#D4AF37]">Rôle</th>
+                <th className="pb-3 font-bold text-[#D4AF37]">Adresse</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-white/5">
+              <tr>
+                <td className="py-4 pr-4 font-bold">Code du travail numérique</td>
+                <td className="py-4 pr-4 text-slate-300">L'outil principal pour comprendre le droit du travail avec des fiches pratiques, des simulateurs et des modèles de documents.</td>
+                <td className="py-4">
+                  <a href="https://code.travail.gouv.fr" target="_blank" rel="noopener noreferrer" className="text-[#8C7CF0] hover:underline">code.travail.gouv.fr</a>
+                </td>
+              </tr>
+              <tr>
+                <td className="py-4 pr-4 font-bold">Legifrance</td>
+                <td className="py-4 pr-4 text-slate-300">Le texte de loi officiel : le Code du travail dans son intégralité, ainsi que les conventions collectives et la jurisprudence.</td>
+                <td className="py-4">
+                  <a href="https://www.legifrance.gouv.fr" target="_blank" rel="noopener noreferrer" className="text-[#8C7CF0] hover:underline">legifrance.gouv.fr</a>
+                </td>
+              </tr>
+              <tr>
+                <td className="py-4 pr-4 font-bold">Ministère du Travail</td>
+                <td className="py-4 pr-4 text-slate-300">Pour l'actualité, les réformes, les politiques d'emploi (ex : "Emplois francs") et des fiches pratiques très complètes.</td>
+                <td className="py-4">
+                  <a href="https://travail-emploi.gouv.fr" target="_blank" rel="noopener noreferrer" className="text-[#8C7CF0] hover:underline">travail-emploi.gouv.fr</a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-4">
+        <h2 className="text-xl font-bold text-[#2D3142]">Base de connaissances</h2>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredMessages?.map((msg: any) => (
           <Card key={msg.id} className="group border-none shadow-none bg-[#F8F9FA] rounded-[24px] overflow-hidden hover:bg-white hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300">
