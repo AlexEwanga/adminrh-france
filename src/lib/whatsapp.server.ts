@@ -106,7 +106,7 @@ export const resendDailyMessages = createServerFn({ method: "POST" })
   .handler(async () => {
     // On appelle le hook interne de manière sécurisée
     const baseUrl = process.env['NODE_ENV'] === 'production' 
-      ? `https://project--${process.env['VITE_LOVABLE_PROJECT_ID']}.lovable.app`
+      ? `https://adminrh-france.lovable.app`
       : 'http://localhost:8080';
       
     // Pour forcer le renvoi sans attendre le CRON, on peut appeler l'API
