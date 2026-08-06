@@ -1,1 +1,0 @@
-UPDATE public.quizzes SET questions = '[]'::jsonb WHERE id = 8;
