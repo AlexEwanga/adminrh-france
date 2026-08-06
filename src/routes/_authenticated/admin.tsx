@@ -65,6 +65,17 @@ function AdminEditorPage() {
     }
   }
 
+  const handleUpdateTemplate = async (id: string, content: string) => {
+    try {
+      await saveTemplate({ data: { id, content_template: content } })
+      toast.success("Modèle mis à jour")
+      const updated = await fetchTemplates()
+      setTemplates(updated)
+    } catch (err) {
+      toast.error("Erreur de mise à jour")
+    }
+  }
+
   useEffect(() => {
     loadWhatsApp()
     const savedPhone = localStorage.getItem('admin_whatsapp_phone')
