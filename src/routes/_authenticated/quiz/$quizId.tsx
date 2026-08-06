@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Trophy, ArrowLeft, CheckCircle2, AlertCircle, BookOpen } from 'lucide-react'
 import { toast } from 'sonner'
 import { useServerFn } from '@tanstack/react-start'
+import { getQuizGroup } from '@/lib/quiz-themes'
 
 export const Route = createFileRoute('/_authenticated/quiz/$quizId')({
   component: QuizTakePage,
