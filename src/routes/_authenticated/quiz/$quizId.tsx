@@ -29,6 +29,7 @@ function QuizTakePage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showNextButton, setShowNextButton] = useState(false)
   const [shuffledQuestions, setShuffledQuestions] = useState<any[]>([])
+  const [showCasus, setShowCasus] = useState(false)
 
   const questions = (quiz?.questions as any[]) || []
 
@@ -62,6 +63,7 @@ function QuizTakePage() {
     }
 
     setShowNextButton(true)
+    setShowCasus(true)
   }
 
   const handleNext = async () => {
@@ -69,6 +71,7 @@ function QuizTakePage() {
       setCurrentIdx(c => c + 1)
       setSelectedIdx(null)
       setShowNextButton(false)
+      setShowCasus(false)
     } else {
       setIsSubmitting(true)
       try {
@@ -146,9 +149,9 @@ function QuizTakePage() {
       </div>
 
       <div className="flex-1 flex flex-col gap-8">
-        {quiz?.casus && (
-          <div className="bg-[#E0E7FF]/30 p-6 rounded-[24px] border border-[#E0E7FF]">
-            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#6366F1] mb-2">Cas pratique (Casus)</h4>
+        {quiz?.casus && showCasus && (
+          <div className="bg-[#E0E7FF]/30 p-6 rounded-[24px] border border-[#E0E7FF] animate-in fade-in slide-in-from-top-4 duration-500">
+            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#6366F1] mb-2">Explication & Cas pratique</h4>
             <p className="text-[#2D3142] italic leading-relaxed">
               "{quiz.casus}"
             </p>
