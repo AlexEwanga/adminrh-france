@@ -33,19 +33,21 @@ function QuizTakePage() {
 
   const questions = (quiz?.questions as any[]) || []
 
-  // Randomly select 10 questions from the pool if there are more than 10
+  // Initialize and shuffle once
   useState(() => {
     if (questions.length > 0) {
-      const pool = [...questions].sort(() => Math.random() - 0.5)
-      setShuffledQuestions(pool.slice(0, 10))
+      // Create a unique set of 10 questions to ensure NO repetition
+      const uniquePool = [...questions].sort(() => Math.random() - 0.5)
+      setShuffledQuestions(uniquePool.slice(0, 10))
     }
   })
 
   // Sync shuffled questions if quiz data arrives late
   if (questions.length > 0 && shuffledQuestions.length === 0) {
-    const pool = [...questions].sort(() => Math.random() - 0.5)
-    setShuffledQuestions(pool.slice(0, 10))
+    const uniquePool = [...questions].sort(() => Math.random() - 0.5)
+    setShuffledQuestions(uniquePool.slice(0, 10))
   }
+
 
   const currentQuestion = shuffledQuestions[currentIdx]
 
