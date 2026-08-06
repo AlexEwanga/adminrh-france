@@ -4,7 +4,7 @@ import { getQuizById, submitQuizResult } from '@/lib/learning.functions'
 import { useState } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Trophy, ArrowLeft, CheckCircle2, AlertCircle } from 'lucide-react'
+import { Trophy, ArrowLeft, CheckCircle2, AlertCircle, BookOpen } from 'lucide-react'
 import { toast } from 'sonner'
 import { useServerFn } from '@tanstack/react-start'
 
@@ -33,19 +33,21 @@ function QuizTakePage() {
 
   const questions = (quiz?.questions as any[]) || []
 
-  // Randomly select 10 questions from the pool if there are more than 10
+  // Initialize and shuffle once
   useState(() => {
     if (questions.length > 0) {
-      const pool = [...questions].sort(() => Math.random() - 0.5)
-      setShuffledQuestions(pool.slice(0, 10))
+      // Create a unique set of 10 questions to ensure NO repetition
+      const uniquePool = [...questions].sort(() => Math.random() - 0.5)
+      setShuffledQuestions(uniquePool.slice(0, 10))
     }
   })
 
   // Sync shuffled questions if quiz data arrives late
   if (questions.length > 0 && shuffledQuestions.length === 0) {
-    const pool = [...questions].sort(() => Math.random() - 0.5)
-    setShuffledQuestions(pool.slice(0, 10))
+    const uniquePool = [...questions].sort(() => Math.random() - 0.5)
+    setShuffledQuestions(uniquePool.slice(0, 10))
   }
+
 
   const currentQuestion = shuffledQuestions[currentIdx]
 
@@ -156,25 +158,32 @@ function QuizTakePage() {
             <div className="flex flex-col gap-4">
               <div>
                 <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#6366F1] mb-2">Cas pratique (Casus)</h4>
-                <p className="text-[#2D3142] italic leading-relaxed">
-                  "{currentQuestion.casus}"
-                </p>
+                <div className="bg-white/80 p-5 rounded-2xl border border-white shadow-sm">
+                  <p className="text-[#1E2A4A] text-[15px] font-semibold leading-relaxed">
+                    {currentQuestion.casus}
+                  </p>
+                </div>
               </div>
               
-              {currentQuestion.reference && (
-                <div className="pt-4 border-t border-[#E0E7FF]">
-                  <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#D4AF37] mb-2">Référence & Article</h4>
-                  <div className="bg-white/50 p-4 rounded-xl border border-white/80">
-                    <p className="text-[13px] font-bold text-[#2D3142] mb-1">{currentQuestion.reference}</p>
-                    <p className="text-[12px] text-slate-600 leading-snug">
-                      {currentQuestion.article}
-                    </p>
+              <div className="pt-4 border-t border-[#E0E7FF]">
+                <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#D4AF37] mb-2">Référence Légale & Article Complet (Partie Législative)</h4>
+                <div className="bg-[#1E2A4A] p-6 rounded-[20px] shadow-xl border border-white/10 relative overflow-hidden">
+                  <div className="absolute top-0 right-0 p-4 opacity-10">
+                    <BookOpen size={80} className="text-white" />
+                  </div>
+                  <p className="text-[14px] font-bold text-[#D4AF37] mb-3 flex items-center gap-2 relative z-10">
+                    <span className="w-2 h-2 bg-[#D4AF37] rounded-full animate-pulse"></span>
+                    {currentQuestion.reference || "Code du travail - Partie Législative"}
+                  </p>
+                  <div className="text-[14px] text-slate-200 leading-relaxed font-medium whitespace-pre-wrap border-l-2 border-[#D4AF37]/50 pl-5 py-1 relative z-10">
+                    {currentQuestion.article}
                   </div>
                 </div>
-              )}
+              </div>
             </div>
           </div>
         )}
+
 
         <div>
           <span className="inline-block px-3 py-1 bg-slate-100 rounded-lg text-[11px] font-black uppercase tracking-widest text-slate-500 mb-4">
