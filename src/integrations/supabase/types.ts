@@ -225,6 +225,7 @@ export type Database = {
       }
       quizzes: {
         Row: {
+          casus: string | null
           category: string | null
           created_at: string | null
           difficulty: number | null
@@ -233,6 +234,7 @@ export type Database = {
           title: string
         }
         Insert: {
+          casus?: string | null
           category?: string | null
           created_at?: string | null
           difficulty?: number | null
@@ -241,6 +243,7 @@ export type Database = {
           title: string
         }
         Update: {
+          casus?: string | null
           category?: string | null
           created_at?: string | null
           difficulty?: number | null
