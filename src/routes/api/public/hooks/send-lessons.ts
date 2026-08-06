@@ -49,12 +49,21 @@ export const Route = createFileRoute('/api/public/hooks/send-lessons')({
 
           const messageToSend = messages[messageIndex % messages.length]
 
-          // 3. Envoi WhatsApp via CallMeBot
-          const formattedContent = `*${messageToSend.subject}*\n\n${messageToSend.content}\n\n_AdminRH-France_`;
+          // 3. Récupérer le modèle WhatsApp
+          const { data: template } = await supabase
+            .from('whatsapp_templates')
+            .select('content_template')
+            .eq('is_default', true)
+            .single();
+
+          const contentTpl = template?.content_template || "*{{subject}}*\n\n{{content}}\n\n_AdminRH-France_";
+          const formattedContent = contentTpl
+            .replace('{{subject}}', messageToSend.subject)
+            .replace('{{content}}', messageToSend.content);
           
           // On envoie au numéro de l'administrateur configuré ou par défaut
           const targetPhone = "+243821355337";
-          await sendWhatsAppMessage(targetPhone, formattedContent);
+          await sendWhatsAppMessage(targetPhone, formattedContent, messageToSend.subject);
 
           // 4. Mettre à jour le planning pour le prochain envoi
           const nextIndex = (messageIndex + 1) % messages.length
