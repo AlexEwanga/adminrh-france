@@ -15,9 +15,12 @@ import {
   ChevronRight,
   ChevronLeft
 } from 'lucide-react'
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { toast } from 'sonner'
 import allQuestions from '@/lib/all_questions.json'
+import { testWhatsAppConnection } from '@/lib/whatsapp.server'
+import { useServerFn } from '@tanstack/react-start'
+import { Phone, MessageSquare, Send } from 'lucide-react'
 
 export const Route = createFileRoute('/_authenticated/admin')({
   component: AdminEditorPage,
