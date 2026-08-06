@@ -18,9 +18,11 @@ import {
 import { useState, useMemo, useEffect } from 'react'
 import { toast } from 'sonner'
 import allQuestions from '@/lib/all_questions.json'
-import { testWhatsAppConnection } from '@/lib/whatsapp.server'
+import { testWhatsAppConnection, getWhatsAppLogs, getWhatsAppTemplates, updateWhatsAppTemplate } from '@/lib/whatsapp.server'
 import { useServerFn } from '@tanstack/react-start'
-import { Phone, MessageSquare, Send } from 'lucide-react'
+import { Phone, MessageSquare, Send, Clock, FileText, Settings, History } from 'lucide-react'
+import { format } from 'date-fns'
+import { fr } from 'date-fns/locale'
 
 export const Route = createFileRoute('/_authenticated/admin')({
   component: AdminEditorPage,
