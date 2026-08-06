@@ -71,7 +71,8 @@ function Dashboard() {
       msg.subject.toLowerCase().includes(searchTerm.toLowerCase()) || 
       (msg.tag && msg.tag.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (msg.content && msg.content.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (msg.reference && msg.reference.toLowerCase().includes(searchTerm.toLowerCase()))
+      (msg.reference && msg.reference.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (msg.article && msg.article.toLowerCase().includes(searchTerm.toLowerCase()))
     )
     return results
   }, [messages, searchTerm])
