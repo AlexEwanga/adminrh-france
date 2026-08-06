@@ -1,6 +1,8 @@
 import { supabase } from '@/integrations/supabase/client';
 import { requireSupabaseAuth } from '@/integrations/supabase/auth-middleware';
 import { createServerFn } from '@tanstack/react-start';
+import { z } from 'zod';
+
 
 export const getLearningStats = createServerFn({ method: 'GET' })
   .middleware([requireSupabaseAuth])
@@ -197,3 +199,37 @@ export const submitQuizResult = createServerFn({ method: "POST" })
 
     return result;
   });
+
+export const addLearningContent = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(z.object({
+    subject: z.string(),
+    content: z.string(),
+    reference: z.string().regex(/^Art\.\sL\d+-\d+$/, "Référence Legifrance invalide"),
+    tag: z.string().optional()
+  }))
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    
+    // Simulate Legifrance verification
+    const isValidRef = data.reference.startsWith('Art. L');
+    if (!isValidRef) {
+      throw new Error("La référence n'a pas pu être validée par Legifrance");
+    }
+
+    const { data: content, error } = await supabase
+      .from('messages')
+      .insert({
+        subject: data.subject,
+        content: data.content,
+        source: data.reference,
+        tag: data.tag || 'Législatif',
+        is_active: true
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+    return content;
+  });
+
