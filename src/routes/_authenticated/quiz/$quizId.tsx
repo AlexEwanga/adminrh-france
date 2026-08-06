@@ -27,6 +27,7 @@ function QuizTakePage() {
   const [finished, setFinished] = useState(false)
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [showNextButton, setShowNextButton] = useState(false)
   const [shuffledQuestions, setShuffledQuestions] = useState<any[]>([])
 
   const questions = (quiz?.questions as any[]) || []
@@ -56,29 +57,32 @@ function QuizTakePage() {
       toast.error(`Mauvaise réponse. La bonne réponse était : ${currentQuestion.options[currentQuestion.correct_index]}`, { duration: 3000 })
     }
 
-    setTimeout(async () => {
-      if (currentIdx + 1 < shuffledQuestions.length) {
-        setCurrentIdx(c => c + 1)
-        setSelectedIdx(null)
-      } else {
-        setIsSubmitting(true)
-        try {
-          const finalScore = Math.round(((score + (isCorrect ? 1 : 0)) / shuffledQuestions.length) * 100)
-          await submitResult({ 
-            data: { 
-              quiz_id: Number(quizId), 
-              score: finalScore 
-            } 
-          })
-          setFinished(true)
-        } catch (error) {
-          toast.error("Erreur lors de l'enregistrement du score")
-          setFinished(true)
-        } finally {
-          setIsSubmitting(false)
-        }
+    setShowNextButton(true)
+  }
+
+  const handleNext = async () => {
+    if (currentIdx + 1 < shuffledQuestions.length) {
+      setCurrentIdx(c => c + 1)
+      setSelectedIdx(null)
+      setShowNextButton(false)
+    } else {
+      setIsSubmitting(true)
+      try {
+        const finalScore = Math.round((score / shuffledQuestions.length) * 100)
+        await submitResult({ 
+          data: { 
+            quiz_id: Number(quizId), 
+            score: finalScore 
+          } 
+        })
+        setFinished(true)
+      } catch (error) {
+        toast.error("Erreur lors de l'enregistrement du score")
+        setFinished(true)
+      } finally {
+        setIsSubmitting(false)
       }
-    }, 3000)
+    }
   }
 
   if (finished) {
@@ -190,6 +194,17 @@ function QuizTakePage() {
           })}
         </div>
       </div>
+      
+      {showNextButton && (
+        <div className="mt-8 flex justify-end">
+          <Button 
+            onClick={handleNext}
+            className="bg-[#8C7CF0] hover:bg-[#7a6ae0] text-white rounded-2xl py-6 px-8 font-bold shadow-lg transition-all active:scale-95"
+          >
+            {currentIdx + 1 < shuffledQuestions.length ? "Question suivante" : "Voir les résultats"}
+          </Button>
+        </div>
+      )}
       
       {isSubmitting && (
         <div className="mt-8 text-center text-slate-400 font-medium animate-pulse">
