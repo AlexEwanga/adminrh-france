@@ -155,10 +155,47 @@ function Dashboard() {
     }
   }
 
+  const todayLabel = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })
+  const sentToday = summary?.todayLogs?.length || 0
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 pb-6">
+      {/* Bandeau de bienvenue */}
+      <div className="lg:col-span-12 bg-gradient-to-r from-[#1E2A4A] to-[#2D3142] rounded-[32px] p-8 text-white relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-72 h-72 bg-[#D4AF37]/10 rounded-full blur-3xl -mr-24 -mt-24" />
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div>
+            <p className="text-[#D4AF37] font-bold text-xs uppercase tracking-widest mb-2">{todayLabel}</p>
+            <h1 className="text-3xl font-extrabold tracking-tight">Bonjour, prêt à progresser ?</h1>
+            <p className="text-slate-300 mt-2 font-medium text-sm">
+              {sentToday}/5 leçons WhatsApp reçues aujourd'hui — {summary?.totalLessons || 0} dossiers disponibles dans votre base.
+            </p>
+          </div>
+          <div className="flex gap-3">
+            <Button asChild className="bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-[#1E2A4A] font-bold rounded-2xl h-12 px-6 shadow-lg">
+              <Link to="/quiz">
+                <GraduationCap size={18} className="mr-2" />
+                Lancer un Quiz
+              </Link>
+            </Button>
+            <Button asChild variant="outline" className="bg-white/5 border-white/20 hover:bg-white/10 text-white rounded-2xl h-12 px-6 font-bold">
+              <Link to="/learning">Base de connaissances</Link>
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* KPIs */}
+      <div className="lg:col-span-12 grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+        <KpiCard icon={<Trophy size={20} />} label="Points d'expertise" value={summary?.points ?? 0} accent="bg-[#D4AF37]/10 text-[#B8942F]" />
+        <KpiCard icon={<TrendingUp size={20} />} label="Score moyen" value={`${summary?.avgScore ?? 0}%`} accent="bg-[#8C7CF0]/10 text-[#8C7CF0]" />
+        <KpiCard icon={<CheckCircle2 size={20} />} label="Quiz réalisés" value={summary?.quizTaken ?? 0} accent="bg-emerald-50 text-emerald-600" />
+        <KpiCard icon={<Flame size={20} />} label="Série d'apprentissage" value={`${summary?.streak ?? 0} j`} accent="bg-orange-50 text-orange-500" />
+      </div>
+
       {/* Top Row: Charts & Stats */}
       <div className="lg:col-span-12 grid grid-cols-1 md:grid-cols-2 gap-6">
+
         <Card className="rounded-[32px] border-white/50 shadow-sm overflow-hidden bg-white">
           <CardHeader className="pb-2">
             <CardTitle className="text-xl font-bold text-[#2D3142]">Performance Hebdomadaire</CardTitle>
