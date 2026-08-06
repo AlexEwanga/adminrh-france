@@ -162,6 +162,7 @@ export const submitQuizResult = createServerFn({ method: "POST" })
       _score: data.score
     });
 
+
     if (rpcError) {
       console.error('Error updating learning stats:', rpcError);
     }
