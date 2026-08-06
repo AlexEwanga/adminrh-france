@@ -3,11 +3,20 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { getRecentMessages } from '@/lib/learning.functions'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { BookOpen, Search, Filter } from 'lucide-react'
+import { BookOpen, Search, Filter, X, ExternalLink, Bookmark } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { useState, useEffect } from 'react'
 import { toast } from 'sonner'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogClose,
+} from "@/components/ui/dialog"
+
 
 
 export const Route = createFileRoute('/_authenticated/learning')({
@@ -16,6 +25,8 @@ export const Route = createFileRoute('/_authenticated/learning')({
 
 function Learning() {
   const [searchQuery, setSearchQuery] = useState('')
+  const [selectedLesson, setSelectedLesson] = useState<any>(null)
+
 
   const { data: messagesData } = useSuspenseQuery({
     queryKey: ['recent-messages'],
@@ -141,9 +152,9 @@ function Learning() {
                     variant="link" 
                     className="text-[#8C7CF0] font-bold p-0 h-auto text-xs hover:text-[#1E2A4A] transition-colors"
                     onClick={() => {
-                      // Logic to view details could be added here
-                      toast.info("Détails de la leçon", { description: msg.content })
+                      setSelectedLesson(msg)
                     }}
+
                   >
                     Lire la suite
                   </Button>
@@ -160,7 +171,116 @@ function Learning() {
           </div>
         )}
       </div>
+
+      <Dialog open={!!selectedLesson} onOpenChange={(open) => !open && setSelectedLesson(null)}>
+        <DialogContent className="sm:max-w-[700px] rounded-[32px] p-0 overflow-hidden border-none shadow-2xl">
+          {selectedLesson && (
+            <div className="flex flex-col max-h-[90vh]">
+              {/* Header with Background */}
+              <div className="bg-[#1E2A4A] p-8 text-white relative">
+                <div className="absolute top-0 right-0 w-48 h-48 bg-[#D4AF37]/10 rounded-full blur-3xl -mr-12 -mt-12" />
+                <div className="relative z-10">
+                  <Badge className="bg-[#D4AF37] text-[#1E2A4A] border-none mb-4 font-bold uppercase tracking-widest text-[10px]">
+                    {selectedLesson.tag || 'Législatif'}
+                  </Badge>
+                  <DialogTitle className="text-2xl md:text-3xl font-extrabold leading-tight">
+                    {selectedLesson.subject}
+                  </DialogTitle>
+                </div>
+                <DialogClose className="absolute top-6 right-6 p-2 rounded-xl bg-white/10 hover:bg-white/20 transition-colors text-white outline-none">
+                  <X size={20} />
+                </DialogClose>
+              </div>
+
+              {/* Content Area */}
+              <div className="p-8 overflow-y-auto bg-white flex flex-col gap-8 custom-scrollbar">
+                {/* Point Clé Section */}
+                <section className="bg-slate-50 rounded-2xl p-6 border border-slate-100">
+                  <div className="flex items-center gap-2 mb-3 text-[#1E2A4A]">
+                    <Bookmark size={18} className="fill-[#1E2A4A]" />
+                    <h4 className="font-bold text-sm uppercase tracking-wider">Point Clé</h4>
+                  </div>
+                  <p className="text-slate-600 leading-relaxed font-medium">
+                    {selectedLesson.content}
+                  </p>
+                </section>
+
+                {/* Casus Section */}
+                {(selectedLesson.casus || selectedLesson.exus) && (
+
+                  <section>
+                    <div className="flex items-center gap-2 mb-4 text-[#2D3142]">
+                      <div className="p-2 bg-[#8C7CF0]/10 rounded-lg">
+                        <BookOpen size={18} className="text-[#8C7CF0]" />
+                      </div>
+                      <h4 className="font-bold text-lg">Cas pratique (Casus)</h4>
+                    </div>
+                    <div className="text-slate-600 leading-relaxed whitespace-pre-wrap pl-4 border-l-4 border-[#8C7CF0]/30 py-1">
+                      {selectedLesson.casus || selectedLesson.exus}
+                    </div>
+
+                  </section>
+                )}
+
+                {/* Article Section */}
+                {selectedLesson.article && (
+                  <section className="bg-[#1E2A4A]/5 rounded-2xl p-6 border border-[#1E2A4A]/10">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-2 text-[#1E2A4A]">
+                        <h4 className="font-bold text-lg">Référence Légale</h4>
+                      </div>
+                      <span className="bg-white px-3 py-1 rounded-lg text-[#1E2A4A] text-xs font-bold border border-[#1E2A4A]/10">
+                        {selectedLesson.reference}
+                      </span>
+                    </div>
+                    <div className="bg-white p-5 rounded-xl border border-slate-100 italic text-slate-600 text-sm leading-relaxed shadow-sm">
+                      "{selectedLesson.article}"
+                    </div>
+                  </section>
+                )}
+
+                {/* Best Practice Section */}
+                {selectedLesson.best_practice && (
+                  <section className="bg-green-50 rounded-2xl p-6 border border-green-100">
+                    <div className="flex items-center gap-2 mb-3 text-green-700">
+                      <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                      <h4 className="font-bold text-sm uppercase tracking-wider">Bonne pratique conseillée</h4>
+                    </div>
+                    <p className="text-green-800/80 text-sm leading-relaxed font-medium">
+                      {selectedLesson.best_practice}
+                    </p>
+                  </section>
+                )}
+              </div>
+
+              {/* Footer Actions */}
+              <div className="p-6 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-4">
+                <div className="flex items-center gap-2 text-slate-400 text-[10px] font-bold uppercase tracking-widest">
+                  <span>ID: {selectedLesson.id}</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  {selectedLesson.source && (
+                    <Button variant="outline" className="rounded-xl border-slate-200 h-10 px-4 font-bold text-xs" asChild>
+                      <a href={selectedLesson.source} target="_blank" rel="noopener noreferrer">
+                        <ExternalLink size={14} className="mr-2" />
+                        Voir sur Legifrance
+                      </a>
+                    </Button>
+                  )}
+                  <Button 
+                    className="bg-[#1E2A4A] hover:bg-[#1E2A4A]/90 text-white rounded-xl h-10 px-6 font-bold text-xs shadow-lg shadow-[#1E2A4A]/20"
+                    onClick={() => setSelectedLesson(null)}
+                  >
+                    Fermer la leçon
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
+
   )
 }
 
