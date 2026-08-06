@@ -24,6 +24,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogClose,
 } from "@/components/ui/dialog"
 import { ScrollArea } from "@/components/ui/scroll-area"
 
@@ -265,19 +266,14 @@ function ProgressionPage() {
                           )}
                         </div>
                         <div className="px-8 py-6 bg-slate-50 border-t border-slate-100 flex justify-end">
-                          <Button 
-                            variant="outline" 
-                            className="rounded-xl border-slate-200 text-[#2D3142] font-bold"
-                            onClick={(e) => {
-                              const target = e.currentTarget.closest('[role="dialog"]');
-                              if (target) {
-                                const closeButton = target.querySelector('button[aria-label="Close"]');
-                                if (closeButton instanceof HTMLButtonElement) closeButton.click();
-                              }
-                            }}
-                          >
-                            Fermer
-                          </Button>
+                          <DialogClose asChild>
+                            <Button 
+                              variant="outline" 
+                              className="rounded-xl border-slate-200 text-[#2D3142] font-bold"
+                            >
+                              Fermer
+                            </Button>
+                          </DialogClose>
                         </div>
                       </DialogContent>
                     </Dialog>
