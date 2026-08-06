@@ -4,7 +4,7 @@ import { getQuizById, submitQuizResult } from '@/lib/learning.functions'
 import { useState } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Trophy, ArrowLeft, CheckCircle2, AlertCircle } from 'lucide-react'
+import { Trophy, ArrowLeft, CheckCircle2, AlertCircle, BookOpen } from 'lucide-react'
 import { toast } from 'sonner'
 import { useServerFn } from '@tanstack/react-start'
 
