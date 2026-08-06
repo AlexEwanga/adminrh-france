@@ -280,10 +280,6 @@ export type Database = {
         }
         Returns: boolean
       }
-      update_learning_stats: {
-        Args: { _date: string; _score: number; _user_id: string }
-        Returns: undefined
-      }
     }
     Enums: {
       app_role: "admin" | "user"
