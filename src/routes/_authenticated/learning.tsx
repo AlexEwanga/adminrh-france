@@ -15,10 +15,11 @@ export const Route = createFileRoute('/_authenticated/learning')({
 function Learning() {
   const [searchQuery, setSearchQuery] = useState('')
 
-  const { data: messages } = useSuspenseQuery({
+  const { data: messagesData } = useSuspenseQuery({
     queryKey: ['recent-messages'],
     queryFn: () => getRecentMessages()
   })
+  const messages = messagesData || []
 
   useEffect(() => {
     const handleSearch = (e: any) => {
