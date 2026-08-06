@@ -35,6 +35,40 @@ function AdminEditorPage() {
   const [questions, setQuestions] = useState(allQuestions)
   const [editingId, setEditingId] = useState<number | null>(null)
   const [editForm, setEditForm] = useState<any>(null)
+  
+  const [whatsappPhone, setWhatsappPhone] = useState('')
+  const [isTesting, setIsTesting] = useState(false)
+  const sendTest = useServerFn(testWhatsAppConnection)
+
+  useEffect(() => {
+    const savedPhone = localStorage.getItem('admin_whatsapp_phone')
+    if (savedPhone) setWhatsappPhone(savedPhone)
+  }, [])
+
+  const handleSavePhone = () => {
+    localStorage.setItem('admin_whatsapp_phone', whatsappPhone)
+    toast.success("Numéro WhatsApp enregistré localement")
+  }
+
+  const handleTestWhatsApp = async () => {
+    if (!whatsappPhone) {
+      toast.error("Veuillez saisir un numéro de téléphone")
+      return
+    }
+    setIsTesting(true)
+    try {
+      const result = await sendTest({ data: { phone: whatsappPhone } })
+      if (result.success) {
+        toast.success("Message de test envoyé !")
+      } else {
+        toast.error(result.error || "Erreur lors de l'envoi")
+      }
+    } catch (error: any) {
+      toast.error("Erreur technique: " + error.message)
+    } finally {
+      setIsTesting(false)
+    }
+  }
 
   const themes = useMemo(() => {
     const t = new Set(['Tous'])
