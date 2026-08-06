@@ -20,18 +20,21 @@ export type Database = {
           last_message_date: string | null
           message_index: number | null
           next_message_time: string | null
+          sent_count_today: number | null
         }
         Insert: {
           id?: number
           last_message_date?: string | null
           message_index?: number | null
           next_message_time?: string | null
+          sent_count_today?: number | null
         }
         Update: {
           id?: number
           last_message_date?: string | null
           message_index?: number | null
           next_message_time?: string | null
+          sent_count_today?: number | null
         }
         Relationships: []
       }
