@@ -124,10 +124,11 @@ export const getProgressionData = createServerFn({ method: "GET" })
 export const getQuizById = createServerFn({ method: "GET" })
   .inputValidator((d: { id: string | number }) => d)
   .handler(async ({ data }) => {
+    const quizId = typeof data.id === 'string' ? parseInt(data.id, 10) : data.id;
     const { data: quiz, error } = await supabase
       .from('quizzes')
       .select('*')
-      .eq('id', data.id)
+      .eq('id', quizId)
       .single();
       
     if (error) throw error;
@@ -155,12 +156,17 @@ export const submitQuizResult = createServerFn({ method: "POST" })
     
     // Update learning stats for today
     const today = new Date().toISOString().split('T')[0];
-    await supabase.rpc('update_learning_stats', {
+    const { error: rpcError } = await supabase.rpc('update_learning_stats', {
       _user_id: session.user.id,
       _date: today,
       _score: data.score
     });
 
+    if (rpcError) {
+      console.error('Error updating learning stats:', rpcError);
+    }
+
     return result;
   });
+
 
