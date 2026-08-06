@@ -33,16 +33,18 @@ function QuizTakePage() {
 
   const questions = (quiz?.questions as any[]) || []
 
-  // Shuffle questions once on load
+  // Randomly select 10 questions from the pool if there are more than 10
   useState(() => {
     if (questions.length > 0) {
-      setShuffledQuestions([...questions].sort(() => Math.random() - 0.5))
+      const pool = [...questions].sort(() => Math.random() - 0.5)
+      setShuffledQuestions(pool.slice(0, 10))
     }
   })
 
   // Sync shuffled questions if quiz data arrives late
   if (questions.length > 0 && shuffledQuestions.length === 0) {
-    setShuffledQuestions([...questions].sort(() => Math.random() - 0.5))
+    const pool = [...questions].sort(() => Math.random() - 0.5)
+    setShuffledQuestions(pool.slice(0, 10))
   }
 
   const currentQuestion = shuffledQuestions[currentIdx]
@@ -149,12 +151,28 @@ function QuizTakePage() {
       </div>
 
       <div className="flex-1 flex flex-col gap-8">
-        {quiz?.casus && showCasus && (
+        {showCasus && currentQuestion.casus && (
           <div className="bg-[#E0E7FF]/30 p-6 rounded-[24px] border border-[#E0E7FF] animate-in fade-in slide-in-from-top-4 duration-500">
-            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#6366F1] mb-2">Explication & Cas pratique</h4>
-            <p className="text-[#2D3142] italic leading-relaxed">
-              "{quiz.casus}"
-            </p>
+            <div className="flex flex-col gap-4">
+              <div>
+                <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#6366F1] mb-2">Cas pratique (Casus)</h4>
+                <p className="text-[#2D3142] italic leading-relaxed">
+                  "{currentQuestion.casus}"
+                </p>
+              </div>
+              
+              {currentQuestion.reference && (
+                <div className="pt-4 border-t border-[#E0E7FF]">
+                  <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#D4AF37] mb-2">Référence & Article</h4>
+                  <div className="bg-white/50 p-4 rounded-xl border border-white/80">
+                    <p className="text-[13px] font-bold text-[#2D3142] mb-1">{currentQuestion.reference}</p>
+                    <p className="text-[12px] text-slate-600 leading-snug">
+                      {currentQuestion.article}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         )}
 
