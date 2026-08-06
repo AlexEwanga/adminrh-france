@@ -160,6 +160,25 @@ function Dashboard() {
     }
   }
 
+  const handleAddObjective = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!newObjectiveTitle) return
+
+    setIsAddingObjective(true)
+    try {
+      await addObjective({ data: { title: newObjectiveTitle, subject: newObjectiveSubject || 'Droit du travail' } })
+      setNewObjectiveTitle('')
+      setNewObjectiveSubject('')
+      setShowObjectiveForm(false)
+      toast.success('Objectif ajouté')
+      queryClient.invalidateQueries({ queryKey: ['objectives'] })
+    } catch (error) {
+      toast.error("Erreur lors de l'ajout de l'objectif")
+    } finally {
+      setIsAddingObjective(false)
+    }
+  }
+
   const todayLabel = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })
   const sentToday = summary?.todayLogs?.length || 0
 
