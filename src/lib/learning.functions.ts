@@ -222,7 +222,7 @@ export const addLearningContent = createServerFn({ method: "POST" })
       .insert({
         subject: data.subject,
         content: data.content,
-        reference: data.reference,
+        source: data.reference,
         tag: data.tag || 'Législatif',
         is_active: true
       })
