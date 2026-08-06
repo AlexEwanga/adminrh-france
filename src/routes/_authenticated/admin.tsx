@@ -61,7 +61,8 @@ function AdminEditorPage() {
       if (result.success) {
         toast.success("Message de test envoyé !")
       } else {
-        toast.error(result.error || "Erreur lors de l'envoi")
+        const errorMsg = (result as any).error || "Erreur lors de l'envoi"
+        toast.error(errorMsg)
       }
     } catch (error: any) {
       toast.error("Erreur technique: " + error.message)
