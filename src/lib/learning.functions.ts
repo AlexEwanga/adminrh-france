@@ -156,6 +156,7 @@ export const submitQuizResult = createServerFn({ method: "POST" })
     
     // Update learning stats for today
     const today = new Date().toISOString().split('T')[0] as string;
+    // Call the function in the private schema (PostgREST will find it via search_path)
     const { error: rpcError } = await (supabase.rpc as any)('update_learning_stats', {
       _user_id: session.user.id,
       _date: today,
