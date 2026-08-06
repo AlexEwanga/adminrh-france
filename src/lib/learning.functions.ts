@@ -158,7 +158,7 @@ export const submitQuizResult = createServerFn({ method: "POST" })
     if (error) throw error;
     
     // Update learning stats
-    const today: string = new Date().toISOString().split('T')[0];
+    const today = new Date().toISOString().split('T')[0] || new Date().toLocaleDateString('en-CA');
     
     // Check if stats table is empty or we need to initialize
     const { data: existingStat, error: fetchError } = await supabase
