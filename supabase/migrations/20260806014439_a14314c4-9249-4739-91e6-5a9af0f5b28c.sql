@@ -1,0 +1,1 @@
+UPDATE public.quizzes SET title = 'Droit du travail - Ultime (30 questions)' WHERE id = 6;
