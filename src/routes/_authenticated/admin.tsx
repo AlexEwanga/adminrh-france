@@ -135,7 +135,6 @@ function AdminEditorPage() {
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Paramètres WhatsApp */}
         <div className="lg:col-span-12">
           <Card className="border-none shadow-sm bg-[#F8F9FA] rounded-[32px] overflow-hidden">
