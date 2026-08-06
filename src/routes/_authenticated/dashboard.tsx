@@ -50,10 +50,11 @@ function Dashboard() {
     queryFn: () => getLearningStats()
   })
 
-  const { data: messages } = useSuspenseQuery({
+  const { data: messagesData } = useSuspenseQuery({
     queryKey: ['recent-messages'],
     queryFn: () => getRecentMessages()
   })
+  const messages = messagesData || []
 
   const { data: notes } = useSuspenseQuery({
     queryKey: ['notes'],
