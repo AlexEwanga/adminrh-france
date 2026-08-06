@@ -10,6 +10,8 @@ export const Route = createFileRoute('/api/public/hooks/send-lessons')({
   server: {
     handlers: {
       POST: async ({ request }) => {
+        const url = new URL(request.url);
+        const isForce = url.searchParams.get('force') === 'true';
         // En Lovable Cloud, la anon key s'utilise comme 'apikey'
         const authHeader = request.headers.get('apikey')
         if (!authHeader || authHeader !== process.env['SUPABASE_PUBLISHABLE_KEY']) {
@@ -44,7 +46,12 @@ export const Route = createFileRoute('/api/public/hooks/send-lessons')({
           const lastSentCount = (lastDate === today) ? (schedule?.sent_count_today || 0) : 0;
           
           // Nombre de messages à envoyer pour rattraper le retard
-          const toSendCount = slotsElapsed - lastSentCount;
+          // Si 'force' est présent, on renvoie au moins 1 message même si on est à jour
+          let toSendCount = slotsElapsed - lastSentCount;
+          
+          if (isForce && toSendCount <= 0) {
+            toSendCount = 1; // Forcer au moins le dernier message envoyé ou le suivant
+          }
 
           if (toSendCount <= 0) {
             return new Response(JSON.stringify({ 

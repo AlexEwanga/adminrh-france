@@ -111,7 +111,7 @@ export const resendDailyMessages = createServerFn({ method: "POST" })
       
     // Pour forcer le renvoi sans attendre le CRON, on peut appeler l'API
     // Mais ici on va implémenter la logique directement ou via fetch
-    const response = await fetch(`${baseUrl}/api/public/hooks/send-lessons`, {
+    const response = await fetch(`${baseUrl}/api/public/hooks/send-lessons?force=true`, {
       method: 'POST',
       headers: {
         'apikey': process.env['SUPABASE_PUBLISHABLE_KEY'] || ''
