@@ -19,6 +19,7 @@ import { Route as AuthenticatedProgressionRouteImport } from './routes/_authenti
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AuthenticatedQuizIndexRouteImport } from './routes/_authenticated/quiz.index'
 import { Route as AuthenticatedQuizQuizIdRouteImport } from './routes/_authenticated/quiz/$quizId'
+import { Route as ApiPublicFixMessagesRouteImport } from './routes/api/public/fix-messages'
 import { Route as ApiPublicHooksSendLessonsRouteImport } from './routes/api/public/hooks/send-lessons'
 
 const IndexRoute = IndexRouteImport.update({
@@ -71,6 +72,11 @@ const AuthenticatedQuizQuizIdRoute = AuthenticatedQuizQuizIdRouteImport.update({
   path: '/quiz/$quizId',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const ApiPublicFixMessagesRoute = ApiPublicFixMessagesRouteImport.update({
+  id: '/api/public/fix-messages',
+  path: '/api/public/fix-messages',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicHooksSendLessonsRoute =
   ApiPublicHooksSendLessonsRouteImport.update({
     id: '/api/public/hooks/send-lessons',
@@ -87,6 +93,7 @@ export interface FileRoutesByFullPath {
   '/progression': typeof AuthenticatedProgressionRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/quiz/$quizId': typeof AuthenticatedQuizQuizIdRoute
+  '/api/public/fix-messages': typeof ApiPublicFixMessagesRoute
   '/quiz/': typeof AuthenticatedQuizIndexRoute
   '/api/public/hooks/send-lessons': typeof ApiPublicHooksSendLessonsRoute
 }
@@ -99,6 +106,7 @@ export interface FileRoutesByTo {
   '/progression': typeof AuthenticatedProgressionRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/quiz/$quizId': typeof AuthenticatedQuizQuizIdRoute
+  '/api/public/fix-messages': typeof ApiPublicFixMessagesRoute
   '/quiz': typeof AuthenticatedQuizIndexRoute
   '/api/public/hooks/send-lessons': typeof ApiPublicHooksSendLessonsRoute
 }
@@ -113,6 +121,7 @@ export interface FileRoutesById {
   '/_authenticated/progression': typeof AuthenticatedProgressionRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/_authenticated/quiz/$quizId': typeof AuthenticatedQuizQuizIdRoute
+  '/api/public/fix-messages': typeof ApiPublicFixMessagesRoute
   '/_authenticated/quiz/': typeof AuthenticatedQuizIndexRoute
   '/api/public/hooks/send-lessons': typeof ApiPublicHooksSendLessonsRoute
 }
@@ -127,6 +136,7 @@ export interface FileRouteTypes {
     | '/progression'
     | '/auth/callback'
     | '/quiz/$quizId'
+    | '/api/public/fix-messages'
     | '/quiz/'
     | '/api/public/hooks/send-lessons'
   fileRoutesByTo: FileRoutesByTo
@@ -139,6 +149,7 @@ export interface FileRouteTypes {
     | '/progression'
     | '/auth/callback'
     | '/quiz/$quizId'
+    | '/api/public/fix-messages'
     | '/quiz'
     | '/api/public/hooks/send-lessons'
   id:
@@ -152,6 +163,7 @@ export interface FileRouteTypes {
     | '/_authenticated/progression'
     | '/auth/callback'
     | '/_authenticated/quiz/$quizId'
+    | '/api/public/fix-messages'
     | '/_authenticated/quiz/'
     | '/api/public/hooks/send-lessons'
   fileRoutesById: FileRoutesById
@@ -160,6 +172,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
+  ApiPublicFixMessagesRoute: typeof ApiPublicFixMessagesRoute
   ApiPublicHooksSendLessonsRoute: typeof ApiPublicHooksSendLessonsRoute
 }
 
@@ -235,6 +248,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedQuizQuizIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/api/public/fix-messages': {
+      id: '/api/public/fix-messages'
+      path: '/api/public/fix-messages'
+      fullPath: '/api/public/fix-messages'
+      preLoaderRoute: typeof ApiPublicFixMessagesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/send-lessons': {
       id: '/api/public/hooks/send-lessons'
       path: '/api/public/hooks/send-lessons'
@@ -281,8 +301,19 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
+  ApiPublicFixMessagesRoute: ApiPublicFixMessagesRoute,
   ApiPublicHooksSendLessonsRoute: ApiPublicHooksSendLessonsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
