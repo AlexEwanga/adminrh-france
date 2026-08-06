@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { getLearningStats, getRecentMessages, getNotes, addNote, getObjectives, getDashboardSummary } from '@/lib/learning.functions'
+import { getLearningStats, getRecentMessages, getNotes, addNote, getObjectives, addObjective, getDashboardSummary } from '@/lib/learning.functions'
 import { useState, useEffect, useMemo } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
