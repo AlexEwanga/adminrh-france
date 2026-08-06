@@ -15,9 +15,12 @@ import {
   ChevronRight,
   ChevronLeft
 } from 'lucide-react'
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { toast } from 'sonner'
 import allQuestions from '@/lib/all_questions.json'
+import { testWhatsAppConnection } from '@/lib/whatsapp.server'
+import { useServerFn } from '@tanstack/react-start'
+import { Phone, MessageSquare, Send } from 'lucide-react'
 
 export const Route = createFileRoute('/_authenticated/admin')({
   component: AdminEditorPage,
@@ -32,6 +35,41 @@ function AdminEditorPage() {
   const [questions, setQuestions] = useState(allQuestions)
   const [editingId, setEditingId] = useState<number | null>(null)
   const [editForm, setEditForm] = useState<any>(null)
+  
+  const [whatsappPhone, setWhatsappPhone] = useState('')
+  const [isTesting, setIsTesting] = useState(false)
+  const sendTest = useServerFn(testWhatsAppConnection)
+
+  useEffect(() => {
+    const savedPhone = localStorage.getItem('admin_whatsapp_phone')
+    if (savedPhone) setWhatsappPhone(savedPhone)
+  }, [])
+
+  const handleSavePhone = () => {
+    localStorage.setItem('admin_whatsapp_phone', whatsappPhone)
+    toast.success("Numéro WhatsApp enregistré localement")
+  }
+
+  const handleTestWhatsApp = async () => {
+    if (!whatsappPhone) {
+      toast.error("Veuillez saisir un numéro de téléphone")
+      return
+    }
+    setIsTesting(true)
+    try {
+      const result = await sendTest({ data: { phone: whatsappPhone } })
+      if (result.success) {
+        toast.success("Message de test envoyé !")
+      } else {
+        const errorMsg = (result as any).error || "Erreur lors de l'envoi"
+        toast.error(errorMsg)
+      }
+    } catch (error: any) {
+      toast.error("Erreur technique: " + error.message)
+    } finally {
+      setIsTesting(false)
+    }
+  }
 
   const themes = useMemo(() => {
     const t = new Set(['Tous'])
@@ -97,6 +135,63 @@ function AdminEditorPage() {
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        {/* Paramètres WhatsApp */}
+        <div className="lg:col-span-12">
+          <Card className="border-none shadow-sm bg-[#F8F9FA] rounded-[32px] overflow-hidden">
+            <CardHeader className="p-6 pb-2">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-[#25D366]/10 rounded-xl flex items-center justify-center">
+                  <MessageSquare className="text-[#25D366]" size={20} />
+                </div>
+                <div>
+                  <CardTitle className="text-lg font-bold text-[#2D3142]">Configuration WhatsApp (CallMeBot)</CardTitle>
+                  <p className="text-xs text-slate-400">Configurez l'envoi des leçons quotidiennes.</p>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="p-6 pt-2 flex flex-col md:flex-row items-end gap-4">
+              <div className="flex-1 space-y-2 w-full">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Numéro de téléphone (Format international)</label>
+                <div className="relative">
+                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300" size={16} />
+                  <Input 
+                    value={whatsappPhone}
+                    onChange={e => setWhatsappPhone(e.target.value)}
+                    placeholder="+243821355337"
+                    className="pl-10 rounded-xl border-slate-200 bg-white"
+                  />
+                </div>
+              </div>
+              <div className="flex gap-2 w-full md:w-auto">
+                <Button 
+                  onClick={handleSavePhone}
+                  variant="outline"
+                  className="rounded-xl border-slate-200 font-bold flex-1 md:flex-none"
+                >
+                  Enregistrer
+                </Button>
+                <Button 
+                  onClick={handleTestWhatsApp}
+                  disabled={isTesting}
+                  className="bg-[#25D366] hover:bg-[#128C7E] text-white rounded-xl font-bold flex-1 md:flex-none"
+                >
+                  {isTesting ? "Envoi..." : (
+                    <span className="flex items-center gap-2">
+                      <Send size={16} /> Tester l'envoi
+                    </span>
+                  )}
+                </Button>
+              </div>
+              <div className="bg-amber-50 border border-amber-100 p-3 rounded-xl flex items-start gap-3 w-full md:max-w-xs">
+                <AlertTriangle className="text-amber-500 shrink-0" size={16} />
+                <p className="text-[10px] text-amber-700 leading-tight">
+                  Assurez-vous que la clé <strong>CALLMEBOT_API_KEY</strong> est bien configurée dans les secrets de l'application.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
         {/* Liste & Filtres */}
         <div className="lg:col-span-4 space-y-6">
           <div className="space-y-4">

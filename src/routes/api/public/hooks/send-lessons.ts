@@ -49,10 +49,10 @@ export const Route = createFileRoute('/api/public/hooks/send-lessons')({
 
           const messageToSend = messages[messageIndex % messages.length]
 
-          // 3. Envoi WhatsApp via WPSent
+          // 3. Envoi WhatsApp via CallMeBot
           const formattedContent = `*${messageToSend.subject}*\n\n${messageToSend.content}\n\n_AdminRH-France_`;
           
-          // On envoie au numéro de l'administrateur configuré
+          // On envoie au numéro de l'administrateur configuré ou par défaut
           const targetPhone = "+243821355337";
           await sendWhatsAppMessage(targetPhone, formattedContent);
 
