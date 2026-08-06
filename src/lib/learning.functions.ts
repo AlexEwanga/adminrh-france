@@ -21,13 +21,32 @@ export const getLearningStats = createServerFn({ method: 'GET' })
   });
 
 export const getRecentMessages = createServerFn({ method: 'GET' })
-  .handler(async () => {
-    const { data } = await supabase
-      .from('messages')
-      .select('*')
-      .limit(10)
-      .order('created_at', { ascending: false });
-    return data || [];
+  .middleware([requireSupabaseAuth])
+  .inputValidator(z.object({
+    page: z.number().default(1),
+    pageSize: z.number().default(10),
+    startDate: z.string().optional(),
+    endDate: z.string().optional(),
+    search: z.string().optional()
+  }))
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const { page, pageSize, startDate, endDate, search } = data;
+    
+    let query = supabase
+      .from('whatsapp_logs')
+      .select('*', { count: 'exact' });
+
+    if (startDate) query = query.gte('created_at', startDate);
+    if (endDate) query = query.lte('created_at', endDate);
+    if (search) query = query.or(`subject.ilike.%${search}%,content.ilike.%${search}%,phone_number.ilike.%${search}%`);
+
+    const { data: logs, count, error } = await query
+      .order('created_at', { ascending: false })
+      .range((page - 1) * pageSize, page * pageSize - 1);
+
+    if (error) throw error;
+    return { logs: logs || [], total: count || 0 };
   });
 
 export const getQuizzes = createServerFn({ method: 'GET' })
