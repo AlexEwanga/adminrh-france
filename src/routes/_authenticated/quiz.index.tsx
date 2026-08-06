@@ -22,9 +22,11 @@ function QuizSelectionPage() {
     queryFn: () => getLearningStats()
   })
 
-  const handleStartQuiz = (title: string) => {
-    toast.success(`Démarrage du quiz : ${title}`)
+  const navigate = useNavigate()
+  const handleStartQuiz = (id: number) => {
+    navigate({ to: `/quiz/${id}` })
   }
+
 
   return (
     <div className="bg-white rounded-[32px] p-8 shadow-sm border border-white/50 flex flex-col gap-8 min-h-[calc(100vh-140px)]">
