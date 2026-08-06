@@ -1,300 +1,299 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
-import { Plus, Search, Edit2, Trash2, Send, ExternalLink, ShieldCheck, Database, Zap, Shield } from 'lucide-react'
-import { useState, useEffect } from 'react'
+import { Textarea } from '@/components/ui/textarea'
+import { 
+  ArrowLeft, 
+  Save, 
+  CheckCircle2, 
+  AlertTriangle, 
+  BookOpen, 
+  Search,
+  Filter,
+  ChevronRight,
+  ChevronLeft
+} from 'lucide-react'
+import { useState, useMemo } from 'react'
 import { toast } from 'sonner'
-import { useServerFn } from '@tanstack/react-start'
-import { testWhatsAppConnection } from '@/lib/whatsapp.server'
-
-import { getRecentMessages, getQuizzes } from '@/lib/learning.functions'
-import { useSuspenseQuery } from '@tanstack/react-query'
-
+import allQuestions from '@/lib/all_questions.json'
 
 export const Route = createFileRoute('/_authenticated/admin')({
-  component: AdminPage,
+  component: AdminEditorPage,
 })
 
+function AdminEditorPage() {
+  const [searchTerm, setSearchTerm] = useState('')
+  const [selectedTheme, setSelectedTheme] = useState('Tous')
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 10
 
-function AdminPage() {
-  const [testPhone, setTestPhone] = useState('')
-  const [isTesting, setIsTesting] = useState(false)
-  const [adminSearch, setAdminSearch] = useState('')
+  const [questions, setQuestions] = useState(allQuestions)
+  const [editingId, setEditingId] = useState<number | null>(null)
+  const [editForm, setEditForm] = useState<any>(null)
 
-  useEffect(() => {
-    const handleSearch = (e: any) => {
-      setAdminSearch(e.detail || '')
-    }
-    window.addEventListener('global-search-change', handleSearch)
-    const initialSearch = localStorage.getItem('adminrh-global-search')
-    if (initialSearch) setAdminSearch(initialSearch)
-    return () => window.removeEventListener('global-search-change', handleSearch)
-  }, [])
+  const themes = useMemo(() => {
+    const t = new Set(['Tous'])
+    questions.forEach(q => {
+      if (q.reference?.includes('L12')) t.add('Contrat (CDI/CDD)')
+      else if (q.reference?.includes('L31')) t.add('Durée & Repos')
+      else if (q.reference?.includes('L123')) t.add('Rupture')
+      else t.add('Autres')
+    })
+    return Array.from(t)
+  }, [questions])
 
-  const testWhatsApp = useServerFn(testWhatsAppConnection)
-  const { data: messages } = useSuspenseQuery({
-    queryKey: ['recent-messages'],
-    queryFn: () => getRecentMessages()
-  })
+  const filteredQuestions = useMemo(() => {
+    return questions.filter(q => {
+      const matchesSearch = q.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          q.reference?.toLowerCase().includes(searchTerm.toLowerCase())
+      
+      const matchesTheme = selectedTheme === 'Tous' || 
+                          (selectedTheme === 'Contrat (CDI/CDD)' && q.reference?.includes('L12')) ||
+                          (selectedTheme === 'Durée & Repos' && q.reference?.includes('L31')) ||
+                          (selectedTheme === 'Rupture' && q.reference?.includes('L123'))
+      
+      return matchesSearch && matchesTheme
+    })
+  }, [questions, searchTerm, selectedTheme])
 
-  const { data: quizzes } = useSuspenseQuery({
-    queryKey: ['learning-quizzes'],
-    queryFn: () => getQuizzes()
-  })
-
-
-  const filteredMessages = messages?.filter((msg: any) => 
-    msg.subject.toLowerCase().includes(adminSearch.toLowerCase()) || 
-    (msg.tag && msg.tag.toLowerCase().includes(adminSearch.toLowerCase()))
+  const paginatedQuestions = filteredQuestions.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
   )
 
-  const handleTestConnection = async () => {
-    if (!testPhone) {
-      toast.error("Veuillez entrer un numéro de téléphone (ex: +336...)")
+  const totalPages = Math.ceil(filteredQuestions.length / itemsPerPage)
+
+  const handleEdit = (q: any) => {
+    setEditingId(q.id)
+    setEditForm({ ...q })
+  }
+
+  const handleSave = () => {
+    if (!editForm.reference.match(/^Art\.\sL\d+-\d+$/)) {
+      toast.error("Format de référence invalide (ex: Art. L3121-27)")
       return
     }
-    setIsTesting(true)
-    try {
-      const result = await testWhatsApp({ data: { phone: testPhone } })
-      if (result.success) {
-        toast.success(result.simulated ? "Simulation réussie (Clé API manquante)" : "Message de test envoyé !")
-      } else {
-        toast.error((result as any).error || "Erreur lors du test")
-      }
-    } catch (err) {
-      toast.error("Erreur de connexion")
-    } finally {
-      setIsTesting(false)
-    }
+
+    const newQuestions = questions.map(q => q.id === editingId ? editForm : q)
+    setQuestions(newQuestions)
+    setEditingId(null)
+    toast.success("Question validée et enregistrée localement")
   }
 
   return (
     <div className="bg-white rounded-[32px] p-8 shadow-sm border border-white/50 flex flex-col gap-8 min-h-[calc(100vh-140px)]">
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-[#2D3142]">Administration RH</h1>
-          <p className="text-slate-400 mt-1">Gérez les messages, les quiz et la configuration de l'assistant.</p>
+          <h1 className="text-3xl font-bold text-[#2D3142]">Éditeur de Banque Légale</h1>
+          <p className="text-slate-400 mt-1">Gérez et validez les 1000 dossiers du Code du Travail.</p>
         </div>
-        <div className="flex gap-3">
-          <Button variant="outline" className="rounded-2xl border-slate-100 font-bold text-[#2D3142]">
-            <ShieldCheck size={18} className="mr-2" />
-            Vérifier RLS
-          </Button>
-          <Button 
-            onClick={() => toast.info("Formulaire d'ajout en cours de développement")}
-            className="bg-[#2D3142] hover:bg-[#8C7CF0] text-white rounded-2xl px-6 py-6 font-bold shadow-lg shadow-slate-200 transition-all"
-          >
-            <Plus size={18} className="mr-2" />
-            Ajouter un contenu
-          </Button>
+        <div className="flex items-center gap-3">
+          <Badge className="bg-[#E0E7FF] text-[#6366F1] px-4 py-2 rounded-xl border-none">
+            {questions.length} Questions totales
+          </Badge>
         </div>
       </header>
 
-
-      {/* Configuration WhatsApp Section */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="md:col-span-2 border-none shadow-none bg-[#F8F9FA] rounded-[24px]">
-          <CardHeader>
-            <CardTitle className="text-[#2D3142] flex items-center gap-2">
-              <Send size={20} className="text-[#8C7CF0]" />
-              Configuration WhatsApp (CallMeBot)
-            </CardTitle>
-            <CardDescription className="text-slate-400">
-              Configurez CallMeBot pour envoyer les leçons quotidiennes gratuitement.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="p-6 bg-white rounded-2xl shadow-sm border border-slate-50">
-              <h4 className="font-bold text-sm mb-3 text-[#2D3142]">Instructions de configuration :</h4>
-              <ol className="text-sm text-slate-500 list-decimal ml-4 space-y-2 font-medium">
-                <li>Ajoutez le numéro CallMeBot à vos contacts WhatsApp.</li>
-                <li>Envoyez <code className="bg-[#F0F2F5] px-2 py-0.5 rounded text-[#8C7CF0]">I allow callmebot to send me messages</code> au bot.</li>
-                <li>Récupérez votre <strong>API Key</strong>.</li>
-                <li>Clé configurée : <code className="bg-[#E0E7FF] text-[#6366F1] px-2 py-0.5 rounded font-mono font-bold">4109899</code></li>
-                <li>Lien : <a href="https://www.callmebot.com/blog/free-api-whatsapp-messages/" target="_blank" className="text-[#8C7CF0] hover:underline flex items-center gap-1 inline-flex">Documentation CallMeBot <ExternalLink size={12} /></a></li>
-              </ol>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        {/* Liste & Filtres */}
+        <div className="lg:col-span-4 space-y-6">
+          <div className="space-y-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+              <Input 
+                placeholder="Rechercher un article..." 
+                className="pl-10 rounded-xl bg-[#F8F9FA] border-none"
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+              />
             </div>
-            
-            <div className="flex flex-col sm:flex-row gap-3">
-              <div className="flex-1">
-                <Input 
-                  className="rounded-xl border-slate-100 bg-white h-12"
-                  placeholder="Numéro de test (ex: +33612345678)" 
-                  value={testPhone}
-                  onChange={(e) => setTestPhone(e.target.value)}
-                />
-              </div>
-              <Button 
-                onClick={handleTestConnection} 
-                disabled={isTesting}
-                className="bg-[#8C7CF0] hover:bg-[#8C7CF0]/90 text-white rounded-xl px-8 h-12 font-bold transition-all shadow-md shadow-[#8C7CF0]/20"
+            <div className="flex flex-wrap gap-2">
+              {themes.map(t => (
+                <button
+                  key={t}
+                  onClick={() => { setSelectedTheme(t); setCurrentPage(1); }}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                    selectedTheme === t 
+                    ? 'bg-[#2D3142] text-white shadow-md' 
+                    : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                  }`}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            {paginatedQuestions.map((q: any) => (
+              <div 
+                key={q.id}
+                onClick={() => handleEdit(q)}
+                className={`p-4 rounded-2xl border transition-all cursor-pointer group ${
+                  editingId === q.id 
+                  ? 'bg-[#1E2A4A] border-[#D4AF37] text-white' 
+                  : 'bg-white border-slate-100 hover:border-[#8C7CF0]'
+                }`}
               >
-                {isTesting ? "Envoi..." : "Tester l'envoi"}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-none shadow-none bg-[#F8F9FA] rounded-[24px]">
-          <CardHeader>
-            <CardTitle className="text-[#2D3142] flex items-center gap-2">
-              <Database className="text-[#8C7CF0]" size={20} />
-              Vérification Légale
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="p-4 bg-white rounded-2xl shadow-sm border border-slate-50">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-bold text-[#2D3142]">API Legifrance</span>
-                <Badge className="bg-green-100 text-green-700 hover:bg-green-100 border-none text-[10px]">ACTIF</Badge>
+                <div className="flex justify-between items-start mb-2">
+                  <span className={`text-[10px] font-black uppercase tracking-widest ${editingId === q.id ? 'text-[#D4AF37]' : 'text-slate-400'}`}>
+                    {q.reference}
+                  </span>
+                  {editingId === q.id && <CheckCircle2 size={14} className="text-[#D4AF37]" />}
+                </div>
+                <p className={`text-sm font-bold line-clamp-2 ${editingId === q.id ? 'text-white' : 'text-[#2D3142]'}`}>
+                  {q.question}
+                </p>
               </div>
-              <p className="text-[11px] text-slate-500 leading-relaxed font-medium">
-                Vérification automatique des références (ex: Art. L3121-27) activée pour chaque nouvelle question.
+            ))}
+          </div>
+
+          <div className="flex items-center justify-between pt-4">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage(p => p - 1)}
+            >
+              <ChevronLeft size={16} />
+            </Button>
+            <span className="text-xs font-bold text-slate-400">Page {currentPage} / {totalPages}</span>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage(p => p + 1)}
+            >
+              <ChevronRight size={16} />
+            </Button>
+          </div>
+        </div>
+
+        {/* Éditeur */}
+        <div className="lg:col-span-8">
+          {editForm ? (
+            <Card className="border-none shadow-xl shadow-slate-200/50 bg-white rounded-[32px] overflow-hidden">
+              <CardHeader className="bg-[#F8F9FA] border-b border-slate-100 p-8">
+                <div className="flex justify-between items-center">
+                  <CardTitle className="text-xl font-bold text-[#2D3142]">Modification du Dossier</CardTitle>
+                  <Badge className="bg-[#1E2A4A] text-[#D4AF37] border-none px-3 py-1">Mode Expert</Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="p-8 space-y-6">
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-[11px] font-black uppercase tracking-widest text-slate-400">Référence Légale</label>
+                    <Input 
+                      value={editForm.reference}
+                      onChange={e => setEditForm({...editForm, reference: e.target.value})}
+                      className="rounded-xl border-slate-100 font-mono font-bold"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[11px] font-black uppercase tracking-widest text-slate-400">Difficulté</label>
+                    <div className="flex gap-2">
+                      {[1, 2, 3].map(d => (
+                        <Button
+                          key={d}
+                          variant={editForm.difficulty === d ? 'default' : 'outline'}
+                          className={`flex-1 rounded-xl h-10 font-bold ${editForm.difficulty === d ? 'bg-[#2D3142]' : ''}`}
+                          onClick={() => setEditForm({...editForm, difficulty: d})}
+                        >
+                          {d === 1 ? 'Facile' : d === 2 ? 'Moyen' : 'Expert'}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[11px] font-black uppercase tracking-widest text-slate-400">Question Centrale</label>
+                  <Textarea 
+                    value={editForm.question}
+                    onChange={e => setEditForm({...editForm, question: e.target.value})}
+                    className="rounded-xl border-slate-100 min-h-[80px] font-semibold"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[11px] font-black uppercase tracking-widest text-slate-400">Cas Pratique (Casus)</label>
+                  <Textarea 
+                    value={editForm.casus}
+                    onChange={e => setEditForm({...editForm, casus: e.target.value})}
+                    className="rounded-xl border-slate-100 min-h-[100px] bg-slate-50/50"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-[11px] font-black uppercase tracking-widest text-slate-400">Article Complet (Legifrance)</label>
+                    <a 
+                      href={`https://www.legifrance.gouv.fr/search/all?query=${editForm.reference}`} 
+                      target="_blank"
+                      className="text-[10px] font-bold text-[#8C7CF0] flex items-center gap-1"
+                    >
+                      <BookOpen size={12} /> Vérifier la source
+                    </a>
+                  </div>
+                  <Textarea 
+                    value={editForm.article}
+                    onChange={e => setEditForm({...editForm, article: e.target.value})}
+                    className="rounded-xl border-slate-100 min-h-[120px] bg-[#1E2A4A] text-slate-200 font-medium"
+                  />
+                </div>
+
+                <div className="pt-4 flex gap-4">
+                  <Button 
+                    className="flex-1 bg-[#2D3142] hover:bg-[#8C7CF0] text-white rounded-2xl py-6 font-bold shadow-lg transition-all"
+                    onClick={handleSave}
+                  >
+                    <Save size={18} className="mr-2" /> Valider le dossier
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="rounded-2xl py-6 px-8 border-slate-100 text-slate-400 hover:text-red-500 hover:bg-red-50"
+                    onClick={() => { setEditingId(null); setEditForm(null); }}
+                  >
+                    Annuler
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="h-full flex flex-col items-center justify-center text-center p-12 bg-[#F8F9FA] rounded-[32px] border-2 border-dashed border-slate-200">
+              <div className="w-20 h-20 bg-white rounded-3xl shadow-sm flex items-center justify-center mb-6">
+                <Edit2 size={32} className="text-slate-300" />
+              </div>
+              <h3 className="text-xl font-bold text-[#2D3142] mb-2">Sélectionnez un dossier</h3>
+              <p className="text-slate-400 max-w-xs mx-auto">
+                Choisissez une question dans la liste de gauche pour modifier son contenu, son casus ou sa référence légale.
               </p>
             </div>
-            <Button 
-              variant="outline" 
-              className="w-full rounded-xl border-slate-200 text-slate-600 font-bold text-xs h-10"
-              onClick={() => toast.success("Analyse de conformité terminée : 950/950 articles valides.")}
-            >
-              Scanner la base
-            </Button>
-          </CardContent>
-        </Card>
-
-      </div>
-
-      <div className="flex gap-4 items-center">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-          <Input 
-            className="pl-10 rounded-xl border-slate-100 bg-[#F8F9FA] h-11" 
-            placeholder="Rechercher..." 
-            value={adminSearch}
-            onChange={(e) => {
-              const val = e.target.value
-              setAdminSearch(val)
-              window.dispatchEvent(new CustomEvent('global-search-change', { detail: val }))
-              localStorage.setItem('adminrh-global-search', val)
-            }}
-          />
+          )}
         </div>
-        <Button variant="outline" className="rounded-xl border-slate-100 font-bold h-11">Filtrer</Button>
       </div>
-
-      <Card className="border-none shadow-none bg-[#F8F9FA] rounded-[32px] overflow-hidden">
-        <CardContent className="p-0">
-          <table className="w-full text-left">
-            <thead className="bg-[#F1F3F6] text-slate-400 text-[11px] font-black uppercase tracking-widest">
-              <tr>
-                <th className="px-8 py-6">Sujet</th>
-                <th className="px-8 py-6">Catégorie</th>
-                <th className="px-8 py-6">Statut</th>
-                <th className="px-8 py-6">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100/50">
-              {filteredMessages && filteredMessages.length > 0 ? (
-                filteredMessages.map((msg: any) => (
-                  <tr key={msg.id} className="hover:bg-white transition-all group">
-                    <td className="px-8 py-6">
-                      <div className="font-bold text-[#2D3142]">{msg.subject}</div>
-                      <div className="text-[11px] text-slate-400 mt-0.5">
-                        {msg.created_at ? new Date(msg.created_at).toLocaleDateString('fr-FR') : 'Date inconnue'}
-                      </div>
-                    </td>
-                    <td className="px-8 py-6">
-                      <Badge className="bg-white text-[#2D3142] border-none shadow-sm">{msg.tag || 'Sans catégorie'}</Badge>
-                    </td>
-                    <td className="px-8 py-6">
-                      <div className="flex items-center gap-2">
-                        <div className={`w-2 h-2 rounded-full ${msg.is_active !== false ? 'bg-[#A3E635]' : 'bg-slate-300'}`} />
-                        <span className="text-sm font-bold text-[#2D3142]">{msg.is_active !== false ? 'Actif' : 'Inactif'}</span>
-                      </div>
-                    </td>
-                    <td className="px-8 py-6 text-right">
-                      <div className="flex gap-2">
-                        <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl text-slate-400 hover:text-[#8C7CF0] hover:bg-slate-50">
-                          <Edit2 size={16} />
-                        </Button>
-                        <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl text-slate-400 hover:text-red-500 hover:bg-red-50">
-                          <Trash2 size={16} />
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={4} className="px-8 py-12 text-center text-slate-400 font-medium">
-                    Aucun message dans la base de données.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </CardContent>
-      </Card>
-
-      <div className="flex flex-col gap-4">
-        <h2 className="text-xl font-bold text-[#2D3142]">Gestion des Quiz</h2>
-      </div>
-
-      <Card className="border-none shadow-none bg-[#F8F9FA] rounded-[32px] overflow-hidden">
-        <CardContent className="p-0">
-          <table className="w-full text-left">
-            <thead className="bg-[#F1F3F6] text-slate-400 text-[11px] font-black uppercase tracking-widest">
-              <tr>
-                <th className="px-8 py-6">Titre</th>
-                <th className="px-8 py-6">Catégorie</th>
-                <th className="px-8 py-6">Difficulté</th>
-                <th className="px-8 py-6">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100/50">
-              {quizzes && quizzes.length > 0 ? (
-                quizzes.map((quiz: any) => (
-                  <tr key={quiz.id} className="hover:bg-white transition-all group">
-                    <td className="px-8 py-6">
-                      <div className="font-bold text-[#2D3142]">{quiz.title}</div>
-                      <div className="text-[11px] text-slate-400 mt-0.5">
-                        {Array.isArray(quiz.questions) ? quiz.questions.length : 0} questions
-                      </div>
-                    </td>
-                    <td className="px-8 py-6">
-                      <Badge className="bg-white text-[#2D3142] border-none shadow-sm">{quiz.category}</Badge>
-                    </td>
-                    <td className="px-8 py-6">
-                      <Badge className="bg-[#E0E7FF] text-[#6366F1] border-none shadow-sm">
-                        {quiz.difficulty === 1 ? 'Débutant' : quiz.difficulty === 2 ? 'Intermédiaire' : 'Expert'}
-                      </Badge>
-                    </td>
-                    <td className="px-8 py-6 text-right">
-                      <div className="flex gap-2">
-                        <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl text-slate-400 hover:text-[#8C7CF0] hover:bg-slate-50">
-                          <Edit2 size={16} />
-                        </Button>
-                        <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl text-slate-400 hover:text-red-500 hover:bg-red-50">
-                          <Trash2 size={16} />
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={4} className="px-8 py-12 text-center text-slate-400 font-medium">
-                    Aucun quiz dans la base de données.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </CardContent>
-      </Card>
     </div>
   )
 }
 
+function Edit2(props: any) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+      <path d="M18.375 2.625a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4Z" />
+    </svg>
+  )
+}
