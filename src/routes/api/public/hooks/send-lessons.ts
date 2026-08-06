@@ -79,23 +79,30 @@ export const Route = createFileRoute('/api/public/hooks/send-lessons')({
             .eq('is_default', true)
             .single();
 
-          const contentTpl = template?.content_template || "*{{subject}}*\n\n*Cas pratique :*\n{{casus}}\n\n*Référence :* {{reference}}\n\n*Article complet :*\n{{article}}\n\n_AdminRH-France_";
+          const contentTpl = template?.content_template || "*{{subject}}*\n\n{{content}}\n\n📌 *Cas pratique :*\n{{casus}}\n\n⚖️ *Référence légale :*\n{{reference}}\n\n📖 *Article (partie législative) :*\n{{article}}\n\n✅ *Bonne pratique RH :*\n{{best_practice}}\n\n_AdminRH-France_";
           const targetPhone = "+243821355337"; 
           
           let currentIndex = schedule?.message_index || 0;
           const sentResults = [];
 
-          // 4. Boucle d'envoi pour rattrapage
+          // 4. Boucle d'envoi pour rattrapage — un message = une seule leçon complète
           for (let i = 0; i < toSendCount; i++) {
             const messageToSend = messages[currentIndex % messages.length];
-            
-            // On s'assure que le contenu comporte le Casus, la Référence et l'Article
-            const formattedContent = contentTpl
-              .replace('{{subject}}', messageToSend.subject || "Leçon du jour")
-              .replace('{{content}}', messageToSend.content || "")
-              .replace('{{casus}}', messageToSend.casus || "Scénario pratique non défini")
-              .replace('{{reference}}', messageToSend.reference || "N/A")
-              .replace('{{article}}', messageToSend.article || "Détail de l'article à venir");
+
+            const vars: Record<string, string> = {
+              subject: messageToSend.subject || "Leçon du jour",
+              content: messageToSend.content || "",
+              casus: messageToSend.casus || "Scénario pratique non défini",
+              reference: messageToSend.reference || "N/A",
+              article: messageToSend.article || "Détail de l'article à venir",
+              best_practice: messageToSend.best_practice || "Formalisez la décision par écrit et conservez la preuve de sa remise au salarié.",
+            };
+
+            const formattedContent = contentTpl.replace(
+              /\{\{(subject|content|casus|reference|article|best_practice)\}\}/g,
+              (_m: string, key: string) => vars[key] ?? "",
+            );
+
             
             try {
               await sendWhatsAppMessage(targetPhone, formattedContent, messageToSend.subject);
