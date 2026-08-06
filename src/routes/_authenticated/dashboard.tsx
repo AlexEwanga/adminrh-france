@@ -82,7 +82,6 @@ function Dashboard() {
   }, [notes, searchTerm])
 
   const chartData = useMemo(() => {
-    // Return empty or zeroed data if no stats are available
     if (!stats) return [
       { name: 'Lun', score: 0, messages: 0 },
       { name: 'Mar', score: 0, messages: 0 },
@@ -93,17 +92,27 @@ function Dashboard() {
       { name: 'Dim', score: 0, messages: 0 },
     ]
     
-    // In a real app, we'd map real history here. 
-    // Since we're cleaning demo data, we return zeroed array.
-    return [
-      { name: 'Lun', score: 0, messages: 0 },
-      { name: 'Mar', score: 0, messages: 0 },
-      { name: 'Mer', score: 0, messages: 0 },
-      { name: 'Jeu', score: 0, messages: 0 },
-      { name: 'Ven', score: 0, messages: 0 },
-      { name: 'Sam', score: 0, messages: 0 },
-      { name: 'Dim', score: 0, messages: 0 },
-    ]
+    // Create actual progression data from stats if available, or return recent history
+    // For now, we simulate a week view where the last day is today's score
+    const days = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+    const today = new Date();
+    const result = [];
+    
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(today.getDate() - i);
+      const dayName = days[d.getDay()];
+      
+      // If today, use actual stats
+      const isToday = i === 0;
+      result.push({
+        name: dayName,
+        score: isToday ? (stats.avg_score || 0) : 0,
+        messages: isToday ? (stats.messages_received || 0) : 0
+      });
+    }
+    
+    return result;
   }, [stats])
 
   const filteredTasks = useMemo(() => {
