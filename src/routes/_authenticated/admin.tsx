@@ -223,6 +223,64 @@ function AdminPage() {
           </table>
         </CardContent>
       </Card>
+
+      <div className="flex flex-col gap-4">
+        <h2 className="text-xl font-bold text-[#2D3142]">Gestion des Quiz</h2>
+      </div>
+
+      <Card className="border-none shadow-none bg-[#F8F9FA] rounded-[32px] overflow-hidden">
+        <CardContent className="p-0">
+          <table className="w-full text-left">
+            <thead className="bg-[#F1F3F6] text-slate-400 text-[11px] font-black uppercase tracking-widest">
+              <tr>
+                <th className="px-8 py-6">Titre</th>
+                <th className="px-8 py-6">Catégorie</th>
+                <th className="px-8 py-6">Difficulté</th>
+                <th className="px-8 py-6">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100/50">
+              {quizzes && quizzes.length > 0 ? (
+                quizzes.map((quiz: any) => (
+                  <tr key={quiz.id} className="hover:bg-white transition-all group">
+                    <td className="px-8 py-6">
+                      <div className="font-bold text-[#2D3142]">{quiz.title}</div>
+                      <div className="text-[11px] text-slate-400 mt-0.5">
+                        {Array.isArray(quiz.questions) ? quiz.questions.length : 0} questions
+                      </div>
+                    </td>
+                    <td className="px-8 py-6">
+                      <Badge className="bg-white text-[#2D3142] border-none shadow-sm">{quiz.category}</Badge>
+                    </td>
+                    <td className="px-8 py-6">
+                      <Badge className="bg-[#E0E7FF] text-[#6366F1] border-none shadow-sm">
+                        {quiz.difficulty === 1 ? 'Débutant' : quiz.difficulty === 2 ? 'Intermédiaire' : 'Expert'}
+                      </Badge>
+                    </td>
+                    <td className="px-8 py-6 text-right">
+                      <div className="flex gap-2">
+                        <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl text-slate-400 hover:text-[#8C7CF0] hover:bg-slate-50">
+                          <Edit2 size={16} />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl text-slate-400 hover:text-red-500 hover:bg-red-50">
+                          <Trash2 size={16} />
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={4} className="px-8 py-12 text-center text-slate-400 font-medium">
+                    Aucun quiz dans la base de données.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </CardContent>
+      </Card>
     </div>
   )
 }
+
