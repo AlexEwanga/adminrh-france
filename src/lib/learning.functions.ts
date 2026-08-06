@@ -20,7 +20,7 @@ export const getLearningStats = createServerFn({ method: 'GET' })
     return data;
   });
 
-export const getRecentMessages = createServerFn({ method: 'GET' })
+export const getRecentLogs = createServerFn({ method: 'GET' })
   .middleware([requireSupabaseAuth])
   .inputValidator(z.object({
     page: z.number().default(1),
@@ -47,6 +47,18 @@ export const getRecentMessages = createServerFn({ method: 'GET' })
 
     if (error) throw error;
     return { logs: logs || [], total: count || 0 };
+  });
+
+export const getRecentMessages = createServerFn({ method: 'GET' })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase } = context;
+    const { data } = await supabase
+      .from('messages')
+      .select('*')
+      .limit(10)
+      .order('created_at', { ascending: false });
+    return data || [];
   });
 
 export const getQuizzes = createServerFn({ method: 'GET' })
