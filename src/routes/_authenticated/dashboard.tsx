@@ -34,6 +34,11 @@ function Dashboard() {
   const [newNoteTitle, setNewNoteTitle] = useState('')
   const [newNoteContent, setNewNoteContent] = useState('')
   const [isAddingNote, setIsAddingNote] = useState(false)
+  const [showObjectiveForm, setShowObjectiveForm] = useState(false)
+  const [newObjectiveTitle, setNewObjectiveTitle] = useState('')
+  const [newObjectiveSubject, setNewObjectiveSubject] = useState('')
+  const [isAddingObjective, setIsAddingObjective] = useState(false)
+
   const queryClient = useQueryClient()
 
   useEffect(() => {
