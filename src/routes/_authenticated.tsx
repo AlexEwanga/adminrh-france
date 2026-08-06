@@ -147,7 +147,7 @@ function AuthenticatedLayout() {
               <Search size={18} className="text-slate-400 shrink-0" />
               <input 
                 type="text" 
-                placeholder="Voici le Prompt Ultime pour Lovable..." 
+                placeholder="For the code present, I get the error below.\n\nPlease think step-by-step in order to resolve it.\n```\nTemporary infrastructure issue while preparing the build environment.\n```" 
                 className="text-sm text-slate-600 font-medium bg-transparent focus:outline-none w-full truncate"
                 value={globalSearch}
                 onInput={(e) => {
