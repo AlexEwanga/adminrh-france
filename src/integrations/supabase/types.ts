@@ -271,6 +271,69 @@ export type Database = {
         }
         Relationships: []
       }
+      whatsapp_logs: {
+        Row: {
+          attempts: number
+          content: string
+          created_at: string
+          error_message: string | null
+          id: string
+          phone_number: string
+          provider: string | null
+          status: string
+          subject: string
+        }
+        Insert: {
+          attempts?: number
+          content: string
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          phone_number: string
+          provider?: string | null
+          status: string
+          subject: string
+        }
+        Update: {
+          attempts?: number
+          content?: string
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          phone_number?: string
+          provider?: string | null
+          status?: string
+          subject?: string
+        }
+        Relationships: []
+      }
+      whatsapp_templates: {
+        Row: {
+          content_template: string
+          created_at: string
+          id: string
+          is_default: boolean | null
+          name: string
+          theme: string
+        }
+        Insert: {
+          content_template: string
+          created_at?: string
+          id?: string
+          is_default?: boolean | null
+          name: string
+          theme: string
+        }
+        Update: {
+          content_template?: string
+          created_at?: string
+          id?: string
+          is_default?: boolean | null
+          name?: string
+          theme?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
