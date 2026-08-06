@@ -38,7 +38,7 @@ function QuizTakePage() {
   useState(() => {
     const init = async () => {
       let pool = questions;
-      if (quizId === '8' && pool.length < 950) {
+      if (quizId === '8' && pool.length < 1000) {
         try {
           const allQuestions = await import('@/lib/all_questions.json').then(m => m.default);
           pool = allQuestions;
