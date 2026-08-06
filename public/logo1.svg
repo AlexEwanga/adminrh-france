@@ -1,0 +1,11 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#22c55e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#166534;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <path d="M100 20C55.8 20 20 55.8 20 100S55.8 180 100 180S180 144.2 180 100S144.2 20 100 20ZM100 160C66.9 160 40 133.1 40 100S66.9 40 100 40S160 66.9 160 100S133.1 160 100 160Z" fill="url(#grad1)"/>
+  <path d="M100 60C122.1 60 140 77.9 140 100C140 122.1 122.1 140 100 140C77.9 140 60 122.1 60 100C60 77.9 77.9 60 100 60Z" fill="#4ade80"/>
+  <text x="50%" y="195" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="bold" fill="#1e293b">VORTEX DIGITAL</text>
+</svg>
