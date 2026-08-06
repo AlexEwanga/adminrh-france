@@ -1,0 +1,3 @@
+UPDATE public.quizzes SET questions = '[]'::jsonb WHERE id = 8;
+-- I will add the first few manually just to have something in the DB
+UPDATE public.quizzes SET questions = questions || '[{"id": 1, "question": "Dossier n°1 : Quelle est la durée légale du travail hebdomadaire en France ?", "options": ["35 heures par semaine", "39 heures par semaine", "40 heures par semaine", "44 heures par semaine"], "correct_index": 0, "reference": "Art. L3121-27", "article": "La durée légale du travail effectif des salariés à temps complet est fixée à trente-cinq heures par semaine.", "casus": "[Dossier 1] Un salarié dans une entreprise de logistique effectue 39 heures de travail effectif. Comment sont décomptées les heures au-delà de la durée légale ?"}]'::jsonb WHERE id = 8;

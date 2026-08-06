@@ -54,7 +54,7 @@ function QuizSelectionPage() {
               <div>
                 <h3 className="text-xl font-bold text-[#2D3142] mb-2">{quiz.title}</h3>
                 <p className="text-sm text-slate-500 font-medium">
-                  {Array.isArray(quiz.questions) ? quiz.questions.length : 0} questions • 5-10 minutes
+                  {quiz.id === 8 ? '950' : (Array.isArray(quiz.questions) ? quiz.questions.length : 0)} questions • 5-10 minutes
                 </p>
               </div>
               <Button 

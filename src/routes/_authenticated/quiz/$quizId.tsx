@@ -31,22 +31,30 @@ function QuizTakePage() {
   const [shuffledQuestions, setShuffledQuestions] = useState<any[]>([])
   const [showCasus, setShowCasus] = useState(false)
 
+  // For the Ultimate session (id 8), use the local file if the DB is incomplete
   const questions = (quiz?.questions as any[]) || []
 
   // Initialize and shuffle once
   useState(() => {
-    if (questions.length > 0) {
-      // Create a unique set of 10 questions to ensure NO repetition
-      const uniquePool = [...questions].sort(() => Math.random() - 0.5)
-      setShuffledQuestions(uniquePool.slice(0, 10))
-    }
+    const init = async () => {
+      let pool = questions;
+      if (quizId === '8' && pool.length < 950) {
+        try {
+          const allQuestions = await import('@/lib/all_questions.json').then(m => m.default);
+          pool = allQuestions;
+        } catch (e) {
+          console.error("Failed to load questions from file", e);
+        }
+      }
+      
+      if (pool.length > 0) {
+        const uniquePool = [...pool].sort(() => Math.random() - 0.5);
+        setShuffledQuestions(uniquePool.slice(0, 10));
+      }
+    };
+    init();
   })
 
-  // Sync shuffled questions if quiz data arrives late
-  if (questions.length > 0 && shuffledQuestions.length === 0) {
-    const uniquePool = [...questions].sort(() => Math.random() - 0.5)
-    setShuffledQuestions(uniquePool.slice(0, 10))
-  }
 
 
   const currentQuestion = shuffledQuestions[currentIdx]

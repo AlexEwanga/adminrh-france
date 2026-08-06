@@ -1,0 +1,1 @@
+UPDATE public.quizzes SET questions = questions || '[{"id": 11, "question": "Test", "options": ["A", "B"], "correct_index": 0, "reference": "R", "article": "A", "casus": "C"}]'::jsonb WHERE id = 8;
