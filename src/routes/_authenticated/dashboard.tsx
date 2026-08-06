@@ -307,34 +307,53 @@ function Dashboard() {
       <div className="lg:col-span-5 space-y-6 flex flex-col">
         {/* Mon planning section */}
         <div className="bg-white rounded-[32px] p-6 md:p-8 shadow-sm border border-white/50 flex flex-col gap-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-[#2D3142] tracking-tight">Mon planning</h2>
-            <div className="flex items-center gap-2 bg-[#F8F9FA] px-4 py-2 rounded-xl border border-slate-100 text-sm font-medium text-[#2D3142]">
-              5 Août, Mercredi
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <h2 className="text-2xl font-bold text-[#2D3142] tracking-tight">Mon planning</h2>
+              <p className="text-xs text-slate-400 font-medium mt-1">5 leçons WhatsApp par jour (heure UTC)</p>
+            </div>
+            <div className="flex items-center gap-2 bg-[#F8F9FA] px-4 py-2 rounded-xl border border-slate-100 text-xs font-bold text-[#2D3142] capitalize whitespace-nowrap">
+              {todayLabel}
             </div>
           </div>
 
-          <div className="space-y-1">
-            <ScheduleHeader />
-            <div className="divide-y divide-slate-50">
-              {filteredMessages && filteredMessages.length > 0 ? (
-                filteredMessages.map((msg: any) => (
-                  <ScheduleItem 
-                    key={msg.id}
-                    time={msg.scheduled_hour?.substring(0, 5) || '--:--'} 
-                    lesson={msg.tag || 'Leçon'} 
-                    theme={msg.subject} 
-                    channel="WhatsApp" 
-                  />
-                ))
-              ) : (
-                <div className="py-8 text-center text-slate-400 text-sm">
-                  Aucune leçon planifiée.
+          <div className="space-y-3">
+            {todaySchedule.map((slot) => (
+              <div key={slot.time} className="flex items-center gap-4 p-3 rounded-2xl hover:bg-slate-50 transition-colors">
+                <div className="flex flex-col items-center justify-center bg-[#F8F9FA] rounded-xl w-14 h-14 shrink-0 border border-slate-100">
+                  <Clock size={12} className="text-slate-300 mb-0.5" />
+                  <span className="text-[11px] font-extrabold text-[#2D3142]">{slot.time}</span>
                 </div>
-              )}
-            </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-bold text-[#2D3142] truncate" title={slot.subject}>{slot.subject}</p>
+                  <p className="text-[11px] text-slate-400 font-medium">Canal WhatsApp</p>
+                </div>
+                <Badge
+                  className={`border-none text-[10px] font-bold px-2.5 py-1 rounded-lg shrink-0 ${
+                    slot.status === 'Envoyé'
+                      ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-50'
+                      : slot.status === 'Échec'
+                      ? 'bg-red-50 text-red-600 hover:bg-red-50'
+                      : slot.status === 'En attente'
+                      ? 'bg-amber-50 text-amber-600 hover:bg-amber-50'
+                      : 'bg-slate-100 text-slate-400 hover:bg-slate-100'
+                  }`}
+                >
+                  {slot.status}
+                </Badge>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex items-center justify-between pt-4 border-t border-slate-50">
+            <span className="text-xs font-bold text-slate-400">Progression du jour</span>
+            <span className="text-xs font-extrabold text-[#1E2A4A]">{sentToday}/5 envoyées</span>
+          </div>
+          <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden -mt-3">
+            <div className="h-full bg-[#1E2A4A] rounded-full transition-all duration-700" style={{ width: `${Math.min(100, (sentToday / 5) * 100)}%` }} />
           </div>
         </div>
+
 
         {/* Mes notes section */}
         <div className="space-y-4">
