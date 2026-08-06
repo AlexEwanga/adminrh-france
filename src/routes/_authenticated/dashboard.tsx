@@ -1,11 +1,10 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { useSuspenseQuery, useQueryClient } from '@tanstack/react-query'
-import { getLearningStats, getRecentMessages, getNotes, addNote, getObjectives, addObjective } from '@/lib/learning.functions'
+import { createFileRoute, Link } from '@tanstack/react-router'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { getLearningStats, getRecentMessages, getNotes, addNote, getObjectives, addObjective, getDashboardSummary } from '@/lib/learning.functions'
 import { useState, useEffect, useMemo } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
-import { Plus, MoreHorizontal, MessageSquare, Trophy, Target, BookOpen, Search, Send, Loader2 } from 'lucide-react'
+import { Plus, MoreHorizontal, Trophy, Target, BookOpen, Search, Send, Loader2, Flame, CheckCircle2, Clock, TrendingUp, GraduationCap } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { 
   BarChart as ReBarChart, 
@@ -21,11 +20,13 @@ import {
 } from 'recharts'
 import { toast } from 'sonner'
 import { Input } from '@/components/ui/input'
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
 
 export const Route = createFileRoute('/_authenticated/dashboard')({
   component: Dashboard,
 })
+
+// Créneaux quotidiens d'envoi WhatsApp (UTC)
+const DAILY_SLOTS = ['07:00', '10:00', '13:00', '16:00', '19:00']
 
 function Dashboard() {
   const [activeFilter, setActiveFilter] = useState('Tout')
@@ -33,6 +34,11 @@ function Dashboard() {
   const [newNoteTitle, setNewNoteTitle] = useState('')
   const [newNoteContent, setNewNoteContent] = useState('')
   const [isAddingNote, setIsAddingNote] = useState(false)
+  const [showObjectiveForm, setShowObjectiveForm] = useState(false)
+  const [newObjectiveTitle, setNewObjectiveTitle] = useState('')
+  const [newObjectiveSubject, setNewObjectiveSubject] = useState('')
+  const [isAddingObjective, setIsAddingObjective] = useState(false)
+
   const queryClient = useQueryClient()
 
   useEffect(() => {
@@ -45,37 +51,41 @@ function Dashboard() {
     return () => window.removeEventListener('global-search-change', handleSearch)
   }, [])
 
-  const { data: stats } = useSuspenseQuery({
+  const { data: stats } = useQuery({
     queryKey: ['learning-stats'],
     queryFn: () => getLearningStats()
   })
 
-  const { data: messagesData } = useSuspenseQuery({
+  const { data: summary } = useQuery({
+    queryKey: ['dashboard-summary'],
+    queryFn: () => getDashboardSummary()
+  })
+
+  const { data: messagesData } = useQuery({
     queryKey: ['recent-messages'],
     queryFn: () => getRecentMessages()
   })
   const messages = messagesData || []
 
-  const { data: notes } = useSuspenseQuery({
+  const { data: notes } = useQuery({
     queryKey: ['notes'],
     queryFn: () => getNotes()
   })
 
-  const { data: objectivesData } = useSuspenseQuery({
+  const { data: objectivesData } = useQuery({
     queryKey: ['objectives'],
     queryFn: () => getObjectives()
   })
 
   const filteredMessages = useMemo(() => {
     if (!messages) return []
-    const results = messages.filter((msg: any) => 
+    return messages.filter((msg: any) => 
       msg.subject.toLowerCase().includes(searchTerm.toLowerCase()) || 
       (msg.tag && msg.tag.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (msg.content && msg.content.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (msg.reference && msg.reference.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (msg.article && msg.article.toLowerCase().includes(searchTerm.toLowerCase()))
     )
-    return results
   }, [messages, searchTerm])
 
   const filteredNotes = useMemo(() => {
@@ -86,39 +96,40 @@ function Dashboard() {
     )
   }, [notes, searchTerm])
 
+  // Planning du jour : 5 créneaux réels, statut calculé sur les envois WhatsApp
+  const todaySchedule = useMemo(() => {
+    const logs = summary?.todayLogs || []
+    const nowMinutes = new Date().getUTCHours() * 60 + new Date().getUTCMinutes()
+    return DAILY_SLOTS.map((slot, i) => {
+      const log = logs[i]
+      const [h, m] = slot.split(':').map(Number)
+      const slotMinutes = (h || 0) * 60 + (m || 0)
+      return {
+        time: slot,
+        subject: log?.subject || (messages[i]?.subject ?? 'Leçon à programmer'),
+        status: log
+          ? (log.status === 'success' ? 'Envoyé' : 'Échec')
+          : slotMinutes <= nowMinutes ? 'En attente' : 'Planifié',
+      }
+    })
+  }, [summary, messages])
+
   const chartData = useMemo(() => {
-    if (!stats) return [
-      { name: 'Lun', score: 0, messages: 0 },
-      { name: 'Mar', score: 0, messages: 0 },
-      { name: 'Mer', score: 0, messages: 0 },
-      { name: 'Jeu', score: 0, messages: 0 },
-      { name: 'Ven', score: 0, messages: 0 },
-      { name: 'Sam', score: 0, messages: 0 },
-      { name: 'Dim', score: 0, messages: 0 },
-    ]
-    
-    // Create actual progression data from stats if available, or return recent history
-    // For now, we simulate a week view where the last day is today's score
-    const days = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
-    const today = new Date();
-    const result = [];
-    
+    const days = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam']
+    const today = new Date()
+    const result = []
     for (let i = 6; i >= 0; i--) {
-      const d = new Date();
-      d.setDate(today.getDate() - i);
-      const dayName = days[d.getDay()];
-      
-      // If today, use actual stats
-      const isToday = i === 0;
+      const d = new Date()
+      d.setDate(today.getDate() - i)
+      const isToday = i === 0
       result.push({
-        name: dayName,
-        score: isToday ? (stats.avg_score || 0) : 0,
-        messages: isToday ? (stats.messages_received || 0) : 0
-      });
+        name: days[d.getDay()],
+        score: isToday ? (stats?.avg_score || 0) : 0,
+        messages: isToday ? (summary?.todayLogs?.length || 0) : 0
+      })
     }
-    
-    return result;
-  }, [stats])
+    return result
+  }, [stats, summary])
 
   const filteredTasks = useMemo(() => {
     const tasks = objectivesData || []
@@ -129,6 +140,7 @@ function Dashboard() {
       return matchesFilter && matchesSearch
     })
   }, [activeFilter, searchTerm, objectivesData])
+
 
   const handleAddNote = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -148,10 +160,66 @@ function Dashboard() {
     }
   }
 
+  const handleAddObjective = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!newObjectiveTitle) return
+
+    setIsAddingObjective(true)
+    try {
+      await addObjective({ data: { title: newObjectiveTitle, subject: newObjectiveSubject || 'Droit du travail' } })
+      setNewObjectiveTitle('')
+      setNewObjectiveSubject('')
+      setShowObjectiveForm(false)
+      toast.success('Objectif ajouté')
+      queryClient.invalidateQueries({ queryKey: ['objectives'] })
+    } catch (error) {
+      toast.error("Erreur lors de l'ajout de l'objectif")
+    } finally {
+      setIsAddingObjective(false)
+    }
+  }
+
+  const todayLabel = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })
+  const sentToday = summary?.todayLogs?.length || 0
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 pb-6">
+      {/* Bandeau de bienvenue */}
+      <div className="lg:col-span-12 bg-gradient-to-r from-[#1E2A4A] to-[#2D3142] rounded-[32px] p-8 text-white relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-72 h-72 bg-[#D4AF37]/10 rounded-full blur-3xl -mr-24 -mt-24" />
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div>
+            <p className="text-[#D4AF37] font-bold text-xs uppercase tracking-widest mb-2">{todayLabel}</p>
+            <h1 className="text-3xl font-extrabold tracking-tight">Bonjour, prêt à progresser ?</h1>
+            <p className="text-slate-300 mt-2 font-medium text-sm">
+              {sentToday}/5 leçons WhatsApp reçues aujourd'hui — {summary?.totalLessons || 0} dossiers disponibles dans votre base.
+            </p>
+          </div>
+          <div className="flex gap-3">
+            <Button asChild className="bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-[#1E2A4A] font-bold rounded-2xl h-12 px-6 shadow-lg">
+              <Link to="/quiz">
+                <GraduationCap size={18} className="mr-2" />
+                Lancer un Quiz
+              </Link>
+            </Button>
+            <Button asChild variant="outline" className="bg-white/5 border-white/20 hover:bg-white/10 text-white rounded-2xl h-12 px-6 font-bold">
+              <Link to="/learning">Base de connaissances</Link>
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* KPIs */}
+      <div className="lg:col-span-12 grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+        <KpiCard icon={<Trophy size={20} />} label="Points d'expertise" value={summary?.points ?? 0} accent="bg-[#D4AF37]/10 text-[#B8942F]" />
+        <KpiCard icon={<TrendingUp size={20} />} label="Score moyen" value={`${summary?.avgScore ?? 0}%`} accent="bg-[#8C7CF0]/10 text-[#8C7CF0]" />
+        <KpiCard icon={<CheckCircle2 size={20} />} label="Quiz réalisés" value={summary?.quizTaken ?? 0} accent="bg-emerald-50 text-emerald-600" />
+        <KpiCard icon={<Flame size={20} />} label="Série d'apprentissage" value={`${summary?.streak ?? 0} j`} accent="bg-orange-50 text-orange-500" />
+      </div>
+
       {/* Top Row: Charts & Stats */}
       <div className="lg:col-span-12 grid grid-cols-1 md:grid-cols-2 gap-6">
+
         <Card className="rounded-[32px] border-white/50 shadow-sm overflow-hidden bg-white">
           <CardHeader className="pb-2">
             <CardTitle className="text-xl font-bold text-[#2D3142]">Performance Hebdomadaire</CardTitle>
@@ -224,11 +292,39 @@ function Dashboard() {
       {/* Left Column: Mes objectifs RH */}
       <div className="lg:col-span-7 bg-white rounded-[32px] p-6 md:p-8 shadow-sm border border-white/50 flex flex-col gap-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-[#2D3142] tracking-tight">Mes objectifs RH</h2>
-          <Button size="icon" variant="ghost" className="bg-[#F8F9FA] rounded-xl hover:bg-slate-100 h-10 w-10 border border-slate-100">
-            <Plus size={20} className="text-[#2D3142]" />
+          <div>
+            <h2 className="text-2xl font-bold text-[#2D3142] tracking-tight">Mes objectifs RH</h2>
+            <p className="text-xs text-slate-400 font-medium mt-1">{filteredTasks.length} objectif(s) affiché(s)</p>
+          </div>
+          <Button
+            size="icon"
+            variant="ghost"
+            className="bg-[#F8F9FA] rounded-xl hover:bg-slate-100 h-10 w-10 border border-slate-100"
+            onClick={() => setShowObjectiveForm((v) => !v)}
+          >
+            <Plus size={20} className={`text-[#2D3142] transition-transform ${showObjectiveForm ? 'rotate-45' : ''}`} />
           </Button>
         </div>
+
+        {showObjectiveForm && (
+          <form onSubmit={handleAddObjective} className="bg-[#F8F9FA] rounded-2xl p-4 border border-slate-100 flex flex-col sm:flex-row gap-3">
+            <Input
+              placeholder="Nouvel objectif (ex: Maîtriser la rupture conventionnelle)"
+              className="bg-white border-slate-100 rounded-xl"
+              value={newObjectiveTitle}
+              onChange={(e) => setNewObjectiveTitle(e.target.value)}
+            />
+            <Input
+              placeholder="Thème"
+              className="bg-white border-slate-100 rounded-xl sm:w-40"
+              value={newObjectiveSubject}
+              onChange={(e) => setNewObjectiveSubject(e.target.value)}
+            />
+            <Button type="submit" disabled={!newObjectiveTitle || isAddingObjective} className="bg-[#1E2A4A] hover:bg-[#1E2A4A]/90 rounded-xl font-bold px-6">
+              {isAddingObjective ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Ajouter'}
+            </Button>
+          </form>
+        )}
 
         <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-2 px-2">
           {['Tout', 'À faire', 'En cours', 'Terminé'].map(filter => (
@@ -247,50 +343,102 @@ function Dashboard() {
             <TaskItem key={task.id} {...task} />
           ))}
           {filteredTasks.length === 0 && (
-            <div className="text-center py-12 space-y-2">
-              <Search className="mx-auto text-slate-200 h-12 w-12" />
-              <p className="text-slate-400 font-medium">Aucun objectif trouvé.</p>
+            <div className="text-center py-12 space-y-3 bg-slate-50/60 rounded-[24px] border-2 border-dashed border-slate-100">
+              <Target className="mx-auto text-slate-200 h-12 w-12" />
+              <p className="text-slate-400 font-medium">Aucun objectif pour le moment.</p>
+              <Button
+                variant="link"
+                className="text-[#8C7CF0] font-bold"
+                onClick={() => setShowObjectiveForm(true)}
+              >
+                Créer mon premier objectif
+              </Button>
             </div>
           )}
         </div>
 
-        <Button variant="ghost" className="w-full text-slate-400 font-medium py-6 hover:bg-slate-50 mt-2">
-          Voir tous les objectifs RH
-        </Button>
+        {/* Leçons récentes */}
+        <div className="pt-4 border-t border-slate-50">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-bold text-[#2D3142] flex items-center gap-2">
+              <BookOpen size={18} className="text-[#8C7CF0]" />
+              Dernières leçons reçues
+            </h3>
+            <Button asChild variant="link" className="text-[#8C7CF0] font-bold text-xs p-0 h-auto">
+              <Link to="/learning">Tout voir</Link>
+            </Button>
+          </div>
+          <div className="space-y-2">
+            {filteredMessages.slice(0, 4).map((msg: any) => (
+              <div key={msg.id} className="flex items-center gap-3 p-3 rounded-2xl hover:bg-slate-50 transition-colors">
+                <div className="w-9 h-9 rounded-xl bg-[#1E2A4A]/5 flex items-center justify-center shrink-0">
+                  <BookOpen size={16} className="text-[#1E2A4A]" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-bold text-[#2D3142] truncate">{msg.subject}</p>
+                  <p className="text-[11px] text-slate-400 font-medium truncate">{msg.reference || 'Code du travail'}</p>
+                </div>
+              </div>
+            ))}
+            {filteredMessages.length === 0 && (
+              <p className="text-sm text-slate-400 italic py-4 text-center">Aucune leçon disponible.</p>
+            )}
+          </div>
+        </div>
       </div>
+
 
       {/* Right Column: Planning & Notes */}
       <div className="lg:col-span-5 space-y-6 flex flex-col">
         {/* Mon planning section */}
         <div className="bg-white rounded-[32px] p-6 md:p-8 shadow-sm border border-white/50 flex flex-col gap-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-[#2D3142] tracking-tight">Mon planning</h2>
-            <div className="flex items-center gap-2 bg-[#F8F9FA] px-4 py-2 rounded-xl border border-slate-100 text-sm font-medium text-[#2D3142]">
-              5 Août, Mercredi
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <h2 className="text-2xl font-bold text-[#2D3142] tracking-tight">Mon planning</h2>
+              <p className="text-xs text-slate-400 font-medium mt-1">5 leçons WhatsApp par jour (heure UTC)</p>
+            </div>
+            <div className="flex items-center gap-2 bg-[#F8F9FA] px-4 py-2 rounded-xl border border-slate-100 text-xs font-bold text-[#2D3142] capitalize whitespace-nowrap">
+              {todayLabel}
             </div>
           </div>
 
-          <div className="space-y-1">
-            <ScheduleHeader />
-            <div className="divide-y divide-slate-50">
-              {filteredMessages && filteredMessages.length > 0 ? (
-                filteredMessages.map((msg: any) => (
-                  <ScheduleItem 
-                    key={msg.id}
-                    time={msg.scheduled_hour?.substring(0, 5) || '--:--'} 
-                    lesson={msg.tag || 'Leçon'} 
-                    theme={msg.subject} 
-                    channel="WhatsApp" 
-                  />
-                ))
-              ) : (
-                <div className="py-8 text-center text-slate-400 text-sm">
-                  Aucune leçon planifiée.
+          <div className="space-y-3">
+            {todaySchedule.map((slot) => (
+              <div key={slot.time} className="flex items-center gap-4 p-3 rounded-2xl hover:bg-slate-50 transition-colors">
+                <div className="flex flex-col items-center justify-center bg-[#F8F9FA] rounded-xl w-14 h-14 shrink-0 border border-slate-100">
+                  <Clock size={12} className="text-slate-300 mb-0.5" />
+                  <span className="text-[11px] font-extrabold text-[#2D3142]">{slot.time}</span>
                 </div>
-              )}
-            </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-bold text-[#2D3142] truncate" title={slot.subject}>{slot.subject}</p>
+                  <p className="text-[11px] text-slate-400 font-medium">Canal WhatsApp</p>
+                </div>
+                <Badge
+                  className={`border-none text-[10px] font-bold px-2.5 py-1 rounded-lg shrink-0 ${
+                    slot.status === 'Envoyé'
+                      ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-50'
+                      : slot.status === 'Échec'
+                      ? 'bg-red-50 text-red-600 hover:bg-red-50'
+                      : slot.status === 'En attente'
+                      ? 'bg-amber-50 text-amber-600 hover:bg-amber-50'
+                      : 'bg-slate-100 text-slate-400 hover:bg-slate-100'
+                  }`}
+                >
+                  {slot.status}
+                </Badge>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex items-center justify-between pt-4 border-t border-slate-50">
+            <span className="text-xs font-bold text-slate-400">Progression du jour</span>
+            <span className="text-xs font-extrabold text-[#1E2A4A]">{sentToday}/5 envoyées</span>
+          </div>
+          <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden -mt-3">
+            <div className="h-full bg-[#1E2A4A] rounded-full transition-all duration-700" style={{ width: `${Math.min(100, (sentToday / 5) * 100)}%` }} />
           </div>
         </div>
+
 
         {/* Mes notes section */}
         <div className="space-y-4">
@@ -414,37 +562,20 @@ function NoteCard({ title, content, date, color }: any) {
   )
 }
 
-function ScheduleHeader() {
+function KpiCard({ icon, label, value, accent }: { icon: React.ReactNode, label: string, value: string | number, accent: string }) {
   return (
-    <div className="grid grid-cols-4 px-2 md:px-4 py-2 text-[10px] md:text-[11px] font-bold text-slate-300 uppercase tracking-wider">
-      <span>Heure</span>
-      <span>Sujet</span>
-      <span className="hidden sm:inline">Thème</span>
-      <span className="sm:hidden">Th.</span>
-      <span>Canal</span>
-    </div>
-  )
-}
-
-function ScheduleItem({ time, lesson, theme, channel }: any) {
-  return (
-    <div className="grid grid-cols-4 px-2 md:px-4 py-4 items-center text-[12px] md:text-[13px] group hover:bg-slate-50 transition-colors rounded-xl cursor-pointer">
-      <span className="font-bold text-[#2D3142]">{time}</span>
-      <span className="font-medium text-[#2D3142] truncate mr-2" title={lesson}>{lesson}</span>
-      <div className="flex items-center gap-2 truncate mr-2">
-        <span className="text-slate-500 font-medium truncate" title={theme}>{theme}</span>
+    <div className="bg-white rounded-[28px] p-6 shadow-sm border border-white/50 flex flex-col gap-4 hover:shadow-lg hover:shadow-slate-200/50 transition-all">
+      <div className={`w-11 h-11 rounded-2xl flex items-center justify-center ${accent}`}>
+        {icon}
       </div>
-      <Badge className="bg-green-50 text-green-600 hover:bg-green-100 border-none px-2 py-0.5 text-[10px] w-fit">
-        {channel}
-      </Badge>
-
+      <div>
+        <p className="text-3xl font-extrabold text-[#1E2A4A] tracking-tight leading-none">{value}</p>
+        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mt-2">{label}</p>
+      </div>
     </div>
   )
 }
 
-function Avatar({ className, children }: { className?: string, children?: React.ReactNode }) {
-  return <div className={`rounded-full overflow-hidden flex items-center justify-center ${className}`}>{children}</div>
-}
 
 function AvatarFallback({ className, children }: { className?: string, children?: React.ReactNode }) {
   return <div className={`w-full h-full flex items-center justify-center font-bold ${className}`}>{children}</div>
