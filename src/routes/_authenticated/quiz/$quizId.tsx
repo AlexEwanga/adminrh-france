@@ -38,9 +38,11 @@ function QuizTakePage() {
     let cancelled = false
     const init = async () => {
       let pool = questions
-      if (quizId === '8') {
+      const group = getQuizGroup(quizId)
+      if (quizId === '8' || group) {
         try {
-          pool = await import('@/lib/all_questions.json').then((m) => m.default as any[])
+          const bank = await import('@/lib/all_questions.json').then((m) => m.default as any[])
+          pool = group ? bank.filter((q: any) => group.themes.includes(q.theme)) : bank
         } catch (e) {
           console.error('Impossible de charger la banque de questions', e)
         }
