@@ -45,8 +45,9 @@ function Learning() {
     <div className="bg-white rounded-[32px] p-8 shadow-sm border border-white/50 flex flex-col gap-8 min-h-[calc(100vh-140px)]">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-[#2D3142]">Base de connaissances</h1>
-          <p className="text-slate-400 mt-1">Explorez les leçons et ressources AdminRH-France.</p>
+          <h1 className="text-3xl font-extrabold text-[#1E2A4A] tracking-tight">Base de connaissances</h1>
+          <p className="text-slate-400 mt-1 font-medium">Explorez plus de 1000 dossiers juridiques et leçons AdminRH-France.</p>
+
         </div>
         <div className="flex items-center gap-2">
           <div className="relative w-64">
@@ -72,51 +73,43 @@ function Learning() {
       </div>
 
       {/* Section des Sources Officielles */}
-      <div className="bg-[#1E2A4A] text-white rounded-[24px] p-6 shadow-lg">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 bg-[#D4AF37] rounded-lg">
-            <Search className="text-[#1E2A4A]" size={20} />
+      <div className="bg-gradient-to-br from-[#1E2A4A] to-[#2D3142] text-white rounded-[32px] p-8 shadow-xl relative overflow-hidden group">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-[#D4AF37]/10 rounded-full blur-3xl -mr-32 -mt-32 transition-all group-hover:bg-[#D4AF37]/20" />
+        
+        <div className="relative z-10">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="p-3 bg-[#D4AF37] rounded-2xl shadow-lg shadow-[#D4AF37]/20">
+              <Search className="text-[#1E2A4A]" size={24} />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold tracking-tight">Sources Officielles</h2>
+              <p className="text-slate-300 text-sm font-medium">Accès direct aux piliers du droit du travail français.</p>
+            </div>
           </div>
-          <h2 className="text-xl font-bold">Les trois sources officielles à connaître absolument</h2>
-        </div>
-        <p className="text-slate-300 mb-6 text-sm leading-relaxed">
-          Ces sites sont la base de toute information fiable en droit du travail. Ils sont publics, gratuits et régulièrement mis à jour.
-        </p>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead>
-              <tr className="border-b border-white/10">
-                <th className="pb-3 pr-4 font-bold text-[#D4AF37]">Source</th>
-                <th className="pb-3 pr-4 font-bold text-[#D4AF37]">Rôle</th>
-                <th className="pb-3 font-bold text-[#D4AF37]">Adresse</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-white/5">
-              <tr>
-                <td className="py-4 pr-4 font-bold">Code du travail numérique</td>
-                <td className="py-4 pr-4 text-slate-300">L'outil principal pour comprendre le droit du travail avec des fiches pratiques, des simulateurs et des modèles de documents.</td>
-                <td className="py-4">
-                  <a href="https://code.travail.gouv.fr" target="_blank" rel="noopener noreferrer" className="text-[#8C7CF0] hover:underline">code.travail.gouv.fr</a>
-                </td>
-              </tr>
-              <tr>
-                <td className="py-4 pr-4 font-bold">Legifrance</td>
-                <td className="py-4 pr-4 text-slate-300">Le texte de loi officiel : le Code du travail dans son intégralité, ainsi que les conventions collectives et la jurisprudence.</td>
-                <td className="py-4">
-                  <a href="https://www.legifrance.gouv.fr" target="_blank" rel="noopener noreferrer" className="text-[#8C7CF0] hover:underline">legifrance.gouv.fr</a>
-                </td>
-              </tr>
-              <tr>
-                <td className="py-4 pr-4 font-bold">Ministère du Travail</td>
-                <td className="py-4 pr-4 text-slate-300">Pour l'actualité, les réformes, les politiques d'emploi (ex : "Emplois francs") et des fiches pratiques très complètes.</td>
-                <td className="py-4">
-                  <a href="https://travail-emploi.gouv.fr" target="_blank" rel="noopener noreferrer" className="text-[#8C7CF0] hover:underline">travail-emploi.gouv.fr</a>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+            <OfficialSourceCard 
+              name="Code du travail numérique"
+              description="Fiches pratiques, simulateurs et modèles de documents officiels."
+              url="https://code.travail.gouv.fr"
+              label="Accéder au Code"
+            />
+            <OfficialSourceCard 
+              name="Legifrance"
+              description="Le texte de loi intégral, conventions collectives et jurisprudence."
+              url="https://www.legifrance.gouv.fr"
+              label="Consulter la Loi"
+            />
+            <OfficialSourceCard 
+              name="Ministère du Travail"
+              description="Actualités sociales, réformes et politiques d'emploi en temps réel."
+              url="https://travail-emploi.gouv.fr"
+              label="Voir l'actualité"
+            />
+          </div>
         </div>
       </div>
+
 
       <div className="flex flex-col gap-4">
         <h2 className="text-xl font-bold text-[#2D3142]">Base de connaissances</h2>
@@ -167,6 +160,24 @@ function Learning() {
           </div>
         )}
       </div>
+    </div>
+  )
+}
+
+function OfficialSourceCard({ name, description, url, label }: { name: string, description: string, url: string, label: string }) {
+  return (
+    <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-5 hover:bg-white/10 transition-all group/card">
+      <h3 className="font-bold text-[#D4AF37] mb-2">{name}</h3>
+      <p className="text-xs text-slate-300 leading-relaxed mb-4 min-h-[40px]">{description}</p>
+      <Button 
+        variant="link" 
+        className="p-0 h-auto text-[#8C7CF0] font-bold text-xs group-hover/card:translate-x-1 transition-transform"
+        asChild
+      >
+        <a href={url} target="_blank" rel="noopener noreferrer">
+          {label}
+        </a>
+      </Button>
     </div>
   )
 }
