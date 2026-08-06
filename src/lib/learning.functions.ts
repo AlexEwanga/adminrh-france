@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { requireSupabaseAuth } from '@/integrations/supabase/auth-middleware';
 import { createServerFn } from '@tanstack/react-start';
 
 export const getLearningStats = createServerFn({ method: 'GET' })
@@ -136,15 +137,15 @@ export const getQuizById = createServerFn({ method: "GET" })
   });
 
 export const submitQuizResult = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((d: { quiz_id: number, score: number, time_spent?: number }) => d)
-  .handler(async ({ data }) => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) throw new Error('Unauthorized');
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
 
     const { data: result, error } = await supabase
       .from('quiz_results')
       .insert({
-        user_id: session.user.id,
+        user_id: userId,
         quiz_id: data.quiz_id,
         score: data.score,
         time_spent: data.time_spent || 0
@@ -158,7 +159,7 @@ export const submitQuizResult = createServerFn({ method: "POST" })
     const today = new Date().toISOString().split('T')[0] as string;
     // Call the function in the private schema (PostgREST will find it via search_path)
     const { error: rpcError } = await (supabase.rpc as any)('update_learning_stats', {
-      _user_id: session.user.id,
+      _user_id: userId,
       _date: today,
       _score: data.score
     });
