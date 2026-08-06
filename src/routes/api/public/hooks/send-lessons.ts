@@ -3,8 +3,8 @@ import { createClient } from '@supabase/supabase-js'
 import { sendWhatsAppMessage } from '@/lib/whatsapp.server'
 
 // Configuration : 5 messages par jour à répartir
-// 08h, 10h, 12h, 14h, 16h (GMT)
-const PLANNED_SLOTS = [8, 10, 12, 14, 16];
+// 07h, 10h, 13h, 16h, 19h (GMT/UTC)
+const PLANNED_SLOTS = [7, 10, 13, 16, 19];
 
 export const Route = createFileRoute('/api/public/hooks/send-lessons')({
   server: {
