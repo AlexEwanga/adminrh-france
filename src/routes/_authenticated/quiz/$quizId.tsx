@@ -156,24 +156,26 @@ function QuizTakePage() {
             <div className="flex flex-col gap-4">
               <div>
                 <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#6366F1] mb-2">Cas pratique (Casus)</h4>
-                <p className="text-[#2D3142] italic leading-relaxed">
-                  "{currentQuestion.casus}"
+                <p className="text-[#2D3142] font-semibold leading-relaxed">
+                  {currentQuestion.casus}
                 </p>
               </div>
               
-              {currentQuestion.reference && (
-                <div className="pt-4 border-t border-[#E0E7FF]">
-                  <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#D4AF37] mb-2">Référence & Article</h4>
-                  <div className="bg-white/50 p-4 rounded-xl border border-white/80">
-                    <p className="text-[13px] font-bold text-[#2D3142] mb-1">{currentQuestion.reference}</p>
-                    <p className="text-[12px] text-slate-600 leading-snug">
-                      {currentQuestion.article}
-                    </p>
-                  </div>
+              <div className="pt-4 border-t border-[#E0E7FF]">
+                <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#D4AF37] mb-2">Référence Légale & Article Complet</h4>
+                <div className="bg-white/50 p-6 rounded-xl border border-white/80 shadow-inner">
+                  <p className="text-[14px] font-bold text-[#1E2A4A] mb-3 flex items-center gap-2">
+                    <span className="w-2 h-2 bg-[#D4AF37] rounded-full"></span>
+                    {currentQuestion.reference || "Partie Législative du Code du travail"}
+                  </p>
+                  <p className="text-[14px] text-slate-700 leading-relaxed font-medium whitespace-pre-wrap border-l-4 border-[#D4AF37]/30 pl-4 py-1">
+                    {currentQuestion.article}
+                  </p>
                 </div>
-              )}
+              </div>
             </div>
           </div>
+
         )}
 
         <div>
