@@ -477,37 +477,20 @@ function NoteCard({ title, content, date, color }: any) {
   )
 }
 
-function ScheduleHeader() {
+function KpiCard({ icon, label, value, accent }: { icon: React.ReactNode, label: string, value: string | number, accent: string }) {
   return (
-    <div className="grid grid-cols-4 px-2 md:px-4 py-2 text-[10px] md:text-[11px] font-bold text-slate-300 uppercase tracking-wider">
-      <span>Heure</span>
-      <span>Sujet</span>
-      <span className="hidden sm:inline">Thème</span>
-      <span className="sm:hidden">Th.</span>
-      <span>Canal</span>
-    </div>
-  )
-}
-
-function ScheduleItem({ time, lesson, theme, channel }: any) {
-  return (
-    <div className="grid grid-cols-4 px-2 md:px-4 py-4 items-center text-[12px] md:text-[13px] group hover:bg-slate-50 transition-colors rounded-xl cursor-pointer">
-      <span className="font-bold text-[#2D3142]">{time}</span>
-      <span className="font-medium text-[#2D3142] truncate mr-2" title={lesson}>{lesson}</span>
-      <div className="flex items-center gap-2 truncate mr-2">
-        <span className="text-slate-500 font-medium truncate" title={theme}>{theme}</span>
+    <div className="bg-white rounded-[28px] p-6 shadow-sm border border-white/50 flex flex-col gap-4 hover:shadow-lg hover:shadow-slate-200/50 transition-all">
+      <div className={`w-11 h-11 rounded-2xl flex items-center justify-center ${accent}`}>
+        {icon}
       </div>
-      <Badge className="bg-green-50 text-green-600 hover:bg-green-100 border-none px-2 py-0.5 text-[10px] w-fit">
-        {channel}
-      </Badge>
-
+      <div>
+        <p className="text-3xl font-extrabold text-[#1E2A4A] tracking-tight leading-none">{value}</p>
+        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mt-2">{label}</p>
+      </div>
     </div>
   )
 }
 
-function Avatar({ className, children }: { className?: string, children?: React.ReactNode }) {
-  return <div className={`rounded-full overflow-hidden flex items-center justify-center ${className}`}>{children}</div>
-}
 
 function AvatarFallback({ className, children }: { className?: string, children?: React.ReactNode }) {
   return <div className={`w-full h-full flex items-center justify-center font-bold ${className}`}>{children}</div>
