@@ -65,49 +65,42 @@ export async function sendWhatsAppMessage(phoneNumber: string, message: string, 
   if (!success) throw new Error(lastError || "Erreur d'envoi WhatsApp");
   return { success: true, attempts };
 }
-  // Read key inside the function to ensure we get the latest value from Lovable Cloud
-  const callmebotApiKey = process.env['CALLMEBOT_API_KEY'];
-  
-  if (!callmebotApiKey) {
-    console.log("[WhatsApp Simulation] CALLMEBOT_API_KEY is missing in env. Logging to console:");
-    console.log(`To: ${phoneNumber}`);
-    console.log(`Message: ${message}`);
-    return { success: true, simulated: true };
-  }
 
-  try {
-    // Standardize phone format for CallMeBot (no + sign, no spaces)
-    const cleanPhone = phoneNumber.replace(/[\s+]/g, "");
-    
-    // CallMeBot uses a simple GET request
-    const url = new URL(CALLMEBOT_API_URL);
-    url.searchParams.append("phone", cleanPhone);
-    url.searchParams.append("text", message);
-    url.searchParams.append("apikey", callmebotApiKey);
-    
-    console.log(`[WhatsApp] Sending via CallMeBot to ${cleanPhone}...`);
-    
-    // Use a standard fetch request
-    const response = await fetch(url.toString(), {
-      method: "GET",
-      // Important for some edge runtimes to explicitly avoid cache
-      cache: 'no-store'
-    });
-    
-    const responseText = await response.text();
-    
-    if (response.ok) {
-      console.log("[WhatsApp] CallMeBot Success response:", responseText);
-      return { success: true, provider: "callmebot", detail: responseText };
-    } else {
-      console.error("[WhatsApp] CallMeBot Failed:", response.status, responseText);
-      throw new Error(`CallMeBot error (${response.status}): ${responseText}`);
-    }
-  } catch (error: any) {
-    console.error("[WhatsApp] Network or API Error:", error.message);
-    throw new Error(`Erreur d'envoi: ${error.message}`);
-  }
-}
+export const getWhatsAppLogs = createServerFn({ method: "GET" })
+  .handler(async () => {
+    const { data, error } = await supabase
+      .from('whatsapp_logs')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(50);
+    if (error) throw error;
+    return data;
+  });
+
+export const getWhatsAppTemplates = createServerFn({ method: "GET" })
+  .handler(async () => {
+    const { data, error } = await supabase
+      .from('whatsapp_templates')
+      .select('*')
+      .order('name', { ascending: true });
+    if (error) throw error;
+    return data;
+  });
+
+export const updateWhatsAppTemplate = createServerFn({ method: "POST" })
+  .inputValidator(z.object({
+    id: z.string(),
+    content_template: z.string()
+  }))
+  .handler(async ({ data }) => {
+    const { error } = await supabase
+      .from('whatsapp_templates')
+      .update({ content_template: data.content_template })
+      .eq('id', data.id);
+    if (error) throw error;
+    return { success: true };
+  });
+
 
 export const testWhatsAppConnection = createServerFn({ method: "POST" })
   .inputValidator((data) => z.object({ 
