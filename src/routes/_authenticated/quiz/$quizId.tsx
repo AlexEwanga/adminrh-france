@@ -27,6 +27,7 @@ function QuizTakePage() {
   const [finished, setFinished] = useState(false)
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [showNextButton, setShowNextButton] = useState(false)
   const [shuffledQuestions, setShuffledQuestions] = useState<any[]>([])
 
   const questions = (quiz?.questions as any[]) || []
@@ -190,6 +191,17 @@ function QuizTakePage() {
           })}
         </div>
       </div>
+      
+      {showNextButton && (
+        <div className="mt-8 flex justify-end">
+          <Button 
+            onClick={handleNext}
+            className="bg-[#8C7CF0] hover:bg-[#7a6ae0] text-white rounded-2xl py-6 px-8 font-bold shadow-lg transition-all active:scale-95"
+          >
+            {currentIdx + 1 < shuffledQuestions.length ? "Question suivante" : "Voir les résultats"}
+          </Button>
+        </div>
+      )}
       
       {isSubmitting && (
         <div className="mt-8 text-center text-slate-400 font-medium animate-pulse">
