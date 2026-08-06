@@ -179,7 +179,7 @@ function AuthenticatedLayout() {
                   </Avatar>
                   <div className="text-left hidden lg:block">
                     <p className="text-sm font-bold text-[#2D3142]">Profil RH</p>
-                    <p className="text-[10px] text-slate-400 font-medium">En formation</p>
+                    <p className="text-[10px] text-slate-400 font-medium">0 pts</p>
                   </div>
                   <MoreVertical size={14} className="text-slate-400 ml-0 sm:ml-2 hidden sm:block" />
                 </div>
