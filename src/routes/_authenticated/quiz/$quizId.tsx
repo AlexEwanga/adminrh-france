@@ -49,12 +49,16 @@ function QuizTakePage() {
   const handleSelect = async (idx: number) => {
     setSelectedIdx(idx)
     
-    const isCorrect = idx === currentQuestion.correct_index
+    const correctIndex = currentQuestion.correct_index ?? 
+      currentQuestion.options.findIndex((opt: string) => opt === currentQuestion.correctAnswer);
+      
+    const isCorrect = idx === correctIndex;
     if (isCorrect) {
       setScore(s => s + 1)
       toast.success("Bonne réponse !", { duration: 2000 })
     } else {
-      toast.error(`Mauvaise réponse. La bonne réponse était : ${currentQuestion.options[currentQuestion.correct_index]}`, { duration: 3000 })
+      const correctText = currentQuestion.options[correctIndex] || currentQuestion.correctAnswer;
+      toast.error(`Mauvaise réponse. La bonne réponse était : ${correctText}`, { duration: 3000 })
     }
 
     setShowNextButton(true)
@@ -163,7 +167,9 @@ function QuizTakePage() {
         <div className="grid grid-cols-1 gap-4">
           {currentQuestion.options.map((opt: string, i: number) => {
             const isSelected = selectedIdx === i
-            const isCorrect = i === currentQuestion.correct_index
+            const correctIndex = currentQuestion.correct_index ?? 
+              currentQuestion.options.findIndex((opt: string) => opt === currentQuestion.correctAnswer);
+            const isCorrect = i === correctIndex;
             
             let btnClass = "justify-start text-left h-auto py-6 px-8 rounded-[24px] text-lg font-medium transition-all duration-300 border-2 "
             
