@@ -79,7 +79,7 @@ function AuthenticatedLayout() {
             alt="Zenith Seal" 
             className="w-12 h-12 object-contain"
           />
-          <h2 className="text-xl font-bold tracking-tight text-[#2D3142]">Zenith</h2>
+          <h2 className="text-xl font-bold tracking-tight text-[#2D3142]">AdminRH-France</h2>
         </div>
         
         <nav className="flex-1 px-4 space-y-1">
@@ -121,7 +121,7 @@ function AuthenticatedLayout() {
                     alt="Zenith Seal" 
                     className="w-10 h-10 object-contain"
                   />
-                  <SheetTitle className="text-xl font-bold tracking-tight text-[#2D3142]">Zenith</SheetTitle>
+                  <SheetTitle className="text-xl font-bold tracking-tight text-[#2D3142]">AdminRH-France</SheetTitle>
                 </SheetHeader>
                 
                 <nav className="flex-1 px-4 space-y-1 mt-6">
