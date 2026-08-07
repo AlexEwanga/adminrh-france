@@ -57,7 +57,7 @@ function Learning() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-extrabold text-[#1E2A4A] tracking-tight">Base de connaissances</h1>
-          <p className="text-slate-400 mt-1 font-medium">Explorez plus de 1000 dossiers juridiques et leçons Zenith.</p>
+          <p className="text-slate-400 mt-1 font-medium">Explorez plus de 1000 dossiers juridiques et leçons AdminRH-France.</p>
 
         </div>
         <div className="flex items-center gap-2">

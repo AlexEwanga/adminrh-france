@@ -79,10 +79,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Zenith | Prompt Ultime" },
+      { title: "AdminRH-France | Zenith" },
       { name: "description", content: "Assistant d'apprentissage pour les professionnels RH s'installant en France." },
-      { name: "author", content: "Zenith" },
-      { property: "og:title", content: "Zenith - Votre Assistant RH" },
+      { name: "author", content: "AdminRH-France" },
+      { property: "og:title", content: "AdminRH-France - Votre Assistant RH" },
       { property: "og:description", content: "Apprenez le droit du travail, la culture et la géographie française via WhatsApp." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
