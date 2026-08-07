@@ -118,7 +118,7 @@ function AuthenticatedLayout() {
               <SheetContent side="left" className="p-0 w-72 bg-white border-r-0">
                 <SheetHeader className="p-8 pb-4 flex flex-row items-center gap-3 text-left border-b border-slate-50">
                   <img 
-                    src="/branding/sceau_zenith_hd.png" 
+                    src={zenithLogo.url} 
                     alt="Zenith Seal" 
                     className="w-10 h-10 object-contain"
                   />
