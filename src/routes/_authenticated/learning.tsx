@@ -39,7 +39,7 @@ function Learning() {
       setSearchQuery(e.detail || '')
     }
     window.addEventListener('global-search-change', handleSearch)
-    const initialSearch = localStorage.getItem('adminrh-global-search')
+    const initialSearch = localStorage.getItem('zenith-global-search')
     if (initialSearch) setSearchQuery(initialSearch)
     return () => window.removeEventListener('global-search-change', handleSearch)
   }, [])
@@ -72,7 +72,7 @@ function Learning() {
                 setSearchQuery(val)
                 // Also update global search to keep header in sync
                 window.dispatchEvent(new CustomEvent('global-search-change', { detail: val }))
-                localStorage.setItem('adminrh-global-search', val)
+                localStorage.setItem('zenith-global-search', val)
               }}
             />
           </div>

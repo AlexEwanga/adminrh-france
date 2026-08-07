@@ -59,7 +59,7 @@ function AuthenticatedLayout() {
 
   // Use localStorage to share search value between layout and dashboard
   useEffect(() => {
-    localStorage.setItem('adminrh-global-search', globalSearch)
+    localStorage.setItem('zenith-global-search', globalSearch)
     // Dispatch custom event to notify listeners
     window.dispatchEvent(new CustomEvent('global-search-change', { detail: globalSearch }))
   }, [globalSearch])
@@ -189,7 +189,7 @@ function AuthenticatedLayout() {
 
                   <div className="text-left hidden lg:block">
                     <p className="text-sm font-bold text-[#2D3142]">Alex Ewanga</p>
-                    <p className="text-[10px] text-slate-400 font-medium">0 pts</p>
+                    <p className="text-[10px] text-slate-400 font-medium">Expert RH</p>
                   </div>
                   <MoreVertical size={14} className="text-slate-400 ml-0 sm:ml-2 hidden sm:block" />
                 </div>
