@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useQuery } from '@tanstack/react-query'
+import { useSuspenseQuery } from '@tanstack/react-query'
 import { getLearningStats } from '@/lib/learning.functions'
 import { QUIZ_GROUPS } from '@/lib/quiz-themes'
 import { Card, CardContent } from '@/components/ui/card'
@@ -14,7 +14,7 @@ export const Route = createFileRoute('/_authenticated/quiz/')({
 function QuizSelectionPage() {
   const quizzes = QUIZ_GROUPS
 
-  const { data: stats } = useQuery({
+  const { data: stats } = useSuspenseQuery({
     queryKey: ['learning-stats'],
     queryFn: () => getLearningStats()
   })

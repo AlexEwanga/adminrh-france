@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useQuery } from '@tanstack/react-query'
+import { useSuspenseQuery } from '@tanstack/react-query'
 import { getRecentMessages } from '@/lib/learning.functions'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -28,7 +28,7 @@ function Learning() {
   const [selectedLesson, setSelectedLesson] = useState<any>(null)
 
 
-  const { data: messagesData } = useQuery({
+  const { data: messagesData } = useSuspenseQuery({
     queryKey: ['recent-messages'],
     queryFn: () => getRecentMessages()
   })
@@ -39,7 +39,7 @@ function Learning() {
       setSearchQuery(e.detail || '')
     }
     window.addEventListener('global-search-change', handleSearch)
-    const initialSearch = localStorage.getItem('zenith-global-search')
+    const initialSearch = localStorage.getItem('adminrh-global-search')
     if (initialSearch) setSearchQuery(initialSearch)
     return () => window.removeEventListener('global-search-change', handleSearch)
   }, [])
@@ -72,7 +72,7 @@ function Learning() {
                 setSearchQuery(val)
                 // Also update global search to keep header in sync
                 window.dispatchEvent(new CustomEvent('global-search-change', { detail: val }))
-                localStorage.setItem('zenith-global-search', val)
+                localStorage.setItem('adminrh-global-search', val)
               }}
             />
           </div>

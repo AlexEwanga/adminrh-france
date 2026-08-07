@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { toast } from 'sonner'
-import zenithLogo from "@/assets/zenith_hd.png.asset.json"
 
 export const Route = createFileRoute('/auth')({
   component: AuthPage,
@@ -35,12 +34,10 @@ function AuthPage() {
     <div className="min-h-screen flex items-center justify-center bg-[#F0F2F5] p-6 font-sans">
       <Card className="w-full max-w-md bg-white rounded-[32px] shadow-sm border border-white/50 p-4">
         <CardHeader className="text-center pb-2">
-          <img 
-            src={zenithLogo.url} 
-            alt="Zenith Seal" 
-            className="mx-auto w-16 h-16 object-contain mb-4"
-          />
-          <CardTitle className="text-3xl font-bold text-[#2D3142] tracking-tight">Zenith</CardTitle>
+          <div className="mx-auto w-12 h-12 bg-[#2D3142] rounded-2xl flex items-center justify-center text-white font-bold italic mb-4">
+            AR
+          </div>
+          <CardTitle className="text-3xl font-bold text-[#2D3142] tracking-tight">AdminRH</CardTitle>
           <CardDescription className="text-slate-400 font-medium mt-1">
             Votre assistant d'apprentissage RH en France
           </CardDescription>
@@ -78,7 +75,7 @@ function AuthPage() {
           
           <div className="mt-8 pt-6 border-t border-slate-50 text-center">
             <p className="text-xs text-slate-400 font-medium">
-              Plateforme sécurisée • Zenith 2026
+              Plateforme sécurisée • AdminRH-France 2026
             </p>
           </div>
         </CardContent>

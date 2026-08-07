@@ -79,7 +79,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "AdminRH-France | Zenith" },
+      { title: "AdminRH-France | Prompt Ultime" },
       { name: "description", content: "Assistant d'apprentissage pour les professionnels RH s'installant en France." },
       { name: "author", content: "AdminRH-France" },
       { property: "og:title", content: "AdminRH-France - Votre Assistant RH" },

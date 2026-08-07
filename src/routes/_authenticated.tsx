@@ -20,7 +20,6 @@ import {
 import { Toaster } from 'sonner'
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useState, useEffect } from 'react'
-import zenithLogo from "@/assets/zenith_hd.png.asset.json"
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { 
   DropdownMenu, 
@@ -60,7 +59,7 @@ function AuthenticatedLayout() {
 
   // Use localStorage to share search value between layout and dashboard
   useEffect(() => {
-    localStorage.setItem('zenith-global-search', globalSearch)
+    localStorage.setItem('adminrh-global-search', globalSearch)
     // Dispatch custom event to notify listeners
     window.dispatchEvent(new CustomEvent('global-search-change', { detail: globalSearch }))
   }, [globalSearch])
@@ -75,12 +74,10 @@ function AuthenticatedLayout() {
       {/* Sidebar - Hidden on mobile */}
       <aside className="w-64 bg-white rounded-3xl shadow-sm hidden md:flex flex-col overflow-hidden border border-white/50">
         <div className="p-8 flex items-center gap-3">
-          <img 
-            src={zenithLogo.url} 
-            alt="Zenith Seal" 
-            className="w-12 h-12 object-contain"
-          />
-          <h2 className="text-xl font-bold tracking-tight text-[#2D3142]">AdminRH-France</h2>
+          <div className="w-10 h-10 bg-[#2D3142] rounded-xl flex items-center justify-center text-white font-bold italic">
+            AR
+          </div>
+          <h2 className="text-xl font-bold tracking-tight text-[#2D3142]">AdminRH</h2>
         </div>
         
         <nav className="flex-1 px-4 space-y-1">
@@ -117,12 +114,10 @@ function AuthenticatedLayout() {
               </SheetTrigger>
               <SheetContent side="left" className="p-0 w-72 bg-white border-r-0">
                 <SheetHeader className="p-8 pb-4 flex flex-row items-center gap-3 text-left border-b border-slate-50">
-                  <img 
-                    src={zenithLogo.url} 
-                    alt="Zenith Seal" 
-                    className="w-10 h-10 object-contain"
-                  />
-                  <SheetTitle className="text-xl font-bold tracking-tight text-[#2D3142]">AdminRH-France</SheetTitle>
+                  <div className="w-10 h-10 bg-[#2D3142] rounded-xl flex items-center justify-center text-white font-bold italic">
+                    AR
+                  </div>
+                  <SheetTitle className="text-xl font-bold tracking-tight text-[#2D3142]">AdminRH</SheetTitle>
                 </SheetHeader>
                 
                 <nav className="flex-1 px-4 space-y-1 mt-6">
@@ -190,7 +185,7 @@ function AuthenticatedLayout() {
 
                   <div className="text-left hidden lg:block">
                     <p className="text-sm font-bold text-[#2D3142]">Alex Ewanga</p>
-                    <p className="text-[10px] text-slate-400 font-medium">Expert RH</p>
+                    <p className="text-[10px] text-slate-400 font-medium">0 pts</p>
                   </div>
                   <MoreVertical size={14} className="text-slate-400 ml-0 sm:ml-2 hidden sm:block" />
                 </div>

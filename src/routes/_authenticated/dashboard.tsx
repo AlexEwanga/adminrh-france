@@ -190,7 +190,7 @@ function Dashboard() {
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
             <p className="text-[#D4AF37] font-bold text-xs uppercase tracking-widest mb-2">{todayLabel}</p>
-            <h1 className="text-3xl font-extrabold tracking-tight">Bonjour Alex, prêt à progresser ?</h1>
+            <h1 className="text-3xl font-extrabold tracking-tight">Bonjour, prêt à progresser ?</h1>
             <p className="text-slate-300 mt-2 font-medium text-sm">
               {sentToday}/5 leçons WhatsApp reçues aujourd'hui — {summary?.totalLessons || 0} dossiers disponibles dans votre base.
             </p>
