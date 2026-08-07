@@ -34,10 +34,12 @@ function AuthPage() {
     <div className="min-h-screen flex items-center justify-center bg-[#F0F2F5] p-6 font-sans">
       <Card className="w-full max-w-md bg-white rounded-[32px] shadow-sm border border-white/50 p-4">
         <CardHeader className="text-center pb-2">
-          <div className="mx-auto w-12 h-12 bg-[#2D3142] rounded-2xl flex items-center justify-center text-white font-bold italic mb-4">
-            AR
-          </div>
-          <CardTitle className="text-3xl font-bold text-[#2D3142] tracking-tight">AdminRH</CardTitle>
+          <img 
+            src="/branding/sceau_zenith_hd.png" 
+            alt="Zenith Seal" 
+            className="mx-auto w-16 h-16 object-contain mb-4"
+          />
+          <CardTitle className="text-3xl font-bold text-[#2D3142] tracking-tight">Zenith</CardTitle>
           <CardDescription className="text-slate-400 font-medium mt-1">
             Votre assistant d'apprentissage RH en France
           </CardDescription>
