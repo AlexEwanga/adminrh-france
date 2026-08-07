@@ -74,10 +74,12 @@ function AuthenticatedLayout() {
       {/* Sidebar - Hidden on mobile */}
       <aside className="w-64 bg-white rounded-3xl shadow-sm hidden md:flex flex-col overflow-hidden border border-white/50">
         <div className="p-8 flex items-center gap-3">
-          <div className="w-10 h-10 bg-[#2D3142] rounded-xl flex items-center justify-center text-white font-bold italic">
-            AR
-          </div>
-          <h2 className="text-xl font-bold tracking-tight text-[#2D3142]">AdminRH</h2>
+          <img 
+            src="/branding/sceau_zenith_hd.png" 
+            alt="Zenith Seal" 
+            className="w-12 h-12 object-contain"
+          />
+          <h2 className="text-xl font-bold tracking-tight text-[#2D3142]">Zenith</h2>
         </div>
         
         <nav className="flex-1 px-4 space-y-1">
@@ -114,10 +116,12 @@ function AuthenticatedLayout() {
               </SheetTrigger>
               <SheetContent side="left" className="p-0 w-72 bg-white border-r-0">
                 <SheetHeader className="p-8 pb-4 flex flex-row items-center gap-3 text-left border-b border-slate-50">
-                  <div className="w-10 h-10 bg-[#2D3142] rounded-xl flex items-center justify-center text-white font-bold italic">
-                    AR
-                  </div>
-                  <SheetTitle className="text-xl font-bold tracking-tight text-[#2D3142]">AdminRH</SheetTitle>
+                  <img 
+                    src="/branding/sceau_zenith_hd.png" 
+                    alt="Zenith Seal" 
+                    className="w-10 h-10 object-contain"
+                  />
+                  <SheetTitle className="text-xl font-bold tracking-tight text-[#2D3142]">Zenith</SheetTitle>
                 </SheetHeader>
                 
                 <nav className="flex-1 px-4 space-y-1 mt-6">

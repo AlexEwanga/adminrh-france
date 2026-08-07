@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useSuspenseQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { getQuizById, submitQuizResult } from '@/lib/learning.functions'
 import { useState, useEffect } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
@@ -18,7 +18,7 @@ function QuizTakePage() {
   const navigate = useNavigate()
   const submitResult = useServerFn(submitQuizResult)
   
-  const { data: quiz } = useSuspenseQuery({
+  const { data: quiz } = useQuery({
     queryKey: ['quiz', quizId],
     queryFn: () => getQuizById({ data: { id: quizId } })
   })

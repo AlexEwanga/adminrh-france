@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, AreaChart, Area } from 'recharts'
 import { useState, useMemo } from 'react'
-import { useSuspenseQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { getProgressionData, getLearningStats, getRecentLogs, getWhatsAppStats } from '@/lib/learning.functions'
 import { 
   Table, 
@@ -40,17 +40,17 @@ function ProgressionPage() {
   const [dateFilter, setDateFilter] = useState('')
   const pageSize = 5
 
-  const { data: progressionData } = useSuspenseQuery({
+  const { data: progressionData } = useQuery({
     queryKey: ['progression-data'],
     queryFn: () => getProgressionData()
   })
 
-  const { data: stats } = useSuspenseQuery({
+  const { data: stats } = useQuery({
     queryKey: ['learning-stats'],
     queryFn: () => getLearningStats()
   })
 
-  const { data: logsData } = useSuspenseQuery({
+  const { data: logsData } = useQuery({
     queryKey: ['whatsapp-logs', page, search, dateFilter],
     queryFn: () => getRecentLogs({ 
       data: { 
@@ -63,7 +63,7 @@ function ProgressionPage() {
     })
   })
   
-  const { data: whatsappStats } = useSuspenseQuery({
+  const { data: whatsappStats } = useQuery({
     queryKey: ['whatsapp-stats'],
     queryFn: () => getWhatsAppStats()
   })
@@ -169,12 +169,12 @@ function ProgressionPage() {
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-[#2D3142] text-xl font-bold">Activité WhatsApp (7 jours)</CardTitle>
               <Badge variant="outline" className="rounded-lg border-slate-200 text-slate-500 font-bold">
-                {whatsappStats?.reduce((acc: number, curr: any) => acc + curr.total, 0)} messages
+                {whatsappStats?.reduce((acc: number, curr: any) => acc + (curr.total || 0), 0) || 0} messages
               </Badge>
             </CardHeader>
             <CardContent className="h-[250px] p-6 pt-0">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={whatsappStats}>
+                <AreaChart data={whatsappStats || []}>
                   <defs>
                     <linearGradient id="colorSuccess" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="#10b981" stopOpacity={0.1}/>
@@ -232,7 +232,9 @@ function ProgressionPage() {
               <div>
                 <p className="text-white/70 text-sm font-bold uppercase tracking-wider mb-1">Taux de délivrabilité</p>
                 <h3 className="text-4xl font-black">
-                  {Math.round((whatsappStats?.reduce((acc: number, curr: any) => acc + curr.success, 0) / (whatsappStats?.reduce((acc: number, curr: any) => acc + curr.total, 0) || 1)) * 100)}%
+                  {whatsappStats 
+                    ? Math.round((whatsappStats.reduce((acc: number, curr: any) => acc + (curr.success || 0), 0) / (whatsappStats.reduce((acc: number, curr: any) => acc + (curr.total || 0), 0) || 1)) * 100)
+                    : 0}%
                 </h3>
               </div>
               <div className="mt-4 flex items-center gap-2 text-white/80 text-xs font-bold bg-white/10 p-2 rounded-xl">
@@ -245,7 +247,7 @@ function ProgressionPage() {
               <div>
                 <p className="text-slate-400 text-sm font-bold uppercase tracking-wider mb-1">Moyenne quotidienne</p>
                 <h3 className="text-3xl font-black text-[#2D3142]">
-                  {(whatsappStats?.reduce((acc: number, curr: any) => acc + curr.total, 0) / 7).toFixed(1)}
+                  {((whatsappStats?.reduce((acc: number, curr: any) => acc + (curr.total || 0), 0) || 0) / 7).toFixed(1)}
                 </h3>
               </div>
               <p className="text-slate-400 text-xs font-medium mt-2">Leçons par jour sur la semaine</p>
