@@ -16,7 +16,7 @@ import {
   User,
   Settings as SettingsIcon,
   LogOut as LogOutIcon
-} from 'lucide-center'
+} from 'lucide-react'
 import { Toaster } from 'sonner'
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useState, useEffect } from 'react'
