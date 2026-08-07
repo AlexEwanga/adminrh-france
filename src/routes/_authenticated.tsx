@@ -20,6 +20,7 @@ import {
 import { Toaster } from 'sonner'
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useState, useEffect } from 'react'
+import zenithLogo from "@/assets/zenith_hd.png.asset.json"
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { 
   DropdownMenu, 
@@ -75,7 +76,7 @@ function AuthenticatedLayout() {
       <aside className="w-64 bg-white rounded-3xl shadow-sm hidden md:flex flex-col overflow-hidden border border-white/50">
         <div className="p-8 flex items-center gap-3">
           <img 
-            src="/branding/sceau_zenith_hd.png" 
+            src={zenithLogo.url} 
             alt="Zenith Seal" 
             className="w-12 h-12 object-contain"
           />
@@ -117,7 +118,7 @@ function AuthenticatedLayout() {
               <SheetContent side="left" className="p-0 w-72 bg-white border-r-0">
                 <SheetHeader className="p-8 pb-4 flex flex-row items-center gap-3 text-left border-b border-slate-50">
                   <img 
-                    src="/branding/sceau_zenith_hd.png" 
+                    src={zenithLogo.url} 
                     alt="Zenith Seal" 
                     className="w-10 h-10 object-contain"
                   />

@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { toast } from 'sonner'
+import zenithLogo from "@/assets/zenith_hd.png.asset.json"
 
 export const Route = createFileRoute('/auth')({
   component: AuthPage,
@@ -35,7 +36,7 @@ function AuthPage() {
       <Card className="w-full max-w-md bg-white rounded-[32px] shadow-sm border border-white/50 p-4">
         <CardHeader className="text-center pb-2">
           <img 
-            src="/branding/sceau_zenith_hd.png" 
+            src={zenithLogo.url} 
             alt="Zenith Seal" 
             className="mx-auto w-16 h-16 object-contain mb-4"
           />
