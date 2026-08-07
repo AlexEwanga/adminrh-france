@@ -77,7 +77,7 @@ function AuthPage() {
           
           <div className="mt-8 pt-6 border-t border-slate-50 text-center">
             <p className="text-xs text-slate-400 font-medium">
-              Plateforme sécurisée • AdminRH-France 2026
+              Plateforme sécurisée • Zenith 2026
             </p>
           </div>
         </CardContent>
