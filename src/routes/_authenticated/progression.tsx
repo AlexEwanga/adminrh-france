@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, AreaChart, Area } from 'recharts'
 import { useState, useMemo } from 'react'
-import { useSuspenseQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { getProgressionData, getLearningStats, getRecentLogs, getWhatsAppStats } from '@/lib/learning.functions'
 import { 
   Table, 
@@ -40,7 +40,7 @@ function ProgressionPage() {
   const [dateFilter, setDateFilter] = useState('')
   const pageSize = 5
 
-  const { data: progressionData } = useSuspenseQuery({
+  const { data: progressionData } = useQuery({
     queryKey: ['progression-data'],
     queryFn: () => getProgressionData()
   })
