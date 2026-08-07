@@ -232,7 +232,9 @@ function ProgressionPage() {
               <div>
                 <p className="text-white/70 text-sm font-bold uppercase tracking-wider mb-1">Taux de délivrabilité</p>
                 <h3 className="text-4xl font-black">
-                  {Math.round((whatsappStats?.reduce((acc: number, curr: any) => acc + (curr.success || 0), 0) / (whatsappStats?.reduce((acc: number, curr: any) => acc + (curr.total || 0), 0) || 1)) * 100)}%
+                  {whatsappStats 
+                    ? Math.round((whatsappStats.reduce((acc: number, curr: any) => acc + (curr.success || 0), 0) / (whatsappStats.reduce((acc: number, curr: any) => acc + (curr.total || 0), 0) || 1)) * 100)
+                    : 0}%
                 </h3>
               </div>
               <div className="mt-4 flex items-center gap-2 text-white/80 text-xs font-bold bg-white/10 p-2 rounded-xl">
