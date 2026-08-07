@@ -79,7 +79,7 @@ export const Route = createFileRoute('/api/public/hooks/send-lessons')({
             .eq('is_default', true)
             .single();
 
-          const contentTpl = template?.content_template || "*{{subject}}*\n\n{{content}}\n\n📌 *Cas pratique :*\n{{casus}}\n\n⚖️ *Référence légale :*\n{{reference}}\n\n📖 *Article (partie législative) :*\n{{article}}\n\n✅ *Bonne pratique RH :*\n{{best_practice}}\n\n_AdminRH-France_";
+          const contentTpl = template?.content_template || "*{{subject}}*\n\n{{content}}\n\n📌 *Cas pratique :*\n{{casus}}\n\n⚖️ *Référence légale :*\n{{reference}}\n\n📖 *Article (partie législative) :*\n{{article}}\n\n✅ *Bonne pratique RH :*\n{{best_practice}}\n\n_Zenith_";
           const targetPhone = "+243821355337"; 
           
           let currentIndex = schedule?.message_index || 0;

@@ -39,7 +39,7 @@ function Learning() {
       setSearchQuery(e.detail || '')
     }
     window.addEventListener('global-search-change', handleSearch)
-    const initialSearch = localStorage.getItem('adminrh-global-search')
+    const initialSearch = localStorage.getItem('zenith-global-search')
     if (initialSearch) setSearchQuery(initialSearch)
     return () => window.removeEventListener('global-search-change', handleSearch)
   }, [])
@@ -57,7 +57,7 @@ function Learning() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-extrabold text-[#1E2A4A] tracking-tight">Base de connaissances</h1>
-          <p className="text-slate-400 mt-1 font-medium">Explorez plus de 1000 dossiers juridiques et leçons AdminRH-France.</p>
+          <p className="text-slate-400 mt-1 font-medium">Explorez plus de 1000 dossiers juridiques et leçons Zenith.</p>
 
         </div>
         <div className="flex items-center gap-2">
@@ -72,7 +72,7 @@ function Learning() {
                 setSearchQuery(val)
                 // Also update global search to keep header in sync
                 window.dispatchEvent(new CustomEvent('global-search-change', { detail: val }))
-                localStorage.setItem('adminrh-global-search', val)
+                localStorage.setItem('zenith-global-search', val)
               }}
             />
           </div>

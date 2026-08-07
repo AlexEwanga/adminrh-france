@@ -152,7 +152,7 @@ export const resendDailyMessages = createServerFn({ method: "POST" })
   .handler(async () => {
     // On appelle le hook interne de manière sécurisée
     const baseUrl = process.env['NODE_ENV'] === 'production' 
-      ? `https://adminrh-france.lovable.app`
+      ? `https://adminrh.lovable.app`
       : 'http://localhost:8080';
       
     // Pour forcer le renvoi sans attendre le CRON, on peut appeler l'API
@@ -183,7 +183,7 @@ export const testWhatsAppConnection = createServerFn({ method: "POST" })
     }
     
     try {
-      return await sendWhatsAppMessage(data.phone, "AdminRH-France : Votre configuration est maintenant opérationnelle ! ✅");
+      return await sendWhatsAppMessage(data.phone, "Zenith : Votre configuration est maintenant opérationnelle ! ✅");
     } catch (error: any) {
       return { success: false, error: error.message };
     }

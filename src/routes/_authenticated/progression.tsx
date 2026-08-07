@@ -92,7 +92,7 @@ function ProgressionPage() {
     <div className="bg-white rounded-[32px] p-6 md:p-8 shadow-sm border border-white/50 flex flex-col gap-8 min-h-[calc(100vh-140px)]">
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-[#2D3142]">Ma Progression RH</h1>
+          <h1 className="text-3xl font-bold text-[#2D3142]">Ma Progression Zenith</h1>
           <p className="text-slate-400 mt-1">Visualisez votre maîtrise de l'écosystème RH français.</p>
         </div>
         <div className="flex gap-1 bg-slate-50 p-1 rounded-xl border border-slate-100">
