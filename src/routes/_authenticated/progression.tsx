@@ -245,7 +245,7 @@ function ProgressionPage() {
               <div>
                 <p className="text-slate-400 text-sm font-bold uppercase tracking-wider mb-1">Moyenne quotidienne</p>
                 <h3 className="text-3xl font-black text-[#2D3142]">
-                  ((whatsappStats?.reduce((acc: number, curr: any) => acc + (curr.total || 0), 0) || 0) / 7).toFixed(1)}
+                  {((whatsappStats?.reduce((acc: number, curr: any) => acc + (curr.total || 0), 0) || 0) / 7).toFixed(1)}
                 </h3>
               </div>
               <p className="text-slate-400 text-xs font-medium mt-2">Leçons par jour sur la semaine</p>
