@@ -45,12 +45,12 @@ function ProgressionPage() {
     queryFn: () => getProgressionData()
   })
 
-  const { data: stats } = useSuspenseQuery({
+  const { data: stats } = useQuery({
     queryKey: ['learning-stats'],
     queryFn: () => getLearningStats()
   })
 
-  const { data: logsData } = useSuspenseQuery({
+  const { data: logsData } = useQuery({
     queryKey: ['whatsapp-logs', page, search, dateFilter],
     queryFn: () => getRecentLogs({ 
       data: { 
@@ -63,7 +63,7 @@ function ProgressionPage() {
     })
   })
   
-  const { data: whatsappStats } = useSuspenseQuery({
+  const { data: whatsappStats } = useQuery({
     queryKey: ['whatsapp-stats'],
     queryFn: () => getWhatsAppStats()
   })
