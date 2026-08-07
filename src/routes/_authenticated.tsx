@@ -75,7 +75,7 @@ function AuthenticatedLayout() {
       <aside className="w-64 bg-white rounded-3xl shadow-sm hidden md:flex flex-col overflow-hidden border border-white/50">
         <div className="p-8 flex items-center gap-3">
           <img 
-            src="/branding/sceau_zenith_hd.png" 
+            src={(await import("@/assets/zenith_hd.png.asset.json")).default.url} 
             alt="Zenith Seal" 
             className="w-12 h-12 object-contain"
           />
