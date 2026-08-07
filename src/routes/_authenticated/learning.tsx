@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useSuspenseQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { getRecentMessages } from '@/lib/learning.functions'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -28,7 +28,7 @@ function Learning() {
   const [selectedLesson, setSelectedLesson] = useState<any>(null)
 
 
-  const { data: messagesData } = useSuspenseQuery({
+  const { data: messagesData } = useQuery({
     queryKey: ['recent-messages'],
     queryFn: () => getRecentMessages()
   })
