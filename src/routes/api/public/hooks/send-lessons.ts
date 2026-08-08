@@ -129,7 +129,7 @@ export const Route = createFileRoute('/api/public/hooks/send-lessons')({
             success: true, 
             sentCount: sentResults.length,
             sentMessages: sentResults,
-            nextIndex: currentIndex,
+            nextIndex: nextMessageIndex % messages.length,
             totalSentToday: lastSentCount + sentResults.length
           }), {
             headers: { 'Content-Type': 'application/json' }
