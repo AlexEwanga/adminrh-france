@@ -19,7 +19,6 @@ import { Route as AuthenticatedProgressionRouteImport } from './routes/_authenti
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AuthenticatedQuizIndexRouteImport } from './routes/_authenticated/quiz.index'
 import { Route as AuthenticatedQuizQuizIdRouteImport } from './routes/_authenticated/quiz/$quizId'
-import { Route as ApiPublicDebugDbRouteImport } from './routes/api/public/debug-db'
 import { Route as ApiPublicFixMessagesRouteImport } from './routes/api/public/fix-messages'
 import { Route as ApiPublicSeedLessonsRouteImport } from './routes/api/public/seed-lessons'
 import { Route as ApiPublicHooksSendLessonsRouteImport } from './routes/api/public/hooks/send-lessons'
@@ -74,11 +73,6 @@ const AuthenticatedQuizQuizIdRoute = AuthenticatedQuizQuizIdRouteImport.update({
   path: '/quiz/$quizId',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const ApiPublicDebugDbRoute = ApiPublicDebugDbRouteImport.update({
-  id: '/api/public/debug-db',
-  path: '/api/public/debug-db',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiPublicFixMessagesRoute = ApiPublicFixMessagesRouteImport.update({
   id: '/api/public/fix-messages',
   path: '/api/public/fix-messages',
@@ -105,7 +99,6 @@ export interface FileRoutesByFullPath {
   '/progression': typeof AuthenticatedProgressionRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/quiz/$quizId': typeof AuthenticatedQuizQuizIdRoute
-  '/api/public/debug-db': typeof ApiPublicDebugDbRoute
   '/api/public/fix-messages': typeof ApiPublicFixMessagesRoute
   '/api/public/seed-lessons': typeof ApiPublicSeedLessonsRoute
   '/quiz/': typeof AuthenticatedQuizIndexRoute
@@ -120,7 +113,6 @@ export interface FileRoutesByTo {
   '/progression': typeof AuthenticatedProgressionRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/quiz/$quizId': typeof AuthenticatedQuizQuizIdRoute
-  '/api/public/debug-db': typeof ApiPublicDebugDbRoute
   '/api/public/fix-messages': typeof ApiPublicFixMessagesRoute
   '/api/public/seed-lessons': typeof ApiPublicSeedLessonsRoute
   '/quiz': typeof AuthenticatedQuizIndexRoute
@@ -137,7 +129,6 @@ export interface FileRoutesById {
   '/_authenticated/progression': typeof AuthenticatedProgressionRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/_authenticated/quiz/$quizId': typeof AuthenticatedQuizQuizIdRoute
-  '/api/public/debug-db': typeof ApiPublicDebugDbRoute
   '/api/public/fix-messages': typeof ApiPublicFixMessagesRoute
   '/api/public/seed-lessons': typeof ApiPublicSeedLessonsRoute
   '/_authenticated/quiz/': typeof AuthenticatedQuizIndexRoute
@@ -154,7 +145,6 @@ export interface FileRouteTypes {
     | '/progression'
     | '/auth/callback'
     | '/quiz/$quizId'
-    | '/api/public/debug-db'
     | '/api/public/fix-messages'
     | '/api/public/seed-lessons'
     | '/quiz/'
@@ -169,7 +159,6 @@ export interface FileRouteTypes {
     | '/progression'
     | '/auth/callback'
     | '/quiz/$quizId'
-    | '/api/public/debug-db'
     | '/api/public/fix-messages'
     | '/api/public/seed-lessons'
     | '/quiz'
@@ -185,7 +174,6 @@ export interface FileRouteTypes {
     | '/_authenticated/progression'
     | '/auth/callback'
     | '/_authenticated/quiz/$quizId'
-    | '/api/public/debug-db'
     | '/api/public/fix-messages'
     | '/api/public/seed-lessons'
     | '/_authenticated/quiz/'
@@ -196,7 +184,6 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
-  ApiPublicDebugDbRoute: typeof ApiPublicDebugDbRoute
   ApiPublicFixMessagesRoute: typeof ApiPublicFixMessagesRoute
   ApiPublicSeedLessonsRoute: typeof ApiPublicSeedLessonsRoute
   ApiPublicHooksSendLessonsRoute: typeof ApiPublicHooksSendLessonsRoute
@@ -274,13 +261,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedQuizQuizIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/api/public/debug-db': {
-      id: '/api/public/debug-db'
-      path: '/api/public/debug-db'
-      fullPath: '/api/public/debug-db'
-      preLoaderRoute: typeof ApiPublicDebugDbRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/public/fix-messages': {
       id: '/api/public/fix-messages'
       path: '/api/public/fix-messages'
@@ -341,7 +321,6 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
-  ApiPublicDebugDbRoute: ApiPublicDebugDbRoute,
   ApiPublicFixMessagesRoute: ApiPublicFixMessagesRoute,
   ApiPublicSeedLessonsRoute: ApiPublicSeedLessonsRoute,
   ApiPublicHooksSendLessonsRoute: ApiPublicHooksSendLessonsRoute,
