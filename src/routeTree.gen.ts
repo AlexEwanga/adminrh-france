@@ -20,6 +20,7 @@ import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AuthenticatedQuizIndexRouteImport } from './routes/_authenticated/quiz.index'
 import { Route as AuthenticatedQuizQuizIdRouteImport } from './routes/_authenticated/quiz/$quizId'
 import { Route as ApiPublicFixMessagesRouteImport } from './routes/api/public/fix-messages'
+import { Route as ApiPublicForceNextRouteImport } from './routes/api/public/force-next'
 import { Route as ApiPublicSeedLessonsRouteImport } from './routes/api/public/seed-lessons'
 import { Route as ApiPublicHooksSendLessonsRouteImport } from './routes/api/public/hooks/send-lessons'
 
@@ -78,6 +79,11 @@ const ApiPublicFixMessagesRoute = ApiPublicFixMessagesRouteImport.update({
   path: '/api/public/fix-messages',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicForceNextRoute = ApiPublicForceNextRouteImport.update({
+  id: '/api/public/force-next',
+  path: '/api/public/force-next',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicSeedLessonsRoute = ApiPublicSeedLessonsRouteImport.update({
   id: '/api/public/seed-lessons',
   path: '/api/public/seed-lessons',
@@ -100,6 +106,7 @@ export interface FileRoutesByFullPath {
   '/auth/callback': typeof AuthCallbackRoute
   '/quiz/$quizId': typeof AuthenticatedQuizQuizIdRoute
   '/api/public/fix-messages': typeof ApiPublicFixMessagesRoute
+  '/api/public/force-next': typeof ApiPublicForceNextRoute
   '/api/public/seed-lessons': typeof ApiPublicSeedLessonsRoute
   '/quiz/': typeof AuthenticatedQuizIndexRoute
   '/api/public/hooks/send-lessons': typeof ApiPublicHooksSendLessonsRoute
@@ -114,6 +121,7 @@ export interface FileRoutesByTo {
   '/auth/callback': typeof AuthCallbackRoute
   '/quiz/$quizId': typeof AuthenticatedQuizQuizIdRoute
   '/api/public/fix-messages': typeof ApiPublicFixMessagesRoute
+  '/api/public/force-next': typeof ApiPublicForceNextRoute
   '/api/public/seed-lessons': typeof ApiPublicSeedLessonsRoute
   '/quiz': typeof AuthenticatedQuizIndexRoute
   '/api/public/hooks/send-lessons': typeof ApiPublicHooksSendLessonsRoute
@@ -130,6 +138,7 @@ export interface FileRoutesById {
   '/auth/callback': typeof AuthCallbackRoute
   '/_authenticated/quiz/$quizId': typeof AuthenticatedQuizQuizIdRoute
   '/api/public/fix-messages': typeof ApiPublicFixMessagesRoute
+  '/api/public/force-next': typeof ApiPublicForceNextRoute
   '/api/public/seed-lessons': typeof ApiPublicSeedLessonsRoute
   '/_authenticated/quiz/': typeof AuthenticatedQuizIndexRoute
   '/api/public/hooks/send-lessons': typeof ApiPublicHooksSendLessonsRoute
@@ -146,6 +155,7 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/quiz/$quizId'
     | '/api/public/fix-messages'
+    | '/api/public/force-next'
     | '/api/public/seed-lessons'
     | '/quiz/'
     | '/api/public/hooks/send-lessons'
@@ -160,6 +170,7 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/quiz/$quizId'
     | '/api/public/fix-messages'
+    | '/api/public/force-next'
     | '/api/public/seed-lessons'
     | '/quiz'
     | '/api/public/hooks/send-lessons'
@@ -175,6 +186,7 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/_authenticated/quiz/$quizId'
     | '/api/public/fix-messages'
+    | '/api/public/force-next'
     | '/api/public/seed-lessons'
     | '/_authenticated/quiz/'
     | '/api/public/hooks/send-lessons'
@@ -185,6 +197,7 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
   ApiPublicFixMessagesRoute: typeof ApiPublicFixMessagesRoute
+  ApiPublicForceNextRoute: typeof ApiPublicForceNextRoute
   ApiPublicSeedLessonsRoute: typeof ApiPublicSeedLessonsRoute
   ApiPublicHooksSendLessonsRoute: typeof ApiPublicHooksSendLessonsRoute
 }
@@ -268,6 +281,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicFixMessagesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/force-next': {
+      id: '/api/public/force-next'
+      path: '/api/public/force-next'
+      fullPath: '/api/public/force-next'
+      preLoaderRoute: typeof ApiPublicForceNextRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/seed-lessons': {
       id: '/api/public/seed-lessons'
       path: '/api/public/seed-lessons'
@@ -322,6 +342,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
   ApiPublicFixMessagesRoute: ApiPublicFixMessagesRoute,
+  ApiPublicForceNextRoute: ApiPublicForceNextRoute,
   ApiPublicSeedLessonsRoute: ApiPublicSeedLessonsRoute,
   ApiPublicHooksSendLessonsRoute: ApiPublicHooksSendLessonsRoute,
 }
