@@ -82,10 +82,14 @@ export const Route = createFileRoute('/api/public/hooks/send-lessons')({
           const contentTpl = template?.content_template || "*{{subject}}*\n\n{{content}}\n\n📌 *Cas pratique :*\n{{casus}}\n\n⚖️ *Référence légale :*\n{{reference}}\n\n📖 *Article (partie législative) :*\n{{article}}\n\n✅ *Bonne pratique RH :*\n{{best_practice}}\n\n_AdminRH-France_";
           const targetPhone = "+243821355337"; 
           
+          // On récupère l'index actuel
           let currentIndex = schedule?.message_index || 0;
           const sentResults = [];
 
-          // 4. Boucle d'envoi pour rattrapage — un message = une seule leçon complète
+          // Logique de progression : si on a déjà envoyé le message d'aujourd'hui,
+          // et qu'on n'est pas en mode "force", on ne devrait pas être ici.
+          // Mais si on est ici, on veut envoyer la PROCHAINE leçon.
+          
           for (let i = 0; i < toSendCount; i++) {
             const messageToSend = messages[currentIndex % messages.length];
 
@@ -103,16 +107,19 @@ export const Route = createFileRoute('/api/public/hooks/send-lessons')({
               (_m: string, key: string) => vars[key] ?? "",
             );
 
-            
             try {
               await sendWhatsAppMessage(targetPhone, formattedContent, messageToSend.subject);
               sentResults.push(messageToSend.subject);
-              currentIndex = (currentIndex + 1) % messages.length;
+              // CRUCIAL : On incrémente l'index APRÈS chaque envoi réussi
+              currentIndex++;
             } catch (err: any) {
               console.error(`Échec de l'envoi du message ${messageToSend.subject}:`, err.message);
               break;
             }
           }
+
+          // Ajustement final de l'index pour rester dans les bornes (boucle)
+          currentIndex = currentIndex % messages.length;
 
           // 5. Mise à jour du planning
           const { error: upsertError } = await supabase
