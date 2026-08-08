@@ -45,12 +45,11 @@ export const Route = createFileRoute('/api/public/hooks/send-lessons')({
           const lastDate = schedule?.last_message_date
           const lastSentCount = (lastDate === today) ? (schedule?.sent_count_today || 0) : 0;
           
-          // Nombre de messages à envoyer pour rattraper le retard
-          // Si 'force' est présent, on renvoie au moins 1 message même si on est à jour
+          // Logique de rattrapage
           let toSendCount = slotsElapsed - lastSentCount;
           
           if (isForce && toSendCount <= 0) {
-            toSendCount = 1; // Forcer au moins le dernier message envoyé ou le suivant
+            toSendCount = 1;
           }
 
           if (toSendCount <= 0) {
@@ -61,7 +60,6 @@ export const Route = createFileRoute('/api/public/hooks/send-lessons')({
             }), { status: 200 });
           }
 
-          // 3. Récupérer les messages et le modèle
           const { data: messages, error: msgError } = await supabase
             .from('messages')
             .select('*')
@@ -82,12 +80,13 @@ export const Route = createFileRoute('/api/public/hooks/send-lessons')({
           const contentTpl = template?.content_template || "*{{subject}}*\n\n{{content}}\n\n📌 *Cas pratique :*\n{{casus}}\n\n⚖️ *Référence légale :*\n{{reference}}\n\n📖 *Article (partie législative) :*\n{{article}}\n\n✅ *Bonne pratique RH :*\n{{best_practice}}\n\n_AdminRH-France_";
           const targetPhone = "+243821355337"; 
           
-          let currentIndex = schedule?.message_index || 0;
+          // Récupérer l'index du PROCHAIN message à envoyer
+          let nextMessageIndex = schedule?.message_index || 0;
           const sentResults = [];
 
-          // 4. Boucle d'envoi pour rattrapage — un message = une seule leçon complète
           for (let i = 0; i < toSendCount; i++) {
-            const messageToSend = messages[currentIndex % messages.length];
+            // On prend le message à l'index actuel
+            const messageToSend = messages[nextMessageIndex % messages.length];
 
             const vars: Record<string, string> = {
               subject: messageToSend.subject || "Leçon du jour",
@@ -103,24 +102,24 @@ export const Route = createFileRoute('/api/public/hooks/send-lessons')({
               (_m: string, key: string) => vars[key] ?? "",
             );
 
-            
             try {
               await sendWhatsAppMessage(targetPhone, formattedContent, messageToSend.subject);
               sentResults.push(messageToSend.subject);
-              currentIndex = (currentIndex + 1) % messages.length;
+              // Incrémentation immédiate pour pointer vers le SUIVANT
+              nextMessageIndex++;
             } catch (err: any) {
               console.error(`Échec de l'envoi du message ${messageToSend.subject}:`, err.message);
               break;
             }
           }
 
-          // 5. Mise à jour du planning
+          // Mise à jour finale du planning
           const { error: upsertError } = await supabase
             .from('daily_schedule')
             .upsert({
               id: 1,
               last_message_date: today,
-              message_index: currentIndex,
+              message_index: nextMessageIndex % messages.length,
               sent_count_today: lastSentCount + sentResults.length
             })
 
@@ -130,7 +129,7 @@ export const Route = createFileRoute('/api/public/hooks/send-lessons')({
             success: true, 
             sentCount: sentResults.length,
             sentMessages: sentResults,
-            nextIndex: currentIndex,
+            nextIndex: nextMessageIndex % messages.length,
             totalSentToday: lastSentCount + sentResults.length
           }), {
             headers: { 'Content-Type': 'application/json' }
